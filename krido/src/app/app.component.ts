@@ -8,7 +8,4 @@ import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
 })
 export class AppComponent {
   title = 'krido';
-
-  constructor() {
-  }
 }

@@ -5,11 +5,13 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { NgbModule } from "@ng-bootstrap/ng-bootstrap";
 import { ActualMonthComponent } from './actual-month/actual-month.component';
+import { MainMenuComponent } from './general/main-menu/main-menu.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    ActualMonthComponent
+    ActualMonthComponent,
+    MainMenuComponent,
   ],
   imports: [
     BrowserModule,
