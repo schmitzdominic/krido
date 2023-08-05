@@ -4,6 +4,7 @@
   },
   "hosting": [
     {
+      "target": "krido",
       "public": "public",
       "ignore": [
         "firebase.json",
