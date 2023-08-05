@@ -1,5 +1,6 @@
 import {ChangeDetectorRef, Component} from '@angular/core';
 import {MenuTitleService} from "../../behavior/menu-title/menu-title.service";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-main-menu',
@@ -12,6 +13,7 @@ export class MainMenuComponent {
   activeId: number = 1;
 
   constructor(private changeDetectorRef: ChangeDetectorRef,
+              private router: Router,
               private menuTitleService: MenuTitleService) {
   }
 
@@ -30,13 +32,27 @@ export class MainMenuComponent {
     this.menuTitleService.title.subscribe(newTitle => {
       this.title = newTitle;
     });
+    this.menuTitleService.activeId.subscribe(newActiveId => {
+      this.activeId = newActiveId;
+    })
   }
 
-  navigateToHome(): void {
-    console.log(this.activeId);
+  navigateToAccounts(): void {
+    this.router.navigate(['/accounts']).then(r => true);
+  }
+  navigateToActualMonth(): void {
+    this.router.navigate(['/actual-month']).then(r => true);
   }
 
-  navigateToSecond(): void {
-    console.log(this.activeId);
+  navigateToBudgets(): void {
+    this.router.navigate(['/budgets']).then(r => true);
+  }
+
+  navigateToExpenditures(): void {
+    this.router.navigate(['/expenditures']).then(r => true);
+  }
+
+  navigateToRegularly(): void {
+    this.router.navigate(['/regularly']).then(r => true);
   }
 }

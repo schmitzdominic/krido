@@ -7,6 +7,7 @@ import {BehaviorSubject} from "rxjs";
 export class MenuTitleService {
 
   title = new BehaviorSubject('');
+  activeId = new BehaviorSubject(0);
 
   constructor() { }
 
@@ -17,5 +18,14 @@ export class MenuTitleService {
    */
   setTitle(newTitle: string): void {
     this.title.next(newTitle);
+  }
+
+  /**
+   * Set new ActiveId
+   *
+   * @param {number} newActiveId to set
+   */
+  setActiveId(newActiveId: number): void {
+    this.activeId.next(newActiveId);
   }
 }
