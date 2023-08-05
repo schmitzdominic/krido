@@ -1,0 +1,14 @@
+{
+  "projects": {
+    "default": "krido-2d5f7"
+  },
+  "targets": {
+    "krido-2d5f7": {
+      "hosting": {
+        "krido": [
+          "krido-2d5f7"
+        ]
+      }
+    }
+  }
+}
