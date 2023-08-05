@@ -1,4 +1,6 @@
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
+import {DateService} from "../services/date-service/date.service";
+import {MenuTitleService} from "../behavior/menu-title/menu-title.service";
 
 @Component({
   selector: 'app-actual-month',
@@ -6,5 +8,19 @@ import { Component } from '@angular/core';
   styleUrls: ['./actual-month.component.scss']
 })
 export class ActualMonthComponent {
+
+  constructor(private menuTitleService: MenuTitleService,
+              private dateService: DateService) {
+  }
+  ngOnInit(): void {
+    this.setInitialValues();
+  }
+
+  /**
+   * Set initial values.
+   */
+  setInitialValues(): void {
+    this.menuTitleService.setTitle(this.dateService.getActualMonthName() + ' ' + this.dateService.getActualYear());
+  }
 
 }
