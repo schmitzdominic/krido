@@ -15,6 +15,10 @@ import { environment } from '../environments/environment';
 import { provideAnalytics,getAnalytics,ScreenTrackingService,UserTrackingService } from '@angular/fire/analytics';
 import { provideAuth,getAuth } from '@angular/fire/auth';
 import { provideDatabase,getDatabase } from '@angular/fire/database';
+import {AngularFireModule} from "@angular/fire/compat";
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import {MatIconModule} from "@angular/material/icon";
+import {MatButtonModule} from '@angular/material/button';
 
 @NgModule({
   declarations: [
@@ -26,15 +30,19 @@ import { provideDatabase,getDatabase } from '@angular/fire/database';
     ExpendituresComponent,
     RegularlyComponent,
   ],
-  imports: [
-    BrowserModule,
-    NgbModule,
-    AppRoutingModule,
-    provideFirebaseApp(() => initializeApp(environment.firebase)),
-    provideAnalytics(() => getAnalytics()),
-    provideAuth(() => getAuth()),
-    provideDatabase(() => getDatabase())
-  ],
+    imports: [
+        BrowserModule,
+        AngularFireModule.initializeApp(environment.firebase),
+        NgbModule,
+        AppRoutingModule,
+        provideFirebaseApp(() => initializeApp(environment.firebase)),
+        provideAnalytics(() => getAnalytics()),
+        provideAuth(() => getAuth()),
+        provideDatabase(() => getDatabase()),
+        BrowserAnimationsModule,
+        MatIconModule,
+        MatButtonModule
+    ],
   providers: [
     ScreenTrackingService,UserTrackingService
   ],

@@ -1,9 +1,9 @@
-<nav class="navbar fixed-bottom navbar-expand-lg bg-body-tertiary">
+<nav class="navbar sticky-top navbar-expand-lg bg-body-tertiary">
   <div class="container-fluid">
-    <a class="navbar-brand" href="#">{{ title }}</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
+    <div class="me-2">
+      <button type="button" class="btn top-50" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><i class="bi bi-list"></i></button>
+    </div>
+    <a class="navbar-brand ps-2">{{ title }}</a>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul ngbNav [(activeId)]="activeId" class="navbar-nav me-auto mb-2 mt-4 mb-lg-0">
         <li [ngbNavItem]="1">
@@ -45,4 +45,6 @@
     </div>
   </div>
 </nav>
-<router-outlet></router-outlet>
+<div class="p-3">
+  <router-outlet></router-outlet>
+</div>

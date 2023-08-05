@@ -1,1 +1,11 @@
-<p>actual-month works!</p>
+<div class="position-fixed end-0 bottom-0 me-4 mb-4">
+  <button type="button" class="btn btn-primary" (click)="addListOfEntries()"><i class="bi bi-plus-lg"></i></button>
+</div>
+
+<table class="table table-striped">
+  <tbody>
+  <tr *ngFor="let entry of entries">
+    <td (click)="test()">{{ entry.name }}</td>
+  </tr>
+  </tbody>
+</table>
