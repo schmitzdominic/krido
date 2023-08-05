@@ -38,21 +38,21 @@ export class MainMenuComponent {
   }
 
   navigateToAccounts(): void {
-    this.router.navigate(['/accounts']).then(r => true);
+    this.router.navigate(['/accounts']);
   }
   navigateToActualMonth(): void {
-    this.router.navigate(['/actual-month']).then(r => true);
+    this.router.navigate(['/actual-month']);
   }
 
   navigateToBudgets(): void {
-    this.router.navigate(['/budgets']).then(r => true);
+    this.router.navigate(['/budgets']);
   }
 
   navigateToExpenditures(): void {
-    this.router.navigate(['/expenditures']).then(r => true);
+    this.router.navigate(['/expenditures']);
   }
 
   navigateToRegularly(): void {
-    this.router.navigate(['/regularly']).then(r => true);
+    this.router.navigate(['/regularly']);
   }
 }
