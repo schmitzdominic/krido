@@ -1,0 +1,29 @@
+<div class="d-flex align-items-center vh-100">
+  <div class="container">
+    <h1 class="d-flex justify-content-center pb-5 display-1" style="font-size: 50px">Login</h1>
+    <form class="needs-validation" [formGroup]="loginFormGroup" (ngSubmit)="onSubmit()" novalidate>
+      <div class="col-md-12 mb-3">
+        <label for="validationCustomUsername" class="form-label">E-Mail</label>
+        <div class="input-group has-validation">
+          <span class="input-group-text" id="inputGroupPrepend">@</span>
+          <input formControlName="email" type="text" class="form-control" id="validationCustomUsername" aria-describedby="inputGroupPrepend" required>
+          <div class="invalid-feedback">
+            E-Mail fehlt!
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 mb-3">
+        <label for="exampleInputPassword1" class="form-label">Password</label>
+        <input formControlName="password" type="password" class="form-control" id="exampleInputPassword1" required>
+        <div class="valid-feedback">
+          Passwort fehlt!
+        </div>
+      </div>
+      <div class="col-md-12">
+        <button [disabled]="loginFormGroup.invalid" class="btn btn-primary float-end" type="submit">Login</button>
+      </div>
+    </form>
+  </div>
+</div>
+<div class="position-fixed bottom-0 m-3"><p>This page is only for private use. It is <b>not</b> possible to create a account.</p></div>
+

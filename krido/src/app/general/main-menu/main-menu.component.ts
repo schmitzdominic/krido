@@ -1,6 +1,7 @@
 import {ChangeDetectorRef, Component} from '@angular/core';
 import {MenuTitleService} from "../../behavior/menu-title/menu-title.service";
 import {Router} from "@angular/router";
+import {UserService} from "../../services/user/user.service";
 
 @Component({
   selector: 'app-main-menu',
@@ -14,7 +15,8 @@ export class MainMenuComponent {
 
   constructor(private changeDetectorRef: ChangeDetectorRef,
               private router: Router,
-              private menuTitleService: MenuTitleService) {
+              private menuTitleService: MenuTitleService,
+              private userService: UserService) {
   }
 
   ngOnInit(): void {
@@ -54,5 +56,10 @@ export class MainMenuComponent {
 
   navigateToRegularly(): void {
     this.router.navigate(['/regularly']);
+  }
+
+  onButtonLogout() {
+    // TODO: Please move this into a other place! Don´t forget to remove the userService!
+    this.userService.signOut();
   }
 }

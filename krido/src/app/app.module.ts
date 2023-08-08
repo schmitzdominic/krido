@@ -19,6 +19,8 @@ import {AngularFireModule} from "@angular/fire/compat";
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {MatIconModule} from "@angular/material/icon";
 import {MatButtonModule} from '@angular/material/button';
+import { LoginComponent } from './components/login/login.component';
+import {ReactiveFormsModule} from "@angular/forms";
 
 @NgModule({
   declarations: [
@@ -29,20 +31,22 @@ import {MatButtonModule} from '@angular/material/button';
     BudgetsComponent,
     ExpendituresComponent,
     RegularlyComponent,
+    LoginComponent,
   ],
-    imports: [
-        BrowserModule,
-        AngularFireModule.initializeApp(environment.firebase),
-        NgbModule,
-        AppRoutingModule,
-        provideFirebaseApp(() => initializeApp(environment.firebase)),
-        provideAnalytics(() => getAnalytics()),
-        provideAuth(() => getAuth()),
-        provideDatabase(() => getDatabase()),
-        BrowserAnimationsModule,
-        MatIconModule,
-        MatButtonModule
-    ],
+  imports: [
+    BrowserModule,
+    AngularFireModule.initializeApp(environment.firebase),
+    NgbModule,
+    AppRoutingModule,
+    provideFirebaseApp(() => initializeApp(environment.firebase)),
+    provideAnalytics(() => getAnalytics()),
+    provideAuth(() => getAuth()),
+    provideDatabase(() => getDatabase()),
+    BrowserAnimationsModule,
+    MatIconModule,
+    MatButtonModule,
+    ReactiveFormsModule
+  ],
   providers: [
     ScreenTrackingService,UserTrackingService
   ],

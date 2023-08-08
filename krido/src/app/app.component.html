@@ -1,1 +1,8 @@
-<app-main-menu></app-main-menu>
+<div *ngIf="showLogin">
+  <app-login
+  (isLoginSuccessful)="onLoginStateChanged($event)">
+  </app-login>
+</div>
+<div *ngIf="showMain">
+  <app-main-menu></app-main-menu>
+</div>
