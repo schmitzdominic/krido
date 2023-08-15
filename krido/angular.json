@@ -5,7 +5,10 @@
   "projects": {
     "krido": {
       "i18n": {
-        "sourceLocale": "de-DE",
+        "sourceLocale": {
+          "code": "de",
+          "baseHref": ""
+        },
         "locales": {
           "en-US": "src/assets/locale/messages.en.xl"
         }
@@ -23,9 +26,6 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "localize": [
-              "de-DE"
-            ],
             "outputPath": "dist/krido",
             "index": "src/index.html",
             "main": "src/main.ts",
