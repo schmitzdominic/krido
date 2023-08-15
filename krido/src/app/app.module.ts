@@ -22,6 +22,7 @@ import {MatButtonModule} from '@angular/material/button';
 import { LoginComponent } from './components/login/login.component';
 import {ReactiveFormsModule} from "@angular/forms";
 import { HomeSetupComponent } from './components/home-setup/home-setup.component';
+import { ToastsContainerComponent } from './general/toasts-container/toasts-container.component';
 
 @NgModule({
   declarations: [
@@ -34,6 +35,7 @@ import { HomeSetupComponent } from './components/home-setup/home-setup.component
     RegularlyComponent,
     LoginComponent,
     HomeSetupComponent,
+    ToastsContainerComponent,
   ],
   imports: [
     BrowserModule,

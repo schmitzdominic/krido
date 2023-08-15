@@ -3,18 +3,18 @@
     <h1 class="d-flex justify-content-center pb-5 display-1" style="font-size: 50px">Login</h1>
     <form class="needs-validation" [formGroup]="loginFormGroup" (ngSubmit)="onSubmit()" novalidate>
       <div class="col-md-12 mb-3">
-        <label for="validationCustomUsername" class="form-label">E-Mail</label>
+        <label for="login-input-username" class="form-label">E-Mail</label>
         <div class="input-group has-validation">
           <span class="input-group-text" id="inputGroupPrepend">@</span>
-          <input formControlName="email" type="text" class="form-control" id="validationCustomUsername" aria-describedby="inputGroupPrepend" required>
+          <input formControlName="email" type="text" class="form-control" id="login-input-username" aria-describedby="inputGroupPrepend" required>
           <div class="invalid-feedback">
             E-Mail fehlt!
           </div>
         </div>
       </div>
       <div class="col-md-12 mb-3">
-        <label for="exampleInputPassword1" class="form-label">Password</label>
-        <input formControlName="password" type="password" class="form-control" id="exampleInputPassword1" required>
+        <label for="login-input-password" class="form-label">Password</label>
+        <input formControlName="password" type="password" class="form-control" id="login-input-password" required>
         <div class="valid-feedback">
           Passwort fehlt!
         </div>

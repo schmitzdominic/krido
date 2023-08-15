@@ -3,6 +3,8 @@ import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {AngularFireAuth} from "@angular/fire/compat/auth";
 import {User} from "../../entities/user.model";
 import {UserService} from "../../services/user/user.service";
+import {ToastService} from "../../services/toast/toast.service";
+import {LoadingService} from "../../services/loading/loading.service";
 
 @Component({
   selector: 'app-login',
@@ -18,10 +20,16 @@ export class LoginComponent {
 
   constructor(private formBuilder: FormBuilder,
               private angularFireAuth: AngularFireAuth,
-              private userService: UserService) {
+              private userService: UserService,
+              private toastService: ToastService,
+              private loadingService: LoadingService) {
   }
 
   ngOnInit(): void {
+    this.createFormGroup();
+  }
+
+  createFormGroup(): void {
     this.loginFormGroup = this.formBuilder.group(
       {
         email: ['', Validators.required],
@@ -40,12 +48,22 @@ export class LoginComponent {
 
   async signIn(email: string, password: string): Promise<void> {
     try {
+      this.loadingService.setLoading = true;
       const result = await this.angularFireAuth
         .signInWithEmailAndPassword(email, password);
+      this.loadingService.setLoading = false;
       await this.setUserData(result.user);
     } catch (error) {
-      //@ts-ignore
-      window.alert(error.message);
+      if (error) {
+        const errorMessage: string = error.toString();
+        if (errorMessage.includes('auth/wrong-password')) {
+          this.toastService.showDanger('Falsches Passwort');
+        } else if (errorMessage.includes('auth/user-not-found')) {
+          this.toastService.showDanger('E-Mail nicht registriert');
+        } else {
+          this.toastService.showDanger(error.toString());
+        }
+      }
     }
   }
 

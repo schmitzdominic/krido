@@ -1,7 +1,10 @@
-import { Component } from '@angular/core';
+import {Component, ViewChild} from '@angular/core';
 import {UserService} from "./services/user/user.service";
 import {Router} from "@angular/router";
 import {AngularFireAuth} from "@angular/fire/compat/auth";
+import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
+import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap/modal/modal-ref";
+import {LoadingService} from "./services/loading/loading.service";
 
 @Component({
   selector: 'app-root',
@@ -9,6 +12,11 @@ import {AngularFireAuth} from "@angular/fire/compat/auth";
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
+
+  @ViewChild('loadingModal') loadingModal: NgbModalRef | undefined;
+
+  modalRef: NgbModalRef | undefined;
+
   title = 'krido';
 
   showLogin:      boolean = true;
@@ -19,10 +27,13 @@ export class AppComponent {
 
   constructor(private userService: UserService,
               private router: Router,
-              private angularFireAuth: AngularFireAuth) {
+              private angularFireAuth: AngularFireAuth,
+              private modalService: NgbModal,
+              private loadingService: LoadingService) {
   }
 
   ngOnInit() {
+    this.subscribeLoadingService();
     this.checkIfUserLoggedIn();
     if (this.userService.isLoggedIn) {
       this.onLoginStateChanged(true);
@@ -37,11 +48,21 @@ export class AppComponent {
     this.showHomeSetup = showHomeSetup;
   }
 
+  private subscribeLoadingService() {
+    this.loadingService.isLoading.subscribe(isLoading => {
+      if (isLoading) {
+        this.openLoading();
+      } else {
+        this.closeLoading();
+      }
+    });
+  }
+
   private checkIfUserLoggedIn() {
     this.angularFireAuth.authState.subscribe((firebaseUser) => {
       if (firebaseUser) {
         this.userService.getUserObservable(firebaseUser).subscribe(user => {
-          this.userService.setUser(user, firebaseUser);
+          this.userService.setLocalStorageUser(user, firebaseUser);
           this.onLoginStateChanged(true);
         });
       } else {
@@ -74,5 +95,22 @@ export class AppComponent {
 
   private showHomeSetupPage(): void {
     this.setPageState(false, false, true);
+  }
+
+  openLoading() {
+    this.modalRef = this.modalService.open(
+      this.loadingModal,
+      {
+        centered: true,
+        size: 'sm',
+        keyboard: false,
+        backdrop: 'static'
+      });
+  }
+
+  closeLoading() {
+    if (this.modalRef) {
+      this.modalRef.close();
+    }
   }
 }

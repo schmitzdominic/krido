@@ -34,7 +34,7 @@ export class ActualMonthComponent {
   }
 
   loadListOfEntries(): void {
-    this.dbService.readList('/list/entries').snapshotChanges().subscribe(entries => {
+    this.dbService.readList('/list/entries').subscribe(entries => {
       entries.forEach(entry => {
         const object = entry.payload.val();
         //@ts-ignore

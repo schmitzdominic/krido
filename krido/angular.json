@@ -4,6 +4,12 @@
   "newProjectRoot": "projects",
   "projects": {
     "krido": {
+      "i18n": {
+        "sourceLocale": "de-DE",
+        "locales": {
+          "en-US": "src/assets/locale/messages.en.xl"
+        }
+      },
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -17,6 +23,9 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
+            "localize": [
+              "de-DE"
+            ],
             "outputPath": "dist/krido",
             "index": "src/index.html",
             "main": "src/main.ts",

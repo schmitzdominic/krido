@@ -33,9 +33,9 @@ export class UserService {
   }
 
   getUserObservable(firebaseUser: firebase.User) {
-    return this.dbService.read(`users/${firebaseUser.uid}`).snapshotChanges();
+    return this.dbService.read(`users/${firebaseUser.uid}`);
   }
-  async setUser(user: SnapshotAction<any>, firebaseUser: firebase.User | null) {
+  async setLocalStorageUser(user: SnapshotAction<any>, firebaseUser: firebase.User | null) {
     if (firebaseUser) {
       if (user.payload.val()) {
         const home = user.payload.val().home;

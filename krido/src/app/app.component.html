@@ -1,3 +1,16 @@
+<!-- Loading Modal -->
+<ng-template #loadingModal let-modal>
+  <div class="modal-body d-flex align-items-center justify-content-center">
+    <div>
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="pt-3">Lädt...</p>
+    </div>
+  </div>
+</ng-template>
+
+<!-- Content -->
 <div *ngIf="showLogin">
   <app-login></app-login>
 </div>
@@ -7,3 +20,6 @@
 <div *ngIf="showMain">
   <app-main-menu></app-main-menu>
 </div>
+
+<!-- Toasts -->
+<app-toasts aria-live="polite" aria-atomic="true"></app-toasts>
