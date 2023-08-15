@@ -5,6 +5,7 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "build:production": "ng build --production --aot --build-optimizer --common-chunk --vendor-chunk --optimization --progress --configuration=production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },

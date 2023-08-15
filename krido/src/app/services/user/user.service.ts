@@ -2,6 +2,9 @@ import { Injectable } from '@angular/core';
 import {DbService} from "../db.service";
 import {User} from "../../entities/user.model";
 import {AngularFireAuth} from "@angular/fire/compat/auth";
+import {Router} from "@angular/router";
+import firebase from "firebase/compat";
+import {SnapshotAction} from "@angular/fire/compat/database";
 
 @Injectable({
   providedIn: 'root'
@@ -9,10 +12,11 @@ import {AngularFireAuth} from "@angular/fire/compat/auth";
 export class UserService {
 
   constructor(private dbService: DbService,
+              private router: Router,
               private angularFireAuth: AngularFireAuth) { }
 
-  createNewUser(user: User) {
-    return this.dbService.create(`users/${user.uid}`, user);
+  createOrUpdateUser(user: User) {
+    return this.dbService.update(`users/${user.uid}`, user);
   }
 
   get isLoggedIn(): boolean {
@@ -20,11 +24,37 @@ export class UserService {
     return user !== null;
   }
 
+  get getUser(): User {
+    return JSON.parse(localStorage.getItem('user')!);
+  }
+
+  get getHome(): string | null {
+    return localStorage.getItem('home');
+  }
+
+  getUserObservable(firebaseUser: firebase.User) {
+    return this.dbService.read(`users/${firebaseUser.uid}`).snapshotChanges();
+  }
+  async setUser(user: SnapshotAction<any>, firebaseUser: firebase.User | null) {
+    if (firebaseUser) {
+      if (user.payload.val()) {
+        const home = user.payload.val().home;
+        const userObject: User = {
+          uid: firebaseUser.uid,
+          email: firebaseUser.email,
+          displayName: firebaseUser.displayName,
+          home: home,
+          firebaseUser: firebaseUser
+        };
+        localStorage.setItem('user', JSON.stringify(userObject));
+      }
+    }
+  }
+
   async signOut() {
-    this.angularFireAuth.signOut().then(data => {
+    this.angularFireAuth.signOut().then(() => {
       localStorage.removeItem('user');
-      console.log('logged out');
-      // Navigate back to login
+      this.router.navigate(['/login']);
     });
   }
 }

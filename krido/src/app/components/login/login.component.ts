@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Output} from '@angular/core';
+import {Component} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {AngularFireAuth} from "@angular/fire/compat/auth";
 import {User} from "../../entities/user.model";
@@ -11,8 +11,6 @@ import {UserService} from "../../services/user/user.service";
 })
 export class LoginComponent {
 
-  @Output() isLoginSuccessful = new EventEmitter<boolean>();
-
   loginFormGroup: FormGroup = new FormGroup({
     email: new FormControl(''),
     password: new FormControl('')
@@ -21,15 +19,6 @@ export class LoginComponent {
   constructor(private formBuilder: FormBuilder,
               private angularFireAuth: AngularFireAuth,
               private userService: UserService) {
-    this.angularFireAuth.authState.subscribe((user) => {
-      if (user) {
-        localStorage.setItem('user', JSON.stringify(user));
-        JSON.parse(localStorage.getItem('user')!);
-      } else {
-        localStorage.setItem('user', 'null');
-        JSON.parse(localStorage.getItem('user')!);
-      }
-    });
   }
 
   ngOnInit(): void {
@@ -53,33 +42,20 @@ export class LoginComponent {
     try {
       const result = await this.angularFireAuth
         .signInWithEmailAndPassword(email, password);
-      await this.SetUserData(result.user);
-      this.angularFireAuth.authState.subscribe((user) => {
-        if (user) {
-          this.isLoginSuccessful.emit(true);
-        }
-      });
+      await this.setUserData(result.user);
     } catch (error) {
       //@ts-ignore
       window.alert(error.message);
     }
   }
 
-  async signOut() {
-    this.angularFireAuth.signOut().then(data => {
-      localStorage.removeItem('user');
-      console.log('logged out');
-      // Navigate back to login
-    });
-  }
-
-  SetUserData(user: any) {
+  setUserData(user: any) {
     const userData: User = {
       uid: user.uid,
       email: user.email,
       displayName: user.displayName
     };
-    return this.userService.createNewUser(userData);
+    return this.userService.createOrUpdateUser(userData);
   }
 
 }

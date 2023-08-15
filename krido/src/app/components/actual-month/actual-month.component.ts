@@ -1,5 +1,5 @@
 import {Component} from '@angular/core';
-import {DateService} from "../../services/date-service/date.service";
+import {DateService} from "../../services/date/date.service";
 import {MenuTitleService} from "../../behavior/menu-title/menu-title.service";
 import {Entry} from "../../entities/entry.model";
 import {DbService} from "../../services/db.service";

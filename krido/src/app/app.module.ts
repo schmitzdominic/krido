@@ -21,6 +21,7 @@ import {MatIconModule} from "@angular/material/icon";
 import {MatButtonModule} from '@angular/material/button';
 import { LoginComponent } from './components/login/login.component';
 import {ReactiveFormsModule} from "@angular/forms";
+import { HomeSetupComponent } from './components/home-setup/home-setup.component';
 
 @NgModule({
   declarations: [
@@ -32,6 +33,7 @@ import {ReactiveFormsModule} from "@angular/forms";
     ExpendituresComponent,
     RegularlyComponent,
     LoginComponent,
+    HomeSetupComponent,
   ],
   imports: [
     BrowserModule,
