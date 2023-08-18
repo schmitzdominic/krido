@@ -23,6 +23,10 @@ import { LoginComponent } from './components/login/login.component';
 import {ReactiveFormsModule} from "@angular/forms";
 import { HomeSetupComponent } from './components/home-setup/home-setup.component';
 import { ToastsContainerComponent } from './general/toasts-container/toasts-container.component';
+import { BudgetListComponent } from './components/budgets/budget-list/budget-list.component';
+import { CycleListComponent } from './components/budgets/cycle-list/cycle-list.component';
+import { AddBudgetContentComponent } from './components/budgets/budget-list/add-budget-content/add-budget-content.component';
+import {CurrencyMaskModule} from "ng2-currency-mask";
 
 @NgModule({
   declarations: [
@@ -36,12 +40,16 @@ import { ToastsContainerComponent } from './general/toasts-container/toasts-cont
     LoginComponent,
     HomeSetupComponent,
     ToastsContainerComponent,
+    BudgetListComponent,
+    CycleListComponent,
+    AddBudgetContentComponent,
   ],
   imports: [
     BrowserModule,
     AngularFireModule.initializeApp(environment.firebase),
     NgbModule,
     AppRoutingModule,
+    CurrencyMaskModule,
     provideFirebaseApp(() => initializeApp(environment.firebase)),
     provideAnalytics(() => getAnalytics()),
     provideAuth(() => getAuth()),

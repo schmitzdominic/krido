@@ -8,6 +8,8 @@ import {MenuTitleService} from "../../behavior/menu-title/menu-title.service";
 })
 export class BudgetsComponent {
 
+  active: string = 'budgets';
+
   constructor(private menuTitleService: MenuTitleService) {
   }
 

@@ -1,1 +1,18 @@
-<p>budgets works!</p>
+<ul ngbNav #nav="ngbNav" [(activeId)]="active" class="nav-tabs">
+  <li [ngbNavItem]="'budgets'">
+    <button ngbNavLink>Budgets</button>
+    <ng-template ngbNavContent>
+      <app-budget-list>
+      </app-budget-list>
+    </ng-template>
+  </li>
+  <li [ngbNavItem]="'cycles'">
+    <button ngbNavLink>Zyklen</button>
+    <ng-template ngbNavContent>
+      <app-cycle-list>
+      </app-cycle-list>
+    </ng-template>
+  </li>
+</ul>
+
+<div [ngbNavOutlet]="nav" class="mt-2"></div>
