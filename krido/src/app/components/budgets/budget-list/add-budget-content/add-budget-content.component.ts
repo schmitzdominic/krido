@@ -24,12 +24,25 @@ export class AddBudgetContentComponent {
   }
 
   ngOnInit() {
+    this.createFormGroup();
+    this.setLimitValidator();
+  }
+
+  createFormGroup() {
     this.addBudgetFormGroup = this.formBuilder.group(
-      {
-        name: ['', Validators.required],
-        limit: ['', Validators.required]
-      }
+        {
+          name: ['', Validators.required],
+          limit: ['', Validators.required]
+        }
     );
+  }
+
+  setLimitValidator() {
+    this.addBudgetFormGroup.controls['limit'].valueChanges.subscribe(limit => {
+      if (limit) {
+        this.addBudgetFormGroup.controls['limit'].setErrors(null);
+      }
+    });
   }
 
   onCancel() {

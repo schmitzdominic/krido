@@ -18,4 +18,8 @@ export class BudgetService {
   addMonthBudget(budget: Budget, year: number, month: number) {
     return this.dbService.createListValue(`${this.rootPath}/month/${year}/${month}`, budget);
   }
+
+  getAllNoTimeLimitBudgets() {
+    return this.dbService.readList(`${this.rootPath}/general`);
+  }
 }
