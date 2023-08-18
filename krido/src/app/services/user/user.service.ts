@@ -28,8 +28,9 @@ export class UserService {
     return JSON.parse(localStorage.getItem('user')!);
   }
 
-  get getHome(): string | null {
-    return localStorage.getItem('home');
+  get getHome(): string {
+    const home = localStorage.getItem('home');
+    return home ? home : '';
   }
 
   getUserObservable(firebaseUser: firebase.User) {

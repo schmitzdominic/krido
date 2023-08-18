@@ -11,6 +11,11 @@ export class DbService {
               private loadingService: LoadingService) {
   }
 
+  get home(): string {
+    const home = localStorage.getItem('home');
+    return home ? home : '';
+  }
+
   create(path: string, object: any): Promise<void> {
     this.loadingService.setLoading = true;
     return this.db.object(path).set(object).finally(() => {this.loadingService.setLoading = false;});

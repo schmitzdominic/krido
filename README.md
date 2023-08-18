@@ -3,6 +3,6 @@
 ## Deployment
 
 ~~~terminal
-> npm run build
+> npm run build --prod
 > firebase deploy
 ~~~
