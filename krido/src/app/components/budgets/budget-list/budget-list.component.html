@@ -3,23 +3,22 @@
   (onClose)="onCloseAddBudgetModal()">
   </app-add-budget-content>
 </ng-template>
-<div ngbDropdown class="pt-3">
-  <span class="pe-3" style="font-size: 20px">Typ</span>
+<div ngbDropdown class="pt-3 pb-3 ms-2">
   <button type="button" class="btn btn-outline-primary" id="budgetType" ngbDropdownToggle>
     {{ chosenType.name }}
   </button>
   <div ngbDropdownMenu aria-labelledby="budgetType">
     <button
-      *ngIf="chosenType.value != typeNoTimeLimit.value"
-      (click)="chooseType(typeNoTimeLimit)"
-      ngbDropdownItem>Ohne Zeitlimit</button>
+            *ngIf="chosenType.value != typeNoTimeLimit.value"
+            (click)="chooseType(typeNoTimeLimit)"
+            ngbDropdownItem>Ohne Zeitlimit</button>
     <button
-      *ngIf="chosenType.value != typeMonthly.value"
-      (click)="chooseType(typeMonthly)"
-      ngbDropdownItem>Monatlich</button>
+            *ngIf="chosenType.value != typeMonthly.value"
+            (click)="chooseType(typeMonthly)"
+            ngbDropdownItem>Monatlich</button>
   </div>
 </div>
-<div *ngIf="chosenType.value == typeNoTimeLimit.value" class="pt-3">
+<div *ngIf="chosenType.value == typeNoTimeLimit.value">
   <!-- No Time Limit -->
   <table class="table table-striped">
     <tbody>
@@ -42,7 +41,7 @@
     </tbody>
   </table>
 </div>
-<div *ngIf="chosenType.value == typeMonthly.value" class="pt-3">
+<div *ngIf="chosenType.value == typeMonthly.value">
   <!-- Monthly -->
 </div>
 <div class="position-fixed end-0 bottom-0 me-4 mb-4">
