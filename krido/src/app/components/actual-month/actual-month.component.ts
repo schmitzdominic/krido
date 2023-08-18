@@ -1,7 +1,6 @@
 import {Component} from '@angular/core';
 import {DateService} from "../../services/date/date.service";
 import {MenuTitleService} from "../../behavior/menu-title/menu-title.service";
-import {Entry} from "../../entities/entry.model";
 import {DbService} from "../../services/db.service";
 
 @Component({
@@ -13,8 +12,6 @@ export class ActualMonthComponent {
 
   actualMonth = this.dateService.getActualMonthName();
   actualYear = this.dateService.getActualYear();
-
-  entries: Entry[] = [];
 
   constructor(private menuTitleService: MenuTitleService,
               private dateService: DateService,
@@ -45,11 +42,11 @@ export class ActualMonthComponent {
   }
 
   addListOfEntries(): void {
-    const elementsToPass: Entry[] = [];
+    /* const elementsToPass: Entry[] = [];
     for (let i = 0; i < 50; i++) {
       elementsToPass.push(new Entry('' + i, i));
-    }
-    this.dbService.updateList('/list', 'entries', elementsToPass);
+    } */
+    // this.dbService.updateList('/list', 'entries', elementsToPass);
   }
 
   test(): void {

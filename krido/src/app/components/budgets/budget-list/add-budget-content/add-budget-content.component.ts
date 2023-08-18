@@ -1,6 +1,8 @@
 import {Component, EventEmitter, Output} from '@angular/core';
 import {Budget} from "../../../../entities/budget.model";
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
+import {BudgetService} from "../../../../services/budget/budget.service";
+import {HelperService} from "../../../../services/helper/helper.service";
 
 @Component({
   selector: 'app-add-budget-content',
@@ -16,7 +18,9 @@ export class AddBudgetContentComponent {
     limit: new FormControl('')
   });
 
-  constructor(private formBuilder: FormBuilder) {
+  constructor(private formBuilder: FormBuilder,
+              private budgetService: BudgetService,
+              private helperService: HelperService) {
   }
 
   ngOnInit() {
@@ -38,12 +42,13 @@ export class AddBudgetContentComponent {
 
   persistBudgetAndCloseModal() {
     const budget: Budget = {
-      searchName: 'searchName',
-      name: 'name',
-      limit: 123.45
+      searchName: this.helperService.createSearchName(this.addBudgetFormGroup.value.name),
+      name: this.addBudgetFormGroup.value.name,
+      limit: this.addBudgetFormGroup.value.limit
     };
-    // TODO: Persist Budget
-    this.onClose.emit();
+    this.budgetService.addBudget(budget).then(() => {
+      this.onClose.emit();
+    });
   }
 
 }

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import {AngularFireDatabase} from "@angular/fire/compat/database";
 import {LoadingService} from "./loading/loading.service";
+import {User} from "../entities/user.model";
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +13,7 @@ export class DbService {
   }
 
   get home(): string {
-    const home = localStorage.getItem('home');
+    const home = (JSON.parse(localStorage.getItem('user')!) as User).home;
     return home ? home : '';
   }
 
@@ -39,10 +40,6 @@ export class DbService {
     return this.db.object(path).remove().finally(() => {this.loadingService.setLoading = false;});
   }
 
-  createList(path: string, object: any) {
-    return this.db.list(path).push(object);
-  }
-
   updateList(path: string, key: string, object: any) {
     this.loadingService.setLoading = true;
     return this.db.list(path).set(key, object).finally(() => {this.loadingService.setLoading = false;});
@@ -51,6 +48,10 @@ export class DbService {
   deleteList(path: string) {
     this.loadingService.setLoading = true;
     return this.db.list(path).remove().finally(() => {this.loadingService.setLoading = false;});
+  }
+
+  createListValue(path: string, object: any) {
+    return this.db.list(path).push(object);
   }
 
   updateListValue(path: string, key: string, object: any) {

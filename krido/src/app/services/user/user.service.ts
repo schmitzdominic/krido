@@ -25,11 +25,11 @@ export class UserService {
   }
 
   get getUser(): User {
-    return JSON.parse(localStorage.getItem('user')!);
+    return JSON.parse(localStorage.getItem('user')!) as User;
   }
 
   get getHome(): string {
-    const home = localStorage.getItem('home');
+    const home = this.getUser.home;
     return home ? home : '';
   }
 

@@ -24,7 +24,6 @@ export class BudgetListComponent {
     this.addBudgetModalRef = this.ngbModal.open(
       this.addBudgetModal,
       {
-        centered: true,
         size: 'sm'
       });
   }

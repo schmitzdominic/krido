@@ -1,0 +1,4 @@
+enum EntryType {
+  outcome,
+  income
+}

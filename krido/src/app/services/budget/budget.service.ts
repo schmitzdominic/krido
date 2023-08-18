@@ -12,10 +12,10 @@ export class BudgetService {
   constructor(private dbService: DbService) { }
 
   addBudget(budget: Budget) {
-    return this.dbService.create(`${this.rootPath}/general`, budget);
+    return this.dbService.createListValue(`${this.rootPath}/general`, budget);
   }
 
   addMonthBudget(budget: Budget, year: number, month: number) {
-    return this.dbService.create(`${this.rootPath}/month/${year}/${month}`, budget);
+    return this.dbService.createListValue(`${this.rootPath}/month/${year}/${month}`, budget);
   }
 }
