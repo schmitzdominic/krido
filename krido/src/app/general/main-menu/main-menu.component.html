@@ -12,35 +12,35 @@
             ngbNavLink
             data-bs-toggle="collapse"
             data-bs-target=".navbar-collapse.show"
-            (click)="navigateToActualMonth()">Aktueller Monat</button>
+            (click)="navigateToHome()"><i class="bi bi-house pe-2"></i> Home</button>
         </li>
         <li [ngbNavItem]="2">
           <button
             ngbNavLink
             data-bs-toggle="collapse"
             data-bs-target=".navbar-collapse.show"
-            (click)="navigateToRegularly()">Regelmäßig</button>
+            (click)="navigateToRegularly()"><i class="bi bi-arrow-repeat pe-2"></i> Regelmäßig</button>
         </li>
         <li [ngbNavItem]="3">
           <button
             ngbNavLink
             data-bs-toggle="collapse"
             data-bs-target=".navbar-collapse.show"
-            (click)="navigateToExpenditures()">Ausgaben</button>
+            (click)="navigateToHistory()"><i class="bi bi-clock-history pe-2"></i> Historie</button>
         </li>
         <li [ngbNavItem]="4">
           <button
             ngbNavLink
             data-bs-toggle="collapse"
             data-bs-target=".navbar-collapse.show"
-            (click)="navigateToAccounts()">Konten</button>
+            (click)="navigateToAccounts()"><i class="bi bi-bank pe-2"></i> Konten</button>
         </li>
         <li [ngbNavItem]="5">
           <button
             ngbNavLink
             data-bs-toggle="collapse"
             data-bs-target=".navbar-collapse.show"
-            (click)="navigateToBudgets()">Budgets</button>
+            (click)="navigateToBudgets()"><i class="bi bi-bag pe-2"></i> Budgets</button>
         </li>
       </ul>
     </div>

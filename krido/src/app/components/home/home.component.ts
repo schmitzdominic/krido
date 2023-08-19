@@ -5,10 +5,10 @@ import {DbService} from "../../services/db.service";
 
 @Component({
   selector: 'app-actual-month',
-  templateUrl: './actual-month.component.html',
-  styleUrls: ['./actual-month.component.scss']
+  templateUrl: './home.component.html',
+  styleUrls: ['./home.component.scss']
 })
-export class ActualMonthComponent {
+export class HomeComponent {
 
   actualMonth = this.dateService.getActualMonthName();
   actualYear = this.dateService.getActualYear();

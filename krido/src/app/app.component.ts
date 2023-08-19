@@ -23,7 +23,7 @@ export class AppComponent {
   showHomeSetup:  boolean = false;
   showMain:       boolean = false;
 
-  mainPage = 'actual-month';
+  mainPage = 'home';
 
   constructor(private userService: UserService,
               private router: Router,

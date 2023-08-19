@@ -4,11 +4,11 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { NgbModule } from "@ng-bootstrap/ng-bootstrap";
-import { ActualMonthComponent } from './components/actual-month/actual-month.component';
+import { HomeComponent } from './components/home/home.component';
 import { MainMenuComponent } from './general/main-menu/main-menu.component';
 import { AccountsComponent } from './components/accounts/accounts.component';
 import { BudgetsComponent } from './components/budgets/budgets.component';
-import { ExpendituresComponent } from './components/expenditures/expenditures.component';
+import { HistoryComponent } from './components/history/history.component';
 import { RegularlyComponent } from './components/regularly/regularly.component';
 import { initializeApp,provideFirebaseApp } from '@angular/fire/app';
 import { environment } from '../environments/environment';
@@ -32,11 +32,11 @@ import { EditBudgetContentComponent } from './components/budgets/budget-list/edi
 @NgModule({
   declarations: [
     AppComponent,
-    ActualMonthComponent,
+    HomeComponent,
     MainMenuComponent,
     AccountsComponent,
     BudgetsComponent,
-    ExpendituresComponent,
+    HistoryComponent,
     RegularlyComponent,
     LoginComponent,
     HomeSetupComponent,

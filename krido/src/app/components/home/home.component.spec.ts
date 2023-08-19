@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ActualMonthComponent } from './actual-month.component';
+import { HomeComponent } from './home.component';
 
 describe('ActualMonthComponent', () => {
-  let component: ActualMonthComponent;
-  let fixture: ComponentFixture<ActualMonthComponent>;
+  let component: HomeComponent;
+  let fixture: ComponentFixture<HomeComponent>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [ActualMonthComponent]
+      declarations: [HomeComponent]
     });
-    fixture = TestBed.createComponent(ActualMonthComponent);
+    fixture = TestBed.createComponent(HomeComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

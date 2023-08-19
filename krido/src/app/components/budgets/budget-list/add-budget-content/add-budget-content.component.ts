@@ -17,7 +17,7 @@ export class AddBudgetContentComponent {
   @Output() onClose: EventEmitter<any> = new EventEmitter<any>();
 
   title: string = 'Budget erstellen';
-  submitButtonText: string = 'erstellen';
+  submitButtonText: string = 'Erstellen';
 
   addBudgetFormGroup: FormGroup = new FormGroup({
     name: new FormControl(''),
@@ -55,7 +55,7 @@ export class AddBudgetContentComponent {
 
   fillFormIfBudget() {
     if (this.budget) {
-      this.title = 'Budget Editieren';
+      this.title = 'Budget editieren';
       this.submitButtonText = 'Ändern'
       this.addBudgetFormGroup.controls['name'].setValue(this.budget.name);
       this.addBudgetFormGroup.controls['limit'].setValue(this.budget.limit);

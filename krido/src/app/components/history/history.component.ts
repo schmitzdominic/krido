@@ -3,10 +3,10 @@ import {MenuTitleService} from "../../behavior/menu-title/menu-title.service";
 
 @Component({
   selector: 'app-expenditures',
-  templateUrl: './expenditures.component.html',
-  styleUrls: ['./expenditures.component.scss']
+  templateUrl: './history.component.html',
+  styleUrls: ['./history.component.scss']
 })
-export class ExpendituresComponent {
+export class HistoryComponent {
 
   constructor(private menuTitleService: MenuTitleService) {
   }
@@ -19,7 +19,7 @@ export class ExpendituresComponent {
    * Set initial values.
    */
   setInitialValues(): void {
-    this.menuTitleService.setTitle('Ausgaben');
+    this.menuTitleService.setTitle('Historie');
     this.menuTitleService.setActiveId(3);
   }
 }

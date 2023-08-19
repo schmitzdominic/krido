@@ -42,16 +42,16 @@ export class MainMenuComponent {
   navigateToAccounts(): void {
     this.router.navigate(['/accounts']);
   }
-  navigateToActualMonth(): void {
-    this.router.navigate(['/actual-month']);
+  navigateToHome(): void {
+    this.router.navigate(['/home']);
   }
 
   navigateToBudgets(): void {
     this.router.navigate(['/budgets']);
   }
 
-  navigateToExpenditures(): void {
-    this.router.navigate(['/expenditures']);
+  navigateToHistory(): void {
+    this.router.navigate(['/history']);
   }
 
   navigateToRegularly(): void {
