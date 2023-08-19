@@ -1,0 +1,73 @@
+<div>
+  <h1 class="d-flex align-items-center justify-content-center pt-4">{{ title }}</h1>
+</div>
+<div class="modal-body">
+  <form class="needs-validation" [formGroup]="addCycleFormGroup" (ngSubmit)="onSubmit()" novalidate>
+    <div class="col-md-12 mb-3">
+      <label for="add-cycle-name" class="form-label">Name</label>
+      <div class="input-group has-validation">
+        <input formControlName="name" type="text" class="form-control" id="add-cycle-name" aria-describedby="inputGroupPrepend" required>
+        <div class="invalid-feedback">
+          Name fehlt!
+        </div>
+      </div>
+    </div>
+    <div class="col-12 mb-3">
+      <div class="form-check">
+        <input formControlName="initialLimit" class="form-check-input" type="checkbox" value="" id="add-cycle-initial-limit">
+        <label class="form-check-label ps-1" for="add-cycle-initial-limit">
+          Initial Limit
+        </label>
+      </div>
+    </div>
+    <div *ngIf="isLimitVisible" class="col-md-12 mb-3">
+      <label for="add-cycle-limit" class="form-label">Limit</label>
+      <div class="input-group has-validation">
+        <input
+          currencyMask
+          class="form-control"
+          id="add-cycle-limit"
+          formControlName="limit"
+          aria-describedby="inputGroupPrepend"
+          [options]="{ prefix: '', thousands: '', decimal: ',' }"
+          inputmode="numeric"
+          pattern="^\d+(\,\d{1,2})?$">
+        <span class="input-group-text" id="inputGroupPrepend">€</span>
+        <div class="invalid-feedback">
+          Limit fehlt!
+        </div>
+      </div>
+    </div>
+    <div ngbDropdown class="col-md-12 mb-4">
+      <button type="button" class="btn btn-outline-primary" id="add-cycle-type" ngbDropdownToggle>
+        {{ chosenCycleType }}
+      </button>
+      <div ngbDropdownMenu aria-labelledby="budgetType">
+      </div>
+    </div>
+    <div class="col-12 mb-3">
+      <div class="form-check">
+        <input formControlName="transfer" class="form-check-input" type="checkbox" value="" id="add-cycle-transfer">
+        <label class="form-check-label ps-1" for="add-cycle-transfer">
+          Übertrag
+        </label>
+      </div>
+    </div>
+    <div class="col-12 mb-3">
+      <div class="form-check">
+        <input formControlName="createNow" class="form-check-input" type="checkbox" value="" id="add-cycle-create-now">
+        <label class="form-check-label ps-1" for="add-cycle-create-now">
+          Budget für diesen Zyklus erstellen?
+        </label>
+      </div>
+    </div>
+  </form>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-dark" (click)="onCancel()">Abbrechen</button>
+  <button
+    type="button"
+    class="btn btn-light"
+    [disabled]="addCycleFormGroup.invalid"
+    (click)="onSubmit()">{{ submitButtonText }}</button>
+</div>

@@ -1,3 +1,9 @@
+<!-- Modal add Cycle -->
+<ng-template #addCycleModal let-modal>
+  <app-add-cycle-content
+    (onClose)="onCloseAddCycleModal()">
+  </app-add-cycle-content>
+</ng-template>
 <div class="position-fixed end-0 bottom-0 me-4 mb-4">
   <button type="button" class="btn btn-primary" (click)="onAddClick()"><i class="bi bi-plus-lg"></i></button>
 </div>

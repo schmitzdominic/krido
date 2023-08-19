@@ -28,6 +28,8 @@ import { CycleListComponent } from './components/budgets/cycle-list/cycle-list.c
 import { AddBudgetContentComponent } from './components/budgets/budget-list/add-budget-content/add-budget-content.component';
 import {CurrencyMaskModule} from "ng2-currency-mask";
 import { EditBudgetContentComponent } from './components/budgets/budget-list/edit-budget-content/edit-budget-content.component';
+import { AddCycleContentComponent } from './components/budgets/cycle-list/add-cycle-content/add-cycle-content.component';
+import { EditCycleContentComponent } from './components/budgets/cycle-list/edit-cycle-content/edit-cycle-content.component';
 
 @NgModule({
   declarations: [
@@ -45,6 +47,8 @@ import { EditBudgetContentComponent } from './components/budgets/budget-list/edi
     CycleListComponent,
     AddBudgetContentComponent,
     EditBudgetContentComponent,
+    AddCycleContentComponent,
+    EditCycleContentComponent,
   ],
   imports: [
     BrowserModule,
