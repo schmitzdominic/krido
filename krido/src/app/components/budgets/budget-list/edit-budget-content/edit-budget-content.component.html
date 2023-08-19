@@ -1,0 +1,35 @@
+<button type="button" class="btn btn-dark position-absolute end-0 top-0 mt-3 me-3" (click)="onEdit()"><i class="bi bi-pencil"></i></button>
+<!-- Edit -->
+<div *ngIf="!isContentReadOnly">
+  <app-add-budget-content
+    [budget]="budget"
+    (onClose)="onCancel()">
+  </app-add-budget-content>
+</div>
+
+<!-- View -->
+<div *ngIf="isContentReadOnly">
+  <h1 class="name-title pt-4 ps-3 pe-3">{{ budget?.name }}</h1>
+  <div class="modal-body">
+    <div class="text">
+      <p>Höhe: {{ priceService.convertNumberToEuro(budget?.limit) }}</p>
+      <p>Rest: {{ getRestBudget() }}</p>
+      <ngb-progressbar
+        [value]="budget?.usedLimit!"
+        [max]="budget?.limit!"
+        type="{{ getProgressBarType(budget?.usedLimit!, budget?.limit!) }}"
+      >{{ getProgressBarText() }}</ngb-progressbar>
+    </div>
+  </div>
+  <table class="table table-striped">
+    <tbody>
+    <!-- TODO: Here Entries -->
+    </tbody>
+  </table>
+  <div class="modal-footer">
+    <button
+      type="button"
+      class="btn btn-light"
+      (click)="onCancel()">Schließen</button>
+  </div>
+</div>

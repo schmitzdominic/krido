@@ -1,8 +1,17 @@
+<!-- Modal add Budget -->
 <ng-template #addBudgetModal let-modal>
   <app-add-budget-content
   (onClose)="onCloseAddBudgetModal()">
   </app-add-budget-content>
 </ng-template>
+<!-- Modal edit Budget -->
+<ng-template #editBudgetModal let-modal>
+  <app-edit-budget-content
+    [budget]="clickedBudget"
+    (onClose)="onCloseEditBudgetModal()">
+  </app-edit-budget-content>
+</ng-template>
+<!-- Dropdown -->
 <div ngbDropdown class="pt-3 pb-3 ms-2">
   <button type="button" class="btn btn-outline-primary" id="budgetType" ngbDropdownToggle>
     {{ chosenType.name }}
@@ -11,18 +20,18 @@
     <button
             *ngIf="chosenType.value != typeNoTimeLimit.value"
             (click)="chooseType(typeNoTimeLimit)"
-            ngbDropdownItem>Ohne Zeitlimit</button>
+            ngbDropdownItem>{{ typeNoTimeLimit.name }}</button>
     <button
             *ngIf="chosenType.value != typeMonthly.value"
             (click)="chooseType(typeMonthly)"
-            ngbDropdownItem>Monatlich</button>
+            ngbDropdownItem>{{ typeMonthly.name }}</button>
   </div>
 </div>
 <div *ngIf="chosenType.value == typeNoTimeLimit.value">
   <!-- No Time Limit -->
   <table class="table table-striped">
     <tbody>
-      <div *ngFor="let budget of budgets" class="card p-1 m-2">
+      <div *ngFor="let budget of budgets" class="card p-1 m-2" (click)="onCardClick(budget)">
         <div class="card-body">
           <div class="pb-2">
             <span class="name-no-time-limit"> {{budget.name}} </span>

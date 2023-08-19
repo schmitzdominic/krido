@@ -15,6 +15,10 @@ export class BudgetService {
     return this.dbService.createListValue(`${this.rootPath}/general`, budget);
   }
 
+  updateBudget(budget: Budget, key: string) {
+    return this.dbService.updateListValue(`${this.rootPath}/general`, key, budget);
+  }
+
   addMonthBudget(budget: Budget, year: number, month: number) {
     return this.dbService.createListValue(`${this.rootPath}/month/${year}/${month}`, budget);
   }

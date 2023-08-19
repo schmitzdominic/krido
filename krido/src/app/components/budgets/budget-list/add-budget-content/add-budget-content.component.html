@@ -1,5 +1,5 @@
 <div>
-  <h1 class="d-flex align-items-center justify-content-center pt-4">Budget erstellen</h1>
+  <h1 class="d-flex align-items-center justify-content-center pt-4">{{ title }}</h1>
 </div>
 <div class="modal-body">
   <form class="needs-validation" [formGroup]="addBudgetFormGroup" (ngSubmit)="onSubmit()" novalidate>
@@ -39,5 +39,5 @@
     type="button"
     class="btn btn-light"
     [disabled]="addBudgetFormGroup.invalid"
-    (click)="onSubmit()">Erstellen</button>
+    (click)="onSubmit()">{{ submitButtonText }}</button>
 </div>

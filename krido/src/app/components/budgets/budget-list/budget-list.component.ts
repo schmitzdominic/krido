@@ -18,8 +18,10 @@ interface DropdownItem {
 export class BudgetListComponent {
 
   @ViewChild('addBudgetModal') addBudgetModal: NgbModalRef | undefined;
+  @ViewChild('editBudgetModal') editBudgetModal: NgbModalRef | undefined;
 
   addBudgetModalRef: NgbModalRef | undefined;
+  editBudgetModalRef: NgbModalRef | undefined;
 
   typeNoTimeLimit: DropdownItem = {name: 'Ohne Zeitlimit', value: 'noTimeLimit'};
   typeMonthly: DropdownItem = {name: 'Monatlich', value: 'monthly'};
@@ -27,6 +29,7 @@ export class BudgetListComponent {
   chosenType: DropdownItem = this.typeNoTimeLimit;
 
   budgets: Budget[] = [];
+  clickedBudget: Budget | undefined;
 
   constructor(private ngbModal: NgbModal,
               private budgetService: BudgetService,
@@ -51,6 +54,10 @@ export class BudgetListComponent {
     this.openAddBudgetModal();
   }
 
+  onCardClick(budget: Budget): void {
+    this.openEditBudgetModal(budget);
+  }
+
   openAddBudgetModal(): void {
     this.addBudgetModalRef = this.ngbModal.open(
       this.addBudgetModal,
@@ -59,9 +66,24 @@ export class BudgetListComponent {
       });
   }
 
+  openEditBudgetModal(budget: Budget): void {
+    this.clickedBudget = budget;
+    this.editBudgetModalRef = this.ngbModal.open(
+      this.editBudgetModal,
+      {
+        size: 'sm'
+      });
+  }
+
   onCloseAddBudgetModal(): void {
     if (this.addBudgetModalRef) {
       this.addBudgetModalRef.close();
+    }
+  }
+
+  onCloseEditBudgetModal(): void {
+    if (this.editBudgetModalRef) {
+      this.editBudgetModalRef.close();
     }
   }
 
@@ -87,6 +109,7 @@ export class BudgetListComponent {
       this.budgets = [];
       budgets.forEach(budgetRaw => {
         let budget: Budget = budgetRaw.payload.val() as Budget;
+        budget.key = budgetRaw.key!;
         budget.usedLimit = budget.usedLimit ? budget.usedLimit : 0;
         budget.limit = budget.limit ? budget.limit : 100;
         this.budgets.push(budget);

@@ -27,6 +27,7 @@ import { BudgetListComponent } from './components/budgets/budget-list/budget-lis
 import { CycleListComponent } from './components/budgets/cycle-list/cycle-list.component';
 import { AddBudgetContentComponent } from './components/budgets/budget-list/add-budget-content/add-budget-content.component';
 import {CurrencyMaskModule} from "ng2-currency-mask";
+import { EditBudgetContentComponent } from './components/budgets/budget-list/edit-budget-content/edit-budget-content.component';
 
 @NgModule({
   declarations: [
@@ -43,6 +44,7 @@ import {CurrencyMaskModule} from "ng2-currency-mask";
     BudgetListComponent,
     CycleListComponent,
     AddBudgetContentComponent,
+    EditBudgetContentComponent,
   ],
   imports: [
     BrowserModule,

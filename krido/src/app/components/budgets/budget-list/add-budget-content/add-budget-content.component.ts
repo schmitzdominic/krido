@@ -1,8 +1,9 @@
-import {Component, EventEmitter, Output} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {Budget} from "../../../../entities/budget.model";
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {BudgetService} from "../../../../services/budget/budget.service";
 import {HelperService} from "../../../../services/helper/helper.service";
+import {ToastService} from "../../../../services/toast/toast.service";
 
 @Component({
   selector: 'app-add-budget-content',
@@ -11,7 +12,12 @@ import {HelperService} from "../../../../services/helper/helper.service";
 })
 export class AddBudgetContentComponent {
 
+  @Input() budget: Budget | undefined;
+
   @Output() onClose: EventEmitter<any> = new EventEmitter<any>();
+
+  title: string = 'Budget erstellen';
+  submitButtonText: string = 'erstellen';
 
   addBudgetFormGroup: FormGroup = new FormGroup({
     name: new FormControl(''),
@@ -20,12 +26,14 @@ export class AddBudgetContentComponent {
 
   constructor(private formBuilder: FormBuilder,
               private budgetService: BudgetService,
-              private helperService: HelperService) {
+              private helperService: HelperService,
+              private toastService: ToastService) {
   }
 
   ngOnInit() {
     this.createFormGroup();
     this.setLimitValidator();
+    this.fillFormIfBudget();
   }
 
   createFormGroup() {
@@ -45,6 +53,15 @@ export class AddBudgetContentComponent {
     });
   }
 
+  fillFormIfBudget() {
+    if (this.budget) {
+      this.title = 'Budget Editieren';
+      this.submitButtonText = 'Ändern'
+      this.addBudgetFormGroup.controls['name'].setValue(this.budget.name);
+      this.addBudgetFormGroup.controls['limit'].setValue(this.budget.limit);
+    }
+  }
+
   onCancel() {
     this.onClose.emit();
   }
@@ -59,9 +76,24 @@ export class AddBudgetContentComponent {
       name: this.addBudgetFormGroup.value.name,
       limit: this.addBudgetFormGroup.value.limit
     };
-    this.budgetService.addBudget(budget).then(() => {
-      this.onClose.emit();
-    });
+    if (this.budget) {
+      // Edit existing budget
+      if (this.budget.key) {
+        const key = this.budget.key;
+        delete budget['key'];
+        this.budgetService.updateBudget(budget, key).then(() => {
+          this.onClose.emit();
+        });
+      } else {
+        this.toastService.showDanger('Es tut mir leid, dein Budget konnte nicht editiert werden!');
+        this.onClose.emit();
+      }
+    } else {
+     // Create new budget
+      this.budgetService.addBudget(budget).then(() => {
+        this.onClose.emit();
+      });
+    }
   }
 
 }

@@ -7,7 +7,10 @@ export class PriceService {
 
   constructor() { }
 
-  convertNumberToEuro(number: number) {
-    return (Math.round(number * 100) / 100).toFixed(2).replaceAll('.', ',') + ' €';
+  convertNumberToEuro(number: number | undefined) {
+    if (number) {
+      return (Math.round(number * 100) / 100).toFixed(2).replaceAll('.', ',') + ' €';
+    }
+    return '0,00 €';
   }
 }
