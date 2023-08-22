@@ -63,6 +63,7 @@ export class LoginComponent {
         } else {
           this.toastService.showDanger(error.toString());
         }
+        this.loadingService.setLoading = false;
       }
     }
   }
