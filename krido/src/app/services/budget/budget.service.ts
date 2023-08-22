@@ -28,6 +28,10 @@ export class BudgetService {
     return this.dbService.updateListValue(`${this.rootPath}/month`, key, budget);
   }
 
+  updateCycle(cycle: Cycle, key: string) {
+    return this.dbService.updateListValue(`${this.rootPath}/cycle`, key, cycle);
+  }
+
   addMonthBudget(budget: Budget) {
     return this.dbService.createListValue(`${this.rootPath}/month`, budget);
   }

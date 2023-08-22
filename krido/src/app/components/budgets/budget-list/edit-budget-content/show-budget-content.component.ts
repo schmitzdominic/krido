@@ -5,11 +5,11 @@ import {PriceService} from "../../../../services/price/price.service";
 import {NgbProgressbarConfig} from "@ng-bootstrap/ng-bootstrap";
 
 @Component({
-  selector: 'app-edit-budget-content',
-  templateUrl: './edit-budget-content.component.html',
-  styleUrls: ['./edit-budget-content.component.scss']
+  selector: 'app-show-budget-content',
+  templateUrl: './show-budget-content.component.html',
+  styleUrls: ['./show-budget-content.component.scss']
 })
-export class EditBudgetContentComponent {
+export class ShowBudgetContentComponent {
 
   @Input() budget: Budget | undefined;
 

@@ -1,8 +1,9 @@
 <!-- Modal add Cycle -->
 <ng-template #addCycleModal let-modal>
-  <app-add-cycle-content
+  <app-add-or-edit-cycle-content
+    [cycle]="clickedCycle"
     (onClose)="onCloseAddCycleModal()">
-  </app-add-cycle-content>
+  </app-add-or-edit-cycle-content>
 </ng-template>
 <div class="container">
   <div class="row">

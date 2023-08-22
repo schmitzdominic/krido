@@ -9,11 +9,11 @@ import {HelperService} from "../../../../services/helper/helper.service";
 import {DateService} from "../../../../services/date/date.service";
 
 @Component({
-  selector: 'app-add-cycle-content',
-  templateUrl: './add-cycle-content.component.html',
-  styleUrls: ['./add-cycle-content.component.scss']
+  selector: 'app-add-or-edit-cycle-content',
+  templateUrl: './add-or-edit-cycle-content.component.html',
+  styleUrls: ['./add-or-edit-cycle-content.component.scss']
 })
-export class AddCycleContentComponent {
+export class AddOrEditCycleContentComponent {
 
   @Input() cycle: Cycle | undefined;
 
@@ -23,6 +23,7 @@ export class AddCycleContentComponent {
   submitButtonText: string = 'Erstellen';
 
   isLimitVisible: boolean = false;
+  isCreateNowVisible: boolean = true;
   isNameInvalid: boolean = true;
   isLimitInvalid: boolean = false;
 
@@ -46,15 +47,16 @@ export class AddCycleContentComponent {
   ngOnInit() {
     this.createFormGroup();
     this.setValidators();
+    this.fillFormIfCycle();
   }
 
   createFormGroup() {
     this.addCycleFormGroup = this.formBuilder.group(
       {
-        name: ['', Validators.required],
-        initialLimit: [''],
-        limit: [''],
-        transfer: [''],
+        name: [this.cycle ? this.cycle.name : '', Validators.required],
+        initialLimit: [this.cycle && this.cycle.limit ? true : ''],
+        limit: [this.cycle && this.cycle.limit ? this.cycle.limit : ''],
+        transfer: [this.cycle ? this.cycle.isTransfer : ''],
         createNow: ['']
       }
     );
@@ -78,6 +80,18 @@ export class AddCycleContentComponent {
     });
   }
 
+  fillFormIfCycle() {
+    if (this.cycle) {
+      this.title = 'Zyklus editieren';
+      this.submitButtonText = 'Ändern'
+      this.isCreateNowVisible = false;
+      if (this.cycle.limit) {
+        this.isLimitVisible = true;
+      }
+      this.isNameInvalid = false;
+      this.isLimitInvalid = false;
+    }
+  }
 
   onSubmit() {
     const name: string = this.addCycleFormGroup.value.name;
@@ -90,15 +104,29 @@ export class AddCycleContentComponent {
     if (this.addCycleFormGroup.value.initialLimit) {
       cycle.limit = Number(this.addCycleFormGroup.value.limit);
     }
-    this.budgetService.addCycle(cycle).then(() => {
-      if (this.addCycleFormGroup.value.createNow) {
-        this.createBudgetForThisCycle()?.then(() => {
+    if (this.cycle) {
+      if (this.cycle.key) {
+        const key = this.cycle.key;
+        delete cycle['key'];
+        this.budgetService.updateCycle(cycle, key).then(() => {
           this.onClose.emit();
         });
       } else {
+        this.toastService.showDanger('Es tut mir leid, der Zyklus konnte nicht editiert werden!');
         this.onClose.emit();
       }
-    });
+    } else {
+      // on Add
+      this.budgetService.addCycle(cycle).then(() => {
+        if (this.addCycleFormGroup.value.createNow) {
+          this.createBudgetForThisCycle()?.then(() => {
+            this.onClose.emit();
+          });
+        } else {
+          this.onClose.emit();
+        }
+      });
+    }
   }
 
   createBudgetForThisCycle() {

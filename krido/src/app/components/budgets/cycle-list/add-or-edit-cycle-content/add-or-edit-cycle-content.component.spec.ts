@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { AddCycleContentComponent } from './add-cycle-content.component';
+import { AddOrEditCycleContentComponent } from './add-or-edit-cycle-content.component';
 
 describe('AddCycleContentComponent', () => {
-  let component: AddCycleContentComponent;
-  let fixture: ComponentFixture<AddCycleContentComponent>;
+  let component: AddOrEditCycleContentComponent;
+  let fixture: ComponentFixture<AddOrEditCycleContentComponent>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [AddCycleContentComponent]
+      declarations: [AddOrEditCycleContentComponent]
     });
-    fixture = TestBed.createComponent(AddCycleContentComponent);
+    fixture = TestBed.createComponent(AddOrEditCycleContentComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -1,15 +1,15 @@
 <!-- Modal add Budget -->
 <ng-template #addBudgetModal let-modal>
-  <app-add-budget-content
+  <app-add-or-edit-budget-content
   (onClose)="onCloseAddBudgetModal()">
-  </app-add-budget-content>
+  </app-add-or-edit-budget-content>
 </ng-template>
 <!-- Modal edit Budget -->
 <ng-template #editBudgetModal let-modal>
-  <app-edit-budget-content
+  <app-show-budget-content
     [budget]="clickedBudget"
     (onClose)="onCloseEditBudgetModal()">
-  </app-edit-budget-content>
+  </app-show-budget-content>
 </ng-template>
 <div class="container">
   <!-- timeless budgets -->

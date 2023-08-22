@@ -17,6 +17,7 @@ export class CycleListComponent {
   addCycleModalRef: NgbModalRef | undefined;
 
   cycles: Cycle[] = [];
+  clickedCycle: Cycle | undefined;
 
   constructor(private ngbModal: NgbModal,
               private budgetService: BudgetService,
@@ -39,7 +40,8 @@ export class CycleListComponent {
   }
 
   onCardClick(cycle: Cycle) {
-
+    this.clickedCycle = cycle;
+    this.onAddClick();
   }
 
   onAddClick(): void {

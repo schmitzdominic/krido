@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { EditBudgetContentComponent } from './edit-budget-content.component';
+import { ShowBudgetContentComponent } from './show-budget-content.component';
 
 describe('EditBudgetContentComponent', () => {
-  let component: EditBudgetContentComponent;
-  let fixture: ComponentFixture<EditBudgetContentComponent>;
+  let component: ShowBudgetContentComponent;
+  let fixture: ComponentFixture<ShowBudgetContentComponent>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [EditBudgetContentComponent]
+      declarations: [ShowBudgetContentComponent]
     });
-    fixture = TestBed.createComponent(EditBudgetContentComponent);
+    fixture = TestBed.createComponent(ShowBudgetContentComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

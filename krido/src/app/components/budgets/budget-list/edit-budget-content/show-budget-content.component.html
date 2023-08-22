@@ -1,10 +1,10 @@
 <button *ngIf="isEditButtonShown" type="button" class="btn btn-dark position-absolute end-0 top-0 mt-3 me-3" (click)="onEdit()"><i class="bi bi-pencil"></i></button>
 <!-- Edit -->
 <div *ngIf="!isContentReadOnly">
-  <app-add-budget-content
+  <app-add-or-edit-budget-content
     [budget]="budget"
     (onClose)="onCancel()">
-  </app-add-budget-content>
+  </app-add-or-edit-budget-content>
 </div>
 
 <!-- View -->

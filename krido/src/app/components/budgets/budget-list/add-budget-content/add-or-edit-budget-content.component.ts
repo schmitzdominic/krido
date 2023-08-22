@@ -6,11 +6,11 @@ import {HelperService} from "../../../../services/helper/helper.service";
 import {ToastService} from "../../../../services/toast/toast.service";
 
 @Component({
-  selector: 'app-add-budget-content',
-  templateUrl: './add-budget-content.component.html',
-  styleUrls: ['./add-budget-content.component.scss']
+  selector: 'app-add-or-edit-budget-content',
+  templateUrl: './add-or-edit-budget-content.component.html',
+  styleUrls: ['./add-or-edit-budget-content.component.scss']
 })
-export class AddBudgetContentComponent {
+export class AddOrEditBudgetContentComponent {
 
   @Input() budget: Budget | undefined;
 

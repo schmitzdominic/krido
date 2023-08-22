@@ -50,7 +50,7 @@
         </label>
       </div>
     </div>
-    <div class="col-12 mb-3">
+    <div *ngIf="isCreateNowVisible" class="col-12 mb-3">
       <div class="form-check">
         <input formControlName="createNow" class="form-check-input" type="checkbox" value="" id="add-cycle-create-now">
         <label class="form-check-label ps-1" for="add-cycle-create-now">
