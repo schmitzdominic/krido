@@ -39,4 +39,8 @@ export class BudgetService {
   getAllMonthlyBudgets() {
     return this.dbService.readList(`${this.rootPath}/month`);
   }
+
+  getAllCycles() {
+    return this.dbService.readList(`${this.rootPath}/cycle`);
+  }
 }

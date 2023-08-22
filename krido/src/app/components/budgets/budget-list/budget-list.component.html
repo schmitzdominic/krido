@@ -21,8 +21,8 @@
       <div *ngFor="let budget of noTimeLimitBudgets" class="card p-1 m-2" (click)="onCardClick(budget)">
         <div class="card-body">
           <div style="height: 30px">
-            <span class="name-no-time-limit position-absolute start-0 top-0 pt-3 ps-3"> {{budget.name}} </span>
-            <span class="limit-no-time-limit position-absolute top-0 end-0 pt-3 pe-3">{{ budget.limit ? priceService.convertNumberToEuro(budget.limit!) : 'Bitte Limit setzen' }}</span>
+            <span class="name position-absolute start-0 top-0 pt-3 ps-3"> {{budget.name}} </span>
+            <span class="limit position-absolute top-0 end-0 pt-3 pe-3">{{ budget.limit ? priceService.convertNumberToEuro(budget.limit!) : 'Bitte Limit setzen' }}</span>
           </div>
           <div>
             <ngb-progressbar
@@ -45,8 +45,8 @@
       <div *ngFor="let budget of monthlyBudgets" class="card p-1 m-2" (click)="onCardClick(budget)">
         <div class="card-body">
           <div style="height: 30px">
-            <span class="name-monthly position-absolute start-0 top-0 pt-3 ps-3"> {{budget.name}} </span>
-            <span class="limit-monthly position-absolute top-0 end-0 pt-3 pe-3">{{ budget.limit ? priceService.convertNumberToEuro(budget.limit!) : 'Bitte Limit setzen' }}</span>
+            <span class="name position-absolute start-0 top-0 pt-3 ps-3"> {{budget.name}} </span>
+            <span class="limit position-absolute top-0 end-0 pt-3 pe-3">{{ budget.limit ? priceService.convertNumberToEuro(budget.limit!) : 'Bitte Limit setzen' }}</span>
           </div>
           <div>
             <ngb-progressbar
