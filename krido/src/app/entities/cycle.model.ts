@@ -5,8 +5,6 @@ export interface Cycle {
   searchName: string;
   name: string;
   limit?: number;
-  isInitialValue: boolean;
   isTransfer: boolean;
-  isCreateThisCycle: boolean;
-  cycleType: CycleType;
+  type: CycleType;
 }

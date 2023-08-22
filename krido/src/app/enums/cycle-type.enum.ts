@@ -1,3 +1,3 @@
 export enum CycleType {
-  monthly = 'Monatlich'
+  monthly
 }

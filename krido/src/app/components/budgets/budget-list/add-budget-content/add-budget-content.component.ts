@@ -39,8 +39,8 @@ export class AddBudgetContentComponent {
   createFormGroup() {
     this.addBudgetFormGroup = this.formBuilder.group(
         {
-          name: ['', Validators.required],
-          limit: ['', Validators.required]
+          name: [this.budget ? this.budget.name : '', Validators.required],
+          limit: [this.budget ? this.budget.limit : '', Validators.required]
         }
     );
   }
@@ -57,8 +57,6 @@ export class AddBudgetContentComponent {
     if (this.budget) {
       this.title = 'Budget editieren';
       this.submitButtonText = 'Ändern'
-      this.addBudgetFormGroup.controls['name'].setValue(this.budget.name);
-      this.addBudgetFormGroup.controls['limit'].setValue(this.budget.limit);
     }
   }
 

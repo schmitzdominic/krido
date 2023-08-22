@@ -6,5 +6,6 @@ export interface Budget {
   name: string;
   limit?: number;
   usedLimit?: number;
+  validityPeriod?: string;
   entries?: Entry[];
 }

@@ -8,6 +8,6 @@ export class HelperService {
   constructor() { }
 
   createSearchName(name: string): string {
-    return name.replaceAll(' ', '');
+    return name.replaceAll(' ', '').toLowerCase();
   }
 }
