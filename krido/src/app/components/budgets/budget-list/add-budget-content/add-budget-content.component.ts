@@ -72,16 +72,23 @@ export class AddBudgetContentComponent {
     const budget: Budget = {
       searchName: this.helperService.createSearchName(this.addBudgetFormGroup.value.name),
       name: this.addBudgetFormGroup.value.name,
-      limit: this.addBudgetFormGroup.value.limit
+      limit: this.addBudgetFormGroup.value.limit,
+      isArchived: false
     };
     if (this.budget) {
       // Edit existing budget
       if (this.budget.key) {
         const key = this.budget.key;
         delete budget['key'];
-        this.budgetService.updateBudget(budget, key).then(() => {
-          this.onClose.emit();
-        });
+        if (this.budget.validityPeriod) {
+          this.budgetService.updateMonthBudget(budget, key).then(() => {
+            this.onClose.emit();
+          });
+        } else {
+          this.budgetService.updateNoTimeLimitBudget(budget, key).then(() => {
+            this.onClose.emit();
+          });
+        }
       } else {
         this.toastService.showDanger('Es tut mir leid, dein Budget konnte nicht editiert werden!');
         this.onClose.emit();

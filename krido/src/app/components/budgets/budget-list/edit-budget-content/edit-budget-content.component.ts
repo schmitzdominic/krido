@@ -16,6 +16,7 @@ export class EditBudgetContentComponent {
   @Output() onClose: EventEmitter<any> = new EventEmitter<any>();
 
   isContentReadOnly: boolean = true;
+  isEditButtonShown: boolean = true;
 
   editBudgetFormGroup: FormGroup = new FormGroup({
     name: new FormControl(''),
@@ -29,8 +30,16 @@ export class EditBudgetContentComponent {
   }
 
   ngOnInit(): void {
+    this.checkIfLimitIsSet();
     this.createFormGroup();
     this.loadProgressBarConfig();
+  }
+
+  checkIfLimitIsSet() {
+    if (!this.budget?.limit) {
+      this.isEditButtonShown = false;
+      this.onEdit();
+    }
   }
 
   createFormGroup(): void {

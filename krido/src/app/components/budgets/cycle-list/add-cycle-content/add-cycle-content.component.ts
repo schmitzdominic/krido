@@ -23,6 +23,8 @@ export class AddCycleContentComponent {
   submitButtonText: string = 'Erstellen';
 
   isLimitVisible: boolean = false;
+  isNameInvalid: boolean = true;
+  isLimitInvalid: boolean = false;
 
   chosenCycleType: CycleType = CycleType.monthly;
 
@@ -59,7 +61,19 @@ export class AddCycleContentComponent {
   }
 
   setValidators() {
+    this.addCycleFormGroup.controls['name'].valueChanges.subscribe((name: string) => {
+      this.isNameInvalid = name.length <= 0;
+    });
+    this.addCycleFormGroup.controls['limit'].valueChanges.subscribe((limit: number) => {
+      this.isLimitInvalid = limit <= 0;
+    });
     this.addCycleFormGroup.controls['initialLimit'].valueChanges.subscribe(initialLimit => {
+      if (!this.isLimitVisible && initialLimit) {
+        this.addCycleFormGroup.controls['limit'].setValue(0);
+      }
+      if (!initialLimit) {
+        this.isLimitInvalid = false;
+      }
       this.isLimitVisible = initialLimit;
     });
   }
@@ -70,7 +84,7 @@ export class AddCycleContentComponent {
     let cycle: Cycle = {
       searchName: this.helperService.createSearchName(name),
       name: name,
-      isTransfer: this.addCycleFormGroup.value.transfer,
+      isTransfer: !!this.addCycleFormGroup.value.transfer,
       type: this.chosenCycleType
     }
     if (this.addCycleFormGroup.value.initialLimit) {
@@ -94,7 +108,8 @@ export class AddCycleContentComponent {
         let budget: Budget = {
           searchName: this.helperService.createSearchName(name),
           name: name,
-          validityPeriod: this.dateService.getActualMonthString()
+          validityPeriod: this.dateService.getActualMonthString(),
+          isArchived: false
         };
         if (this.addCycleFormGroup.value.initialLimit) {
           budget.limit = Number(this.addCycleFormGroup.value.limit);

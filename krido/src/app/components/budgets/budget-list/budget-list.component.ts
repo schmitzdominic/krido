@@ -28,7 +28,8 @@ export class BudgetListComponent {
 
   chosenType: DropdownItem = this.typeNoTimeLimit;
 
-  budgets: Budget[] = [];
+  noTimeLimitBudgets: Budget[] = [];
+  monthlyBudgets: Budget[] = [];
   clickedBudget: Budget | undefined;
 
   constructor(private ngbModal: NgbModal,
@@ -39,11 +40,11 @@ export class BudgetListComponent {
 
   ngOnInit() {
       this.loadNoTimeLimitBudgets();
+      this.loadTimeLimitBudgets();
       this.loadProgressBarConfig();
   }
 
   loadProgressBarConfig() {
-      this.ngbProgressbarConfig.max = 1000;
       this.ngbProgressbarConfig.striped = true;
       this.ngbProgressbarConfig.animated = true;
       this.ngbProgressbarConfig.type = 'success';
@@ -99,6 +100,7 @@ export class BudgetListComponent {
           break;
         }
         case this.typeMonthly.value: {
+          this.loadTimeLimitBudgets();
           break;
         }
     }
@@ -106,15 +108,32 @@ export class BudgetListComponent {
 
   loadNoTimeLimitBudgets() {
     this.budgetService.getAllNoTimeLimitBudgets().subscribe(budgets => {
-      this.budgets = [];
+      this.noTimeLimitBudgets = [];
       budgets.forEach(budgetRaw => {
         let budget: Budget = budgetRaw.payload.val() as Budget;
         budget.key = budgetRaw.key!;
         budget.usedLimit = budget.usedLimit ? budget.usedLimit : 0;
-        budget.limit = budget.limit ? budget.limit : 100;
-        this.budgets.push(budget);
-      })
-    })
+        budget.limit = budget.limit ? Number(budget.limit) : undefined;
+        if (!budget.isArchived) {
+          this.noTimeLimitBudgets.push(budget);
+        }
+      });
+    });
+  }
+
+  loadTimeLimitBudgets() {
+    this.budgetService.getAllMonthlyBudgets().subscribe(budgets => {
+      this.monthlyBudgets = [];
+      budgets.forEach(budgetRaw => {
+        let budget: Budget = budgetRaw.payload.val() as Budget;
+        budget.key = budgetRaw.key!;
+        budget.usedLimit = budget.usedLimit ? budget.usedLimit : 0;
+        budget.limit = budget.limit ? Number(budget.limit) : undefined;
+        if (!budget.isArchived) {
+          this.monthlyBudgets.push(budget);
+        }
+      });
+    });
   }
 
   getProgressBarType(value: number, max: number): string {

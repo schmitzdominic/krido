@@ -8,4 +8,5 @@ export interface Budget {
   usedLimit?: number;
   validityPeriod?: string;
   entries?: Entry[];
+  isArchived: boolean;
 }

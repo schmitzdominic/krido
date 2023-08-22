@@ -40,9 +40,6 @@
           inputmode="numeric"
           pattern="^\d+(\,\d{1,2})?$">
         <span class="input-group-text" id="inputGroupPrepend">€</span>
-        <div class="invalid-feedback">
-          Limit fehlt!
-        </div>
       </div>
     </div>
     <div class="col-12 mb-3">
@@ -68,6 +65,6 @@
   <button
     type="button"
     class="btn btn-light"
-    [disabled]="addCycleFormGroup.invalid"
+    [disabled]="isNameInvalid || isLimitInvalid"
     (click)="onSubmit()">{{ submitButtonText }}</button>
 </div>

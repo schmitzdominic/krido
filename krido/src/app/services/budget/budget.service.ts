@@ -20,8 +20,12 @@ export class BudgetService {
     return this.dbService.createListValue(`${this.rootPath}/cycle`, cycle);
   }
 
-  updateBudget(budget: Budget, key: string) {
+  updateNoTimeLimitBudget(budget: Budget, key: string) {
     return this.dbService.updateListValue(`${this.rootPath}/general`, key, budget);
+  }
+
+  updateMonthBudget(budget: Budget, key: string) {
+    return this.dbService.updateListValue(`${this.rootPath}/month`, key, budget);
   }
 
   addMonthBudget(budget: Budget) {
@@ -30,5 +34,9 @@ export class BudgetService {
 
   getAllNoTimeLimitBudgets() {
     return this.dbService.readList(`${this.rootPath}/general`);
+  }
+
+  getAllMonthlyBudgets() {
+    return this.dbService.readList(`${this.rootPath}/month`);
   }
 }
