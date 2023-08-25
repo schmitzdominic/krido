@@ -22,7 +22,6 @@ export class AddOrEditCycleContentComponent {
   title: string = 'Zyklus erstellen';
   submitButtonText: string = 'Erstellen';
   errorCycleCouldNotBeChanged: string = 'Es tut mir leid, der Zyklus konnte nicht editiert werden!';
-  errorCycleCouldNotBeCreated: string = 'Es tut mir leid, der Zyklus konnte nicht angelegt werden!';
   errorTypeNotImplemented: string = 'Der ausgewählte Cycle Typ ist nicht implementiert!';
 
   isLimitVisible: boolean = false;
@@ -146,7 +145,6 @@ export class AddOrEditCycleContentComponent {
           this.onClose.emit();
         });
       } else {
-        this.toastService.showDanger(this.errorCycleCouldNotBeCreated);
         this.onClose.emit();
       }
     });
