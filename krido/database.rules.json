@@ -5,8 +5,8 @@
         ".read": "$uid === auth.uid",
         ".write": "$uid === auth.uid"
       }
-    }
-  },
-  ".read": "auth != null",
-  ".write": "auth != null"
+    },
+    ".read": "auth != null",
+    ".write": "auth != null"
+  }
 }
