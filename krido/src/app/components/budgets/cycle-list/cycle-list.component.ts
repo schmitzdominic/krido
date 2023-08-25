@@ -45,10 +45,10 @@ export class CycleListComponent {
   }
 
   onAddClick(): void {
-    this.openAddCycleModal();
+    this.openAddOrEditCycleModal();
   }
 
-  openAddCycleModal(): void {
+  openAddOrEditCycleModal(): void {
     this.addCycleModalRef = this.ngbModal.open(
       this.addCycleModal,
       {
@@ -56,7 +56,8 @@ export class CycleListComponent {
       });
   }
 
-  onCloseAddCycleModal(): void {
+  onCloseAddOrEditCycleModal(): void {
+    this.clickedCycle = undefined;
     if (this.addCycleModalRef) {
       this.addCycleModalRef.close();
     }
