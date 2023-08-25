@@ -104,7 +104,7 @@ export class AddOrEditCycleContentComponent {
       this.changeCycle(cycle);
     } else {
       // on Add
-
+      this.addCycle(cycle);
     }
   }
 
