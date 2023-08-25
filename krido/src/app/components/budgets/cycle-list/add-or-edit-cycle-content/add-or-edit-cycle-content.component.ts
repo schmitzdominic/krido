@@ -21,6 +21,9 @@ export class AddOrEditCycleContentComponent {
 
   title: string = 'Zyklus erstellen';
   submitButtonText: string = 'Erstellen';
+  errorCycleCouldNotBeChanged: string = 'Es tut mir leid, der Zyklus konnte nicht editiert werden!';
+  errorCycleCouldNotBeCreated: string = 'Es tut mir leid, der Zyklus konnte nicht angelegt werden!';
+  errorTypeNotImplemented: string = 'Der ausgewählte Cycle Typ ist nicht implementiert!';
 
   isLimitVisible: boolean = false;
   isCreateNowVisible: boolean = true;
@@ -94,39 +97,59 @@ export class AddOrEditCycleContentComponent {
   }
 
   onSubmit() {
+    let cycle = this.createCycleObjectFromInput();
+    this.setInitialLimit(cycle);
+    if (this.cycle) {
+      // on Change
+      this.changeCycle(cycle);
+    } else {
+      // on Add
+
+    }
+  }
+
+  createCycleObjectFromInput(): Cycle {
     const name: string = this.addCycleFormGroup.value.name;
-    let cycle: Cycle = {
+    return {
       searchName: this.helperService.createSearchName(name),
       name: name,
       isTransfer: !!this.addCycleFormGroup.value.transfer,
       type: this.chosenCycleType
-    }
+    };
+  }
+
+  setInitialLimit(cycle: Cycle) {
     if (this.addCycleFormGroup.value.initialLimit) {
       cycle.limit = Number(this.addCycleFormGroup.value.limit);
+    } else {
+      cycle.limit = Number(0);
     }
-    if (this.cycle) {
-      if (this.cycle.key) {
-        const key = this.cycle.key;
-        delete cycle['key'];
-        this.budgetService.updateCycle(cycle, key).then(() => {
+  }
+
+  changeCycle(cycle: Cycle) {
+    if (this.cycle && this.cycle.key) {
+      const key: string = this.cycle.key;
+      delete cycle['key'];
+      this.budgetService.updateCycle(cycle, key).then(() => {
+        this.onClose.emit();
+      });
+    } else {
+      this.toastService.showDanger(this.errorCycleCouldNotBeChanged);
+      this.onClose.emit();
+    }
+  }
+
+  addCycle(cycle: Cycle) {
+    this.budgetService.addCycle(cycle).then(() => {
+      if (this.addCycleFormGroup.value.createNow) {
+        this.createBudgetForThisCycle()?.then(() => {
           this.onClose.emit();
         });
       } else {
-        this.toastService.showDanger('Es tut mir leid, der Zyklus konnte nicht editiert werden!');
+        this.toastService.showDanger(this.errorCycleCouldNotBeCreated);
         this.onClose.emit();
       }
-    } else {
-      // on Add
-      this.budgetService.addCycle(cycle).then(() => {
-        if (this.addCycleFormGroup.value.createNow) {
-          this.createBudgetForThisCycle()?.then(() => {
-            this.onClose.emit();
-          });
-        } else {
-          this.onClose.emit();
-        }
-      });
-    }
+    });
   }
 
   createBudgetForThisCycle() {
@@ -145,7 +168,7 @@ export class AddOrEditCycleContentComponent {
         return this.budgetService.addMonthBudget(budget);
       }
       default: {
-        this.toastService.showDanger('Der ausgewählte Cycle Typ ist nicht implementiert!');
+        this.toastService.showDanger(this.errorTypeNotImplemented);
         return null;
       }
     }
