@@ -47,7 +47,7 @@ export class AddOrEditBudgetContentComponent {
 
   setLimitValidator() {
     this.addBudgetFormGroup.controls['limit'].valueChanges.subscribe(limit => {
-      if (limit) {
+      if (limit && limit > 0) {
         this.addBudgetFormGroup.controls['limit'].setErrors(null);
       }
     });

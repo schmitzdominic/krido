@@ -25,7 +25,7 @@ import { HomeSetupComponent } from './components/home-setup/home-setup.component
 import { ToastsContainerComponent } from './general/toasts-container/toasts-container.component';
 import { BudgetListComponent } from './components/budgets/budget-list/budget-list.component';
 import { CycleListComponent } from './components/budgets/cycle-list/cycle-list.component';
-import { AddOrEditBudgetContentComponent } from './components/budgets/budget-list/add-budget-content/add-or-edit-budget-content.component';
+import { AddOrEditBudgetContentComponent } from './components/budgets/budget-list/add-or-edit-budget-content/add-or-edit-budget-content.component';
 import {CurrencyMaskModule} from "ng2-currency-mask";
 import { ShowBudgetContentComponent } from './components/budgets/budget-list/edit-budget-content/show-budget-content.component';
 import { AddOrEditCycleContentComponent } from './components/budgets/cycle-list/add-or-edit-cycle-content/add-or-edit-cycle-content.component';
