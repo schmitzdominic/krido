@@ -12,9 +12,7 @@
   </app-show-budget-content>
 </ng-template>
 <div class="container">
-  <!-- timeless budgets -->
   <div class="row">
-    <h2 class="pt-2">Zeitlos</h2>
     <!-- No Time Limit -->
     <table class="table table-striped">
       <tbody>
@@ -37,7 +35,7 @@
       </tbody>
     </table>
   </div>
-  <div class="row">
+  <div class="row" *ngIf="monthlyBudgets.length > 0">
     <h2 class="pt-2">Diesen Monat</h2>
     <!-- Monthly -->
     <table class="table table-striped">
