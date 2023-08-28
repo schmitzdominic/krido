@@ -13,6 +13,13 @@
       </app-cycle-list>
     </ng-template>
   </li>
+  <li [ngbNavItem]="'archive'">
+    <button ngbNavLink>Archiv</button>
+    <ng-template ngbNavContent>
+      <app-budget-archive-list>
+      </app-budget-archive-list>
+    </ng-template>
+  </li>
 </ul>
 
 <div [ngbNavOutlet]="nav" class="mt-2"></div>

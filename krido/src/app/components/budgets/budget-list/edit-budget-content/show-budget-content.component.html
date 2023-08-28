@@ -17,7 +17,7 @@
       <ngb-progressbar
         [value]="budget?.usedLimit!"
         [max]="budget?.limit!"
-        type="{{ getProgressBarType(budget?.usedLimit!, budget?.limit!) }}"
+        type="{{ progressBarService.getProgressBarType(budget?.usedLimit!, budget?.limit!) }}"
       >{{ getProgressBarText() }}</ngb-progressbar>
     </div>
   </div>

@@ -4,6 +4,7 @@ import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap/modal/modal-ref";
 import {Budget} from "../../../entities/budget.model";
 import {BudgetService} from "../../../services/budget/budget.service";
 import {PriceService} from "../../../services/price/price.service";
+import {ProgressBarService} from "../../../services/progress-bar/progress-bar.service";
 
 interface DropdownItem {
   name: string;
@@ -35,6 +36,7 @@ export class BudgetListComponent {
   constructor(private ngbModal: NgbModal,
               private budgetService: BudgetService,
               private ngbProgressbarConfig: NgbProgressbarConfig,
+              public progressBarService: ProgressBarService,
               public priceService: PriceService) {
   }
 
@@ -45,10 +47,7 @@ export class BudgetListComponent {
   }
 
   loadProgressBarConfig() {
-      this.ngbProgressbarConfig.striped = true;
-      this.ngbProgressbarConfig.animated = true;
-      this.ngbProgressbarConfig.type = 'success';
-      this.ngbProgressbarConfig.height = '20px';
+    this.progressBarService.setProgressBarConfig(this.ngbProgressbarConfig);
   }
 
   onAddClick(): void {
@@ -134,16 +133,5 @@ export class BudgetListComponent {
         }
       });
     });
-  }
-
-  getProgressBarType(value: number, max: number): string {
-    const progress = value / max * 100;
-    if (progress >= 75) {
-      return 'danger';
-    } else if (progress >= 50) {
-      return 'warning';
-    } else {
-      return 'success';
-    }
   }
 }

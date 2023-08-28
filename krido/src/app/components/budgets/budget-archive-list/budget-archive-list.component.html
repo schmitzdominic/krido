@@ -1,0 +1,31 @@
+<div class="container">
+  <div class="row">
+    <table class="table table-striped">
+      <tbody>
+        <div *ngFor="let budget of noTimeLimitBudgets" class="card p-1 m-2" (click)="onCardClick(budget)">
+          <div class="card-body">
+            <app-budget-list-entry
+              [budget]="budget">
+            </app-budget-list-entry>
+          </div>
+        </div>
+      </tbody>
+    </table>
+  </div>
+  <div class="row">
+    <table class="table table-striped">
+      <tbody>
+      <div *ngFor="let monthBudget of monthBudgets">
+        <h1>{{ monthBudget.name }}</h1>
+        <div *ngFor="let budget of monthBudget.budgets" class="card p-1 m-2" (click)="onCardClick(budget)">
+          <div class="card-body">
+            <app-budget-list-entry
+              [budget]="budget">
+            </app-budget-list-entry>
+          </div>
+        </div>
+      </div>
+      </tbody>
+    </table>
+  </div>
+</div>

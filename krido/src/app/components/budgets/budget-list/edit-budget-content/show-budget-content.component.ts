@@ -3,6 +3,7 @@ import {Budget} from "../../../../entities/budget.model";
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {PriceService} from "../../../../services/price/price.service";
 import {NgbProgressbarConfig} from "@ng-bootstrap/ng-bootstrap";
+import {ProgressBarService} from "../../../../services/progress-bar/progress-bar.service";
 
 @Component({
   selector: 'app-show-budget-content',
@@ -25,6 +26,7 @@ export class ShowBudgetContentComponent {
 
   constructor(private formBuilder: FormBuilder,
               private ngbProgressbarConfig: NgbProgressbarConfig,
+              public progressBarService: ProgressBarService,
               public priceService: PriceService) {
     this.createFormGroup();
   }
@@ -52,8 +54,7 @@ export class ShowBudgetContentComponent {
   }
 
   loadProgressBarConfig() {
-    this.ngbProgressbarConfig.striped = true;
-    this.ngbProgressbarConfig.animated = true;
+    this.progressBarService.setProgressBarConfig(this.ngbProgressbarConfig);
   }
 
   getRestBudget() {
@@ -62,17 +63,6 @@ export class ShowBudgetContentComponent {
       return this.priceService.convertNumberToEuro(restBudget);
     } else {
       return this.budget?.limit ? this.priceService.convertNumberToEuro(this.budget?.limit) : 'N/A';
-    }
-  }
-
-  getProgressBarType(value: number, max: number): string {
-    const progress = value / max * 100;
-    if (progress >= 75) {
-      return 'danger';
-    } else if (progress >= 50) {
-      return 'warning';
-    } else {
-      return 'success';
     }
   }
 

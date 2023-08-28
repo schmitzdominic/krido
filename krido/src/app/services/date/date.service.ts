@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 
 @Injectable({
   providedIn: 'root'
@@ -31,6 +31,17 @@ export class DateService {
   }
 
   /**
+   * Gets the month name by a monthString.
+   *
+   * @param {String} monthString e.g. 202201 -> Januar
+   * @returns {string} Month Name
+   */
+  getMonthName(monthString: String): string {
+    const monthNumber: number = Number(monthString.slice(-2));
+    return this.monthNames[monthNumber];
+  }
+
+  /**
    * Get the actual month name (browser date)
    */
   getActualMonthName(): string {
@@ -52,8 +63,18 @@ export class DateService {
    * @param {number} month to get the short name from
    * @returns {string} short month name
    */
-  getMonthShortName(month: number) {
+  getMonthShortName(month: number): string {
     return this.monthNames[month].substring(0,3) + '.';
+  }
+
+  /**
+   * Gets the year name by a monthString.
+   *
+   * @param {String} monthString e.g. 202201
+   * @returns {number} Year
+   */
+  getYear(monthString: string): number {
+    return Number(monthString.slice(0, 4));
   }
 
   /**

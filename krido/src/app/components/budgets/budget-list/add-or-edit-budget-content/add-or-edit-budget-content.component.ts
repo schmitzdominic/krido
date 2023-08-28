@@ -4,6 +4,7 @@ import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {BudgetService} from "../../../../services/budget/budget.service";
 import {HelperService} from "../../../../services/helper/helper.service";
 import {ToastService} from "../../../../services/toast/toast.service";
+import {budget} from "@angular/fire/compat/remote-config";
 
 @Component({
   selector: 'app-add-or-edit-budget-content',
@@ -18,6 +19,8 @@ export class AddOrEditBudgetContentComponent {
 
   title: string = 'Budget erstellen';
   submitButtonText: string = 'Erstellen';
+
+  archiveSuccessMessage: string = `${budget.name} erfolgreich archiviert`;
 
   addBudgetFormGroup: FormGroup = new FormGroup({
     name: new FormControl(''),
@@ -60,6 +63,26 @@ export class AddOrEditBudgetContentComponent {
     }
   }
 
+  onArchive(): void {
+    let budget: Budget = this.createBudgetObject();
+    budget.isArchived = true;
+    if (this.budget?.key) {
+      const key: string = this.budget.key;
+      delete budget['key'];
+      if (this.budget?.validityPeriod) {
+        this.budgetService.updateMonthBudget(budget, key).then(() => {
+          this.toastService.showSuccess(this.archiveSuccessMessage);
+          this.onClose.emit();
+        });
+      } else {
+        this.budgetService.updateNoTimeLimitBudget(budget, key). then(() => {
+          this.toastService.showSuccess(this.archiveSuccessMessage);
+          this.onClose.emit();
+        });
+      }
+    }
+  }
+
   onCancel() {
     this.onClose.emit();
   }
@@ -68,13 +91,17 @@ export class AddOrEditBudgetContentComponent {
     this.persistBudgetAndCloseModal();
   }
 
-  persistBudgetAndCloseModal() {
-    const budget: Budget = {
+  createBudgetObject(): Budget {
+    return {
       searchName: this.helperService.createSearchName(this.addBudgetFormGroup.value.name),
       name: this.addBudgetFormGroup.value.name,
       limit: this.addBudgetFormGroup.value.limit,
       isArchived: false
     };
+  }
+
+  persistBudgetAndCloseModal() {
+    const budget = this.createBudgetObject();
     if (this.budget) {
       // Edit existing budget
       if (this.budget.key) {

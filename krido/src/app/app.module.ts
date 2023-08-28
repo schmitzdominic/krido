@@ -31,6 +31,8 @@ import { ShowBudgetContentComponent } from './components/budgets/budget-list/edi
 import { AddOrEditCycleContentComponent } from './components/budgets/cycle-list/add-or-edit-cycle-content/add-or-edit-cycle-content.component';
 import { EditCycleContentComponent } from './components/budgets/cycle-list/edit-cycle-content/edit-cycle-content.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
+import { BudgetArchiveListComponent } from './components/budgets/budget-archive-list/budget-archive-list.component';
+import { BudgetListEntryComponent } from './components/budgets/budget-list-entry/budget-list-entry.component';
 
 @NgModule({
   declarations: [
@@ -50,6 +52,8 @@ import { ServiceWorkerModule } from '@angular/service-worker';
     ShowBudgetContentComponent,
     AddOrEditCycleContentComponent,
     EditCycleContentComponent,
+    BudgetArchiveListComponent,
+    BudgetListEntryComponent,
   ],
   imports: [
     BrowserModule,
