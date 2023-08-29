@@ -68,9 +68,9 @@ export class AddOrEditBudgetContentComponent {
       this.submitButtonText = 'Ändern';
 
       // Set Generic Error Messages
-      this.archiveSuccessArchivedMessage = `${this.budget.name} erfolgreich archiviert`;
-      this.archiveSuccessDeArchivedMessage = `${this.budget.name} erfolgreich aktiviert`;
-      this.deleteSuccessMessage = `${this.budget.name} erfolgreich gelöscht`;
+      this.archiveSuccessArchivedMessage = `Budget ${this.budget.name} erfolgreich archiviert`;
+      this.archiveSuccessDeArchivedMessage = `Bduget ${this.budget.name} erfolgreich aktiviert`;
+      this.deleteSuccessMessage = `Budget ${this.budget.name} erfolgreich gelöscht`;
     }
   }
 

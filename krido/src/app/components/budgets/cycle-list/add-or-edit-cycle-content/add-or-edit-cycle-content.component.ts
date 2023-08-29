@@ -21,8 +21,10 @@ export class AddOrEditCycleContentComponent {
 
   title: string = 'Zyklus erstellen';
   submitButtonText: string = 'Erstellen';
+
   errorCycleCouldNotBeChanged: string = 'Es tut mir leid, der Zyklus konnte nicht editiert werden!';
   errorTypeNotImplemented: string = 'Der ausgewählte Cycle Typ ist nicht implementiert!';
+  deleteSuccessMessage: string = '';
 
   isLimitVisible: boolean = false;
   isCreateNowVisible: boolean = true;
@@ -92,6 +94,9 @@ export class AddOrEditCycleContentComponent {
       }
       this.isNameInvalid = false;
       this.isLimitInvalid = false;
+
+      // Set Generic Error Messages
+      this.deleteSuccessMessage = `Cycle ${this.cycle.name} erfolgreich gelöscht`;
     }
   }
 
@@ -104,6 +109,15 @@ export class AddOrEditCycleContentComponent {
     } else {
       // on Add
       this.addCycle(cycle);
+    }
+  }
+
+  onDelete() {
+    if (this.cycle && this.cycle.key) {
+      this.budgetService.deleteCycle(this.cycle.key).then(() => {
+        this.toastService.showSuccess(this.deleteSuccessMessage);
+        this.onClose.emit();
+      });
     }
   }
 
@@ -139,18 +153,22 @@ export class AddOrEditCycleContentComponent {
   }
 
   addCycle(cycle: Cycle) {
-    this.budgetService.addCycle(cycle).then(() => {
+    this.budgetService.addCycle(cycle).then(cycleReference => {
       if (this.addCycleFormGroup.value.createNow) {
-        this.createBudgetForThisCycle()?.then(() => {
-          this.onClose.emit();
-        });
+        if (cycleReference.key) {
+          this.createBudgetForThisCycle(cycleReference.key)?.then(() => {
+            this.onClose.emit();
+          });
+        } else {
+          this.toastService.showDanger('Etwas ist schief gelaufen bei der Budget Erstellung');
+        }
       } else {
         this.onClose.emit();
       }
     });
   }
 
-  createBudgetForThisCycle() {
+  createBudgetForThisCycle(cycleKey: string) {
     const name: string = this.addCycleFormGroup.value.name;
     switch(this.chosenCycleType) {
       case CycleType.monthly: {
@@ -158,7 +176,8 @@ export class AddOrEditCycleContentComponent {
           searchName: this.helperService.createSearchName(name),
           name: name,
           validityPeriod: this.dateService.getActualMonthString(),
-          isArchived: false
+          isArchived: false,
+          cycleKey: cycleKey
         };
         if (this.addCycleFormGroup.value.initialLimit) {
           budget.limit = Number(this.addCycleFormGroup.value.limit);

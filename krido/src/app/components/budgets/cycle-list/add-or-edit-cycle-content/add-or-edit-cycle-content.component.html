@@ -59,6 +59,7 @@
       </div>
     </div>
   </form>
+  <button *ngIf="cycle" type="button" class="btn btn-danger ms-2" (click)="onDelete()">Löschen</button>
 </div>
 <div class="modal-footer">
   <button type="button" class="btn btn-dark" (click)="onCancel()">Abbrechen</button>
