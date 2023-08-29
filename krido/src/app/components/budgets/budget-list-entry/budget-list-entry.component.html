@@ -1,12 +1,10 @@
-<div style="height: 30px">
+<div style="height: 2em">
   <span class="name position-absolute start-0 top-0 pt-3 ps-3"> {{budget?.name}} </span>
   <span class="limit position-absolute top-0 end-0 pt-3 pe-3">{{ budget?.limit ? priceService.convertNumberToEuro(budget?.limit!) : 'Bitte Limit setzen' }}</span>
 </div>
-<div>
-  <ngb-progressbar
-    [value]="budget?.usedLimit!"
-    [max]="budget?.limit!"
-    [showValue]="true"
-    type="{{progressBarService.getProgressBarType(budget?.usedLimit!, budget?.limit!)}}"
-  ></ngb-progressbar>
-</div>
+<ngb-progressbar
+  [value]="budget?.usedLimit!"
+  [max]="budget?.limit!"
+  [showValue]="true"
+  type="{{progressBarService.getProgressBarType(budget?.usedLimit!, budget?.limit!)}}"
+></ngb-progressbar>

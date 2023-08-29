@@ -11,8 +11,6 @@ export class ProgressBarService {
   setProgressBarConfig(ngbProgressbarConfig: NgbProgressbarConfig) {
     ngbProgressbarConfig.striped = true;
     ngbProgressbarConfig.animated = true;
-    ngbProgressbarConfig.type = 'success';
-    ngbProgressbarConfig.height = '20px';
   }
 
   getProgressBarType(value: number, max: number): string {

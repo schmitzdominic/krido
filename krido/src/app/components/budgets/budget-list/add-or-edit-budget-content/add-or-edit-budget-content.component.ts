@@ -4,7 +4,6 @@ import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {BudgetService} from "../../../../services/budget/budget.service";
 import {HelperService} from "../../../../services/helper/helper.service";
 import {ToastService} from "../../../../services/toast/toast.service";
-import {budget} from "@angular/fire/compat/remote-config";
 
 @Component({
   selector: 'app-add-or-edit-budget-content',
@@ -20,7 +19,13 @@ export class AddOrEditBudgetContentComponent {
   title: string = 'Budget erstellen';
   submitButtonText: string = 'Erstellen';
 
-  archiveSuccessMessage: string = `${budget.name} erfolgreich archiviert`;
+  archiveSuccessArchivedMessage: string = '';
+  archiveSuccessDeArchivedMessage: string = '';
+  deleteSuccessMessage: string = '';
+  errorMessageDeleteNotPossible: string = 'Es tut mir leid, dein Budget enthält noch Einträge';
+
+
+  isDeleteAvailable: boolean = false;
 
   addBudgetFormGroup: FormGroup = new FormGroup({
     name: new FormControl(''),
@@ -37,6 +42,7 @@ export class AddOrEditBudgetContentComponent {
     this.createFormGroup();
     this.setLimitValidator();
     this.fillFormIfBudget();
+    this.isDeleteAvailable = this.isDeleteButtonAvailable();
   }
 
   createFormGroup() {
@@ -59,27 +65,39 @@ export class AddOrEditBudgetContentComponent {
   fillFormIfBudget() {
     if (this.budget) {
       this.title = 'Budget editieren';
-      this.submitButtonText = 'Ändern'
+      this.submitButtonText = 'Ändern';
+
+      // Set Generic Error Messages
+      this.archiveSuccessArchivedMessage = `${this.budget.name} erfolgreich archiviert`;
+      this.archiveSuccessDeArchivedMessage = `${this.budget.name} erfolgreich aktiviert`;
+      this.deleteSuccessMessage = `${this.budget.name} erfolgreich gelöscht`;
     }
   }
 
   onArchive(): void {
-    let budget: Budget = this.createBudgetObject();
-    budget.isArchived = true;
-    if (this.budget?.key) {
-      const key: string = this.budget.key;
-      delete budget['key'];
-      if (this.budget?.validityPeriod) {
-        this.budgetService.updateMonthBudget(budget, key).then(() => {
-          this.toastService.showSuccess(this.archiveSuccessMessage);
-          this.onClose.emit();
-        });
-      } else {
-        this.budgetService.updateNoTimeLimitBudget(budget, key). then(() => {
-          this.toastService.showSuccess(this.archiveSuccessMessage);
+    this.setArchiveState(true);
+  }
+
+  onDeArchive(): void {
+    this.setArchiveState(false);
+  }
+
+  onDelete(): void {
+    if (!this.budget?.entries) {
+      if (this.budget && this.budget.key && this.budget?.validityPeriod) {
+        this.budgetService.deleteMonthBudget(this.budget.key).then(() => {
+          this.toastService.showSuccess(this.deleteSuccessMessage);
           this.onClose.emit();
         });
       }
+      if (this.budget && this.budget.key && !this.budget.validityPeriod) {
+        this.budgetService.deleteBudget(this.budget.key).then(() => {
+          this.toastService.showSuccess(this.deleteSuccessMessage);
+          this.onClose.emit();
+        });
+      }
+    } else {
+      this.toastService.showDanger(this.errorMessageDeleteNotPossible);
     }
   }
 
@@ -105,7 +123,7 @@ export class AddOrEditBudgetContentComponent {
     if (this.budget) {
       // Edit existing budget
       if (this.budget.key) {
-        const key = this.budget.key;
+        const key: string = this.budget.key;
         delete budget['key'];
         if (this.budget.validityPeriod) {
           this.budgetService.updateMonthBudget(budget, key).then(() => {
@@ -128,4 +146,27 @@ export class AddOrEditBudgetContentComponent {
     }
   }
 
+  setArchiveState(state: boolean) {
+    let budget: Budget = this.createBudgetObject();
+    budget.isArchived = state;
+    if (this.budget?.key) {
+      const key: string = this.budget.key;
+      delete budget['key'];
+      if (this.budget?.validityPeriod) {
+        this.budgetService.updateMonthBudget(budget, key).then(() => {
+          this.toastService.showSuccess(state ? this.archiveSuccessArchivedMessage : this.archiveSuccessDeArchivedMessage);
+          this.onClose.emit();
+        });
+      } else {
+        this.budgetService.updateNoTimeLimitBudget(budget, key). then(() => {
+          this.toastService.showSuccess(state ? this.archiveSuccessArchivedMessage : this.archiveSuccessDeArchivedMessage);
+          this.onClose.emit();
+        });
+      }
+    }
+  }
+
+  isDeleteButtonAvailable() {
+    return this.budget && this.budget.isArchived && !this.budget.entries || this.budget?.entries?.length == 0;
+  }
 }

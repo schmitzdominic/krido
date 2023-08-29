@@ -1,7 +1,9 @@
-import { Component } from '@angular/core';
+import {Component, ViewChild} from '@angular/core';
 import {Budget} from "../../../entities/budget.model";
 import {BudgetService} from "../../../services/budget/budget.service";
 import {DateService} from "../../../services/date/date.service";
+import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap/modal/modal-ref";
+import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 
 interface MonthBudget {
   name: string,
@@ -16,10 +18,17 @@ interface MonthBudget {
 })
 export class BudgetArchiveListComponent {
 
+  @ViewChild('editBudgetModal') editBudgetModal: NgbModalRef | undefined;
+
+  editBudgetModalRef: NgbModalRef | undefined;
+
   noTimeLimitBudgets: Budget[] = [];
   monthBudgets: MonthBudget[] = [];
 
-  constructor(private budgetService: BudgetService,
+  clickedBudget: Budget | undefined;
+
+  constructor(private ngbModal: NgbModal,
+              private budgetService: BudgetService,
               private dateService: DateService) {
   }
 
@@ -75,7 +84,22 @@ export class BudgetArchiveListComponent {
   }
 
   onCardClick(budget: Budget) {
+    this.openEditBudgetModal(budget);
+  }
 
+  openEditBudgetModal(budget: Budget): void {
+    this.clickedBudget = budget;
+    this.editBudgetModalRef = this.ngbModal.open(
+      this.editBudgetModal,
+      {
+        size: 'sm'
+      });
+  }
+
+  onCloseEditBudgetModal(): void {
+    if (this.editBudgetModalRef) {
+      this.editBudgetModalRef.close();
+    }
   }
 
 }

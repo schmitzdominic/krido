@@ -21,11 +21,11 @@ export class ToastService {
     this.toasts.splice(0, this.toasts.length);
   }
 
-  showSuccess(text: string, delay: number = 10000) {
+  showSuccess(text: string, delay: number = 5000) {
     this.show(text, { classname: 'bg-success text-light', delay: delay })
   }
 
-  showStandard(text: string, delay: number = 10000) {
+  showStandard(text: string, delay: number = 5000) {
     this.show(text, { delay: delay })
   }
 

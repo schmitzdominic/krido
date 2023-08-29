@@ -1,10 +1,9 @@
 import {Component, ViewChild} from '@angular/core';
-import {NgbModal, NgbProgressbarConfig} from "@ng-bootstrap/ng-bootstrap";
+import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap/modal/modal-ref";
 import {Budget} from "../../../entities/budget.model";
 import {BudgetService} from "../../../services/budget/budget.service";
 import {PriceService} from "../../../services/price/price.service";
-import {ProgressBarService} from "../../../services/progress-bar/progress-bar.service";
 
 interface DropdownItem {
   name: string;
@@ -27,27 +26,19 @@ export class BudgetListComponent {
   typeNoTimeLimit: DropdownItem = {name: 'Ohne Zeitlimit', value: 'noTimeLimit'};
   typeMonthly: DropdownItem = {name: 'Monatlich', value: 'monthly'};
 
-  chosenType: DropdownItem = this.typeNoTimeLimit;
-
   noTimeLimitBudgets: Budget[] = [];
   monthlyBudgets: Budget[] = [];
+
   clickedBudget: Budget | undefined;
 
   constructor(private ngbModal: NgbModal,
               private budgetService: BudgetService,
-              private ngbProgressbarConfig: NgbProgressbarConfig,
-              public progressBarService: ProgressBarService,
               public priceService: PriceService) {
   }
 
   ngOnInit() {
       this.loadNoTimeLimitBudgets();
       this.loadTimeLimitBudgets();
-      this.loadProgressBarConfig();
-  }
-
-  loadProgressBarConfig() {
-    this.progressBarService.setProgressBarConfig(this.ngbProgressbarConfig);
   }
 
   onAddClick(): void {
@@ -84,24 +75,6 @@ export class BudgetListComponent {
   onCloseEditBudgetModal(): void {
     if (this.editBudgetModalRef) {
       this.editBudgetModalRef.close();
-    }
-  }
-
-  chooseType(type: DropdownItem) {
-      this.chosenType = type;
-      this.onTypeChange();
-  }
-
-  onTypeChange() {
-    switch(this.chosenType.value) {
-        case this.typeNoTimeLimit.value: {
-          this.loadNoTimeLimitBudgets();
-          break;
-        }
-        case this.typeMonthly.value: {
-          this.loadTimeLimitBudgets();
-          break;
-        }
     }
   }
 
