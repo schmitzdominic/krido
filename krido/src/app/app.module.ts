@@ -34,6 +34,8 @@ import { ServiceWorkerModule } from '@angular/service-worker';
 import { BudgetArchiveListComponent } from './components/budgets/budget-archive-list/budget-archive-list.component';
 import { BudgetListEntryComponent } from './components/budgets/budget-list-entry/budget-list-entry.component';
 import { SettingsComponent } from './components/settings/settings.component';
+import { SettingsUserComponent } from './components/settings/settings-user/settings-user.component';
+import { SettingsHomeComponent } from './components/settings/settings-home/settings-home.component';
 
 @NgModule({
   declarations: [
@@ -56,6 +58,8 @@ import { SettingsComponent } from './components/settings/settings.component';
     BudgetArchiveListComponent,
     BudgetListEntryComponent,
     SettingsComponent,
+    SettingsUserComponent,
+    SettingsHomeComponent,
   ],
   imports: [
     BrowserModule,
