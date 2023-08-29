@@ -33,6 +33,10 @@ export class UserService {
     return home ? home : '';
   }
 
+  get getHomePin() {
+    return this.dbService.read(`homes/${this.dbService.home}/pin`);
+  }
+
   getUserObservable(firebaseUser: firebase.User) {
     return this.dbService.read(`users/${firebaseUser.uid}`);
   }

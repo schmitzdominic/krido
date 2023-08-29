@@ -10,3 +10,11 @@ html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
 $enable-negative-margins: true;
+
+.badge.medium {
+  font-size: 1em;
+}
+
+.badge.large {
+  font-size: 2em;
+}
