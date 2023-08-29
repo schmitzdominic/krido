@@ -33,6 +33,7 @@ import { EditCycleContentComponent } from './components/budgets/cycle-list/edit-
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { BudgetArchiveListComponent } from './components/budgets/budget-archive-list/budget-archive-list.component';
 import { BudgetListEntryComponent } from './components/budgets/budget-list-entry/budget-list-entry.component';
+import { SettingsComponent } from './components/settings/settings.component';
 
 @NgModule({
   declarations: [
@@ -54,6 +55,7 @@ import { BudgetListEntryComponent } from './components/budgets/budget-list-entry
     EditCycleContentComponent,
     BudgetArchiveListComponent,
     BudgetListEntryComponent,
+    SettingsComponent,
   ],
   imports: [
     BrowserModule,

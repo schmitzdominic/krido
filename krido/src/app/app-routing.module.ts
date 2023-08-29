@@ -7,6 +7,7 @@ import {HistoryComponent} from "./components/history/history.component";
 import {RegularlyComponent} from "./components/regularly/regularly.component";
 import {LoginComponent} from "./components/login/login.component";
 import {AuthGuard} from "./services/auth/auth.guard";
+import {SettingsComponent} from "./components/settings/settings.component";
 
 const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -15,6 +16,7 @@ const routes: Routes = [
   { path: 'accounts', component: AccountsComponent, canActivate: [AuthGuard] },
   { path: 'budgets', component: BudgetsComponent, canActivate: [AuthGuard] },
   { path: 'history', component: HistoryComponent, canActivate: [AuthGuard] },
+  { path: 'settings', component: SettingsComponent, canActivate: [AuthGuard] },
   { path: 'login', component: LoginComponent },
   { path: '**', component: LoginComponent },  // Wildcard route for a 404 page
 ];

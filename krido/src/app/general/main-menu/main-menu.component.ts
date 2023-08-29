@@ -58,6 +58,10 @@ export class MainMenuComponent {
     this.router.navigate(['/regularly']);
   }
 
+  navigateToSettings(): void {
+    this.router.navigate(['/settings']);
+  }
+
   onButtonLogout() {
     // TODO: Please move this into a other place! Don´t forget to remove the userService!
     this.userService.signOut();
