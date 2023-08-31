@@ -35,6 +35,9 @@ import { BudgetListEntryComponent } from './components/budget-list-entry/budget-
 import { SettingsComponent } from './pages/settings/settings.component';
 import { SettingsUserComponent } from './pages/settings/settings-user/settings-user.component';
 import { SettingsHomeComponent } from './pages/settings/settings-home/settings-home.component';
+import { AccountsListComponent } from './pages/accounts/accounts-list/accounts-list.component';
+import { CreditCardListComponent } from './pages/accounts/credit-card-list/credit-card-list.component';
+import { AccountListEntryComponent } from './components/account-list-entry/account-list-entry.component';
 
 @NgModule({
   declarations: [
@@ -58,6 +61,9 @@ import { SettingsHomeComponent } from './pages/settings/settings-home/settings-h
     SettingsComponent,
     SettingsUserComponent,
     SettingsHomeComponent,
+    AccountsListComponent,
+    CreditCardListComponent,
+    AccountListEntryComponent,
   ],
   imports: [
     BrowserModule,

@@ -1,1 +1,18 @@
-<p>accounts works!</p>
+<ul ngbNav #nav="ngbNav" [(activeId)]="active" class="nav-tabs">
+  <li [ngbNavItem]="'accounts'">
+    <button ngbNavLink>Alle</button>
+    <ng-template ngbNavContent>
+      <app-accounts-list>
+      </app-accounts-list>
+    </ng-template>
+  </li>
+  <li [ngbNavItem]="'credit'">
+    <button ngbNavLink>Kreditkarten</button>
+    <ng-template ngbNavContent>
+      <app-credit-card-list>
+      </app-credit-card-list>
+    </ng-template>
+  </li>
+</ul>
+
+<div [ngbNavOutlet]="nav" class="mt-2"></div>

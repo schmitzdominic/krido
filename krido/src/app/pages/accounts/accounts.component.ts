@@ -8,6 +8,8 @@ import {MenuTitleService} from "../../../shared/behavior/menu-title/menu-title.s
 })
 export class AccountsComponent {
 
+  active: string = 'accounts';
+
   constructor(private menuTitleService: MenuTitleService) {
   }
 
