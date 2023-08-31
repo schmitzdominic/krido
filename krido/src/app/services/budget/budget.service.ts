@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import {Budget} from "../../entities/budget.model";
+import {Budget} from "../../../shared/interfaces/budget.model";
 import {DbService} from "../db.service";
-import {Cycle} from "../../entities/cycle.model";
+import {Cycle} from "../../../shared/interfaces/cycle.model";
 
 @Injectable({
   providedIn: 'root'

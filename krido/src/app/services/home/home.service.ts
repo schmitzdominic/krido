@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import {DbService} from "../db.service";
-import {Home} from "../../entities/home.model";
+import {Home} from "../../../shared/interfaces/home.model";
 import {UserService} from "../user/user.service";
-import {User} from "../../entities/user.model";
+import {User} from "../../../shared/interfaces/user.model";
 
 @Injectable({
   providedIn: 'root'

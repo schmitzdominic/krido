@@ -1,13 +1,13 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import {HomeComponent} from "./components/home/home.component";
-import {AccountsComponent} from "./components/accounts/accounts.component";
-import {BudgetsComponent} from "./components/budgets/budgets.component";
-import {HistoryComponent} from "./components/history/history.component";
-import {RegularlyComponent} from "./components/regularly/regularly.component";
+import {HomeComponent} from "./pages/home/home.component";
+import {AccountsComponent} from "./pages/accounts/accounts.component";
+import {BudgetsComponent} from "./pages/budgets/budgets.component";
+import {HistoryComponent} from "./pages/history/history.component";
+import {RegularlyComponent} from "./pages/regularly/regularly.component";
 import {LoginComponent} from "./components/login/login.component";
 import {AuthGuard} from "./services/auth/auth.guard";
-import {SettingsComponent} from "./components/settings/settings.component";
+import {SettingsComponent} from "./pages/settings/settings.component";
 
 const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },

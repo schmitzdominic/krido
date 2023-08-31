@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import {DbService} from "../db.service";
-import {User} from "../../entities/user.model";
+import {User} from "../../../shared/interfaces/user.model";
 import {AngularFireAuth} from "@angular/fire/compat/auth";
 import {Router} from "@angular/router";
 import firebase from "firebase/compat";

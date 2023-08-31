@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {HomeService} from "../../services/home/home.service";
-import {Home} from "../../entities/home.model";
+import {Home} from "../../../shared/interfaces/home.model";
 import {ToastService} from "../../services/toast/toast.service";
 
 @Component({

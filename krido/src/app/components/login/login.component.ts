@@ -1,7 +1,7 @@
 import {Component} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {AngularFireAuth} from "@angular/fire/compat/auth";
-import {User} from "../../entities/user.model";
+import {User} from "../../../shared/interfaces/user.model";
 import {UserService} from "../../services/user/user.service";
 import {ToastService} from "../../services/toast/toast.service";
 import {LoadingService} from "../../services/loading/loading.service";

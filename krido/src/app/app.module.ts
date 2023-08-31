@@ -4,12 +4,12 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { NgbModule } from "@ng-bootstrap/ng-bootstrap";
-import { HomeComponent } from './components/home/home.component';
-import { MainMenuComponent } from './general/main-menu/main-menu.component';
-import { AccountsComponent } from './components/accounts/accounts.component';
-import { BudgetsComponent } from './components/budgets/budgets.component';
-import { HistoryComponent } from './components/history/history.component';
-import { RegularlyComponent } from './components/regularly/regularly.component';
+import { HomeComponent } from './pages/home/home.component';
+import { MainMenuComponent } from './components/main-menu/main-menu.component';
+import { AccountsComponent } from './pages/accounts/accounts.component';
+import { BudgetsComponent } from './pages/budgets/budgets.component';
+import { HistoryComponent } from './pages/history/history.component';
+import { RegularlyComponent } from './pages/regularly/regularly.component';
 import { initializeApp,provideFirebaseApp } from '@angular/fire/app';
 import { environment } from '../environments/environment';
 import { provideAnalytics,getAnalytics,ScreenTrackingService,UserTrackingService } from '@angular/fire/analytics';
@@ -22,20 +22,19 @@ import {MatButtonModule} from '@angular/material/button';
 import { LoginComponent } from './components/login/login.component';
 import {ReactiveFormsModule} from "@angular/forms";
 import { HomeSetupComponent } from './components/home-setup/home-setup.component';
-import { ToastsContainerComponent } from './general/toasts-container/toasts-container.component';
-import { BudgetListComponent } from './components/budgets/budget-list/budget-list.component';
-import { CycleListComponent } from './components/budgets/cycle-list/cycle-list.component';
-import { AddOrEditBudgetContentComponent } from './components/budgets/budget-list/add-or-edit-budget-content/add-or-edit-budget-content.component';
+import { ToastsContainerComponent } from './components/toasts-container/toasts-container.component';
+import { BudgetListComponent } from './pages/budgets/budget-list/budget-list.component';
+import { CycleListComponent } from './pages/budgets/cycle-list/cycle-list.component';
+import { AddOrEditBudgetContentComponent } from './pages/budgets/budget-list/add-or-edit-budget-content/add-or-edit-budget-content.component';
 import {CurrencyMaskModule} from "ng2-currency-mask";
-import { ShowBudgetContentComponent } from './components/budgets/budget-list/edit-budget-content/show-budget-content.component';
-import { AddOrEditCycleContentComponent } from './components/budgets/cycle-list/add-or-edit-cycle-content/add-or-edit-cycle-content.component';
-import { EditCycleContentComponent } from './components/budgets/cycle-list/edit-cycle-content/edit-cycle-content.component';
+import { ViewBudgetContentComponent } from './pages/budgets/budget-list/view-budget-content/view-budget-content.component';
+import { AddOrEditCycleContentComponent } from './pages/budgets/cycle-list/add-or-edit-cycle-content/add-or-edit-cycle-content.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
-import { BudgetArchiveListComponent } from './components/budgets/budget-archive-list/budget-archive-list.component';
-import { BudgetListEntryComponent } from './components/budgets/budget-list-entry/budget-list-entry.component';
-import { SettingsComponent } from './components/settings/settings.component';
-import { SettingsUserComponent } from './components/settings/settings-user/settings-user.component';
-import { SettingsHomeComponent } from './components/settings/settings-home/settings-home.component';
+import { BudgetArchiveListComponent } from './pages/budgets/budget-archive-list/budget-archive-list.component';
+import { BudgetListEntryComponent } from './components/budget-list-entry/budget-list-entry.component';
+import { SettingsComponent } from './pages/settings/settings.component';
+import { SettingsUserComponent } from './pages/settings/settings-user/settings-user.component';
+import { SettingsHomeComponent } from './pages/settings/settings-home/settings-home.component';
 
 @NgModule({
   declarations: [
@@ -52,9 +51,8 @@ import { SettingsHomeComponent } from './components/settings/settings-home/setti
     BudgetListComponent,
     CycleListComponent,
     AddOrEditBudgetContentComponent,
-    ShowBudgetContentComponent,
+    ViewBudgetContentComponent,
     AddOrEditCycleContentComponent,
-    EditCycleContentComponent,
     BudgetArchiveListComponent,
     BudgetListEntryComponent,
     SettingsComponent,

@@ -1,0 +1,48 @@
+<!-- Modal add Budget -->
+<ng-template #addBudgetModal let-modal>
+  <app-add-or-edit-budget-content
+  (onClose)="onCloseAddBudgetModal()">
+  </app-add-or-edit-budget-content>
+</ng-template>
+<!-- Modal edit Budget -->
+<ng-template #editBudgetModal let-modal>
+  <app-view-budget-content
+    [budget]="clickedBudget"
+    (onClose)="onCloseEditBudgetModal()">
+  </app-view-budget-content>
+</ng-template>
+<div class="container">
+  <div class="row">
+    <!-- No Time Limit -->
+    <table class="table table-striped">
+      <tbody>
+        <div *ngFor="let budget of noTimeLimitBudgets" class="card p-1 m-2" (click)="onCardClick(budget)">
+          <div class="card-body">
+            <app-budget-list-entry
+              [budget]="budget">
+            </app-budget-list-entry>
+          </div>
+        </div>
+      </tbody>
+    </table>
+  </div>
+  <div class="row" *ngIf="monthlyBudgets.length > 0">
+    <h2 class="pt-2">Diesen Monat</h2>
+    <!-- Monthly -->
+    <table class="table table-striped">
+      <tbody>
+        <div *ngFor="let budget of monthlyBudgets" class="card p-1 m-2" (click)="onCardClick(budget)">
+          <div class="card-body">
+            <app-budget-list-entry
+              [budget]="budget">
+            </app-budget-list-entry>
+          </div>
+        </div>
+      </tbody>
+    </table>
+  </div>
+  <!-- Add Button -->
+  <div class="position-fixed end-0 bottom-0 me-4 mb-4">
+    <button type="button" class="btn btn-primary" (click)="onAddClick()"><i class="bi bi-plus-lg"></i></button>
+  </div>
+</div>
