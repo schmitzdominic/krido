@@ -1,11 +1,19 @@
-<div class="position-fixed end-0 bottom-0 me-4 mb-4">
-  <button type="button" class="btn btn-primary" (click)="addListOfEntries()"><i class="bi bi-plus-lg"></i></button>
+<!--<div class="position-fixed end-0 bottom-0 me-4 mb-4">
+  <button type="button" class="btn btn-primary" (click)="onButtonAddClick()"><i class="bi bi-plus-lg"></i></button>
+</div>-->
+<div class="row" *ngIf="true">
+  <div class="card">
+    <div class="m-2 mt-3">
+      <img src="assets/img/pig.gif" class="card-img-top" alt="welcome" style="border-radius: 6px;">
+    </div>
+    <div class="card-body">
+      <h1 class="card-title">Willkommen!</h1>
+      <div class="welcome-card-content">
+        <p class="card-text">Du hast noch keine Einträge, Budgets oder Konten angelegt.</p>
+      </div>
+      <div class="position-absolute end-0 bottom-0 me-4 mb-4">
+        <button type="button" class="btn btn-primary" (click)="onButtonAddClick()">Anlegen</button>
+      </div>
+    </div>
+  </div>
 </div>
-
-<table class="table table-striped">
-  <tbody>
-  <!--<tr *ngFor="let entry of entries">
-    <td (click)="test()">{{ entry.name }}</td>
-  </tr>-->
-  </tbody>
-</table>

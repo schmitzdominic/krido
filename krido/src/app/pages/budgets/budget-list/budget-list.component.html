@@ -43,7 +43,9 @@
   </div>
   <div class="row" *ngIf="noTimeLimitBudgets.length == 0 && monthlyBudgets.length == 0">
     <div class="card">
-      <img src="assets/img/no-budget.gif" class="card-img-top pt-3" alt="no budget">
+      <div class="m-2 mt-3">
+        <img src="assets/img/no-budget.gif" class="card-img-top" alt="no budget" style="border-radius: 6px;">
+      </div>
       <div class="card-body">
         <h1 class="card-title">Keine Budgets</h1>
         <div class="no-budget-card-content">
