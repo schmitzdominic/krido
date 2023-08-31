@@ -1,4 +1,4 @@
-import { NgModule, isDevMode } from '@angular/core';
+import {NgModule, isDevMode, LOCALE_ID} from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -81,7 +81,12 @@ import { SettingsHomeComponent } from './pages/settings/settings-home/settings-h
     })
   ],
   providers: [
-    ScreenTrackingService,UserTrackingService
+    ScreenTrackingService,
+    UserTrackingService,
+    {
+      provide: LOCALE_ID,
+      useValue: 'de-DE'
+    },
   ],
   bootstrap: [AppComponent]
 })
