@@ -6,8 +6,8 @@ import {BehaviorSubject} from "rxjs";
 })
 export class MenuTitleService {
 
-  title = new BehaviorSubject('');
-  activeId = new BehaviorSubject(0);
+  title: BehaviorSubject<string> = new BehaviorSubject('');
+  activeId: BehaviorSubject<number> = new BehaviorSubject(0);
 
   constructor() { }
 

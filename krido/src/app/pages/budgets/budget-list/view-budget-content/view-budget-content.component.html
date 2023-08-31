@@ -12,7 +12,7 @@
   <h1 class="name-title pt-4 ps-3 pe-3">{{ budget?.name }}</h1>
   <div class="modal-body">
     <div class="text">
-      <p>Höhe: {{ budget?.limit | currency:'EUR':true }}</p>
+      <p>Höhe: {{ budget?.limit | currency:'EUR':'symbol' }}</p>
       <p>Rest: {{ getRestBudget() }}</p>
       <ngb-progressbar
         [value]="budget?.usedLimit!"

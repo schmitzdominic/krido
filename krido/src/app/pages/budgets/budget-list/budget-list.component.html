@@ -12,7 +12,7 @@
   </app-view-budget-content>
 </ng-template>
 <div class="container">
-  <div class="row">
+  <div class="row" *ngIf="noTimeLimitBudgets.length > 0">
     <!-- No Time Limit -->
     <table class="table table-striped">
       <tbody>
@@ -41,8 +41,22 @@
       </tbody>
     </table>
   </div>
+  <div class="row" *ngIf="noTimeLimitBudgets.length == 0 && monthlyBudgets.length == 0">
+    <div class="card">
+      <img src="assets/img/no-budget.gif" class="card-img-top pt-3" alt="no budget">
+      <div class="card-body">
+        <h1 class="card-title">Keine Budgets</h1>
+        <div class="no-budget-card-content">
+          <p class="card-text">Du hast noch keine Budgets angelegt. Lege jetzt direkt eins an oder erstelle einen Zyklus, der für dich bequem Budgets automatisch anlegt.</p>
+        </div>
+        <div class="position-absolute end-0 bottom-0 me-4 mb-4">
+          <button type="button" class="btn btn-primary" (click)="onAddClick()">Anlegen</button>
+        </div>
+      </div>
+    </div>
+  </div>
   <!-- Add Button -->
-  <div class="position-fixed end-0 bottom-0 me-4 mb-4">
+  <div class="position-fixed end-0 bottom-0 me-4 mb-4" *ngIf="noTimeLimitBudgets.length > 0 || monthlyBudgets.length > 0">
     <button type="button" class="btn btn-primary" (click)="onAddClick()"><i class="bi bi-plus-lg"></i></button>
   </div>
 </div>

@@ -13,7 +13,7 @@
       </app-cycle-list>
     </ng-template>
   </li>
-  <li [ngbNavItem]="'archive'">
+  <li [ngbNavItem]="'archive'" *ngIf="isArchiveShown">
     <button ngbNavLink>Archiv</button>
     <ng-template ngbNavContent>
       <app-budget-archive-list>

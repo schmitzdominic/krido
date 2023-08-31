@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 import {MenuTitleService} from "../../../shared/behavior/menu-title/menu-title.service";
+import {BudgetService} from "../../services/budget/budget.service";
+import {Budget} from "../../../shared/interfaces/budget.model";
 
 @Component({
   selector: 'app-budgets',
@@ -9,12 +11,15 @@ import {MenuTitleService} from "../../../shared/behavior/menu-title/menu-title.s
 export class BudgetsComponent {
 
   active: string = 'budgets';
+  isArchiveShown: boolean = false;
 
-  constructor(private menuTitleService: MenuTitleService) {
+  constructor(private menuTitleService: MenuTitleService,
+              private budgetService: BudgetService) {
   }
 
   ngOnInit(): void {
     this.setInitialValues();
+    this.checkForArchive();
   }
 
   /**
@@ -25,4 +30,16 @@ export class BudgetsComponent {
     this.menuTitleService.setActiveId(5);
   }
 
+  checkForArchive() {
+    this.budgetService.getAllNoTimeLimitBudgets().subscribe(budgets => {
+      if (!this.isArchiveShown) {
+        this.isArchiveShown = !!budgets.find(b => (b.payload.val()! as Budget).isArchived);
+      }
+    });
+    this.budgetService.getAllMonthlyBudgets().subscribe(budgets => {
+      if (!this.isArchiveShown) {
+        this.isArchiveShown = !!budgets.find(b => (b.payload.val()! as Budget).isArchived);
+      }
+    });
+  }
 }
