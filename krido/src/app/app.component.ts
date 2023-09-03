@@ -17,13 +17,12 @@ export class AppComponent {
 
   modalRef: NgbModalRef | undefined;
 
-  title = 'krido';
+  title:    string = 'krido';
+  mainPage: string = 'home';
 
   showLogin:      boolean = true;
   showHomeSetup:  boolean = false;
   showMain:       boolean = false;
-
-  mainPage = 'home';
 
   constructor(private userService: UserService,
               private router: Router,
@@ -62,8 +61,12 @@ export class AppComponent {
     this.angularFireAuth.authState.subscribe((firebaseUser) => {
       if (firebaseUser) {
         this.userService.getUserObservable(firebaseUser).subscribe(user => {
-          this.userService.setLocalStorageUser(user, firebaseUser);
-          this.onLoginStateChanged(true);
+          if (!this.userService.isLoggedIn) {
+            this.userService.setLocalStorageUser(user, firebaseUser);
+            this.onLoginStateChanged(true);
+          } else {
+            this.userService.setLocalStorageUser(user, firebaseUser);
+          }
         });
       } else {
         this.showLoginPage();
@@ -74,7 +77,7 @@ export class AppComponent {
 
   private onLoginStateChanged(isLoggedIn: boolean): void {
     if (isLoggedIn) {
-      if (this.userService.getUser.home) {
+      if (this.userService.user.home) {
         this.showMainPage();
       } else {
         this.showHomeSetupPage();

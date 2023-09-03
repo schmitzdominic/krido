@@ -9,7 +9,7 @@
   <div class="row">
     <ul class="list-group list-group-flush">
       <li class="list-group-item" id="list-cycles" *ngFor="let cycle of cycles" (click)="onCardClick(cycle)">
-        <div style="height: 28px">
+        <div class="custom-list-item">
           <span class="name ps-2 pt-1"> {{ cycle.name }} </span>
           <span class="limit position-absolute top-0 end-0 pt-3 pe-3 value">{{ cycle.limit ? priceService.convertNumberToEuro(cycle.limit!) : 'Kein Limit gesetzt' }}</span>
         </div>

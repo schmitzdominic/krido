@@ -14,7 +14,7 @@
   <div class="row">
     <ul class="list-group list-group-flush">
       <li class="list-group-item" id="list-accounts" *ngFor="let account of accounts" (click)="onClickAccount(account)">
-        <div style="height: 28px">
+        <div class="custom-list-item">
           <i class="bi bi-bank icon" *ngIf="account.accountType === AccountType.giro"></i>
           <i class="bi bi-credit-card-2-front icon" *ngIf="account.accountType === AccountType.creditCard"></i>
           <span class="name ps-2 pt-1"> {{ account.name }} </span>

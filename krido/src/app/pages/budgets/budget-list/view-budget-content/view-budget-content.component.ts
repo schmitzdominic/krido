@@ -1,6 +1,5 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {Budget} from "../../../../../shared/interfaces/budget.model";
-import {FormBuilder} from "@angular/forms";
 import {PriceService} from "../../../../services/price/price.service";
 import {NgbProgressbarConfig} from "@ng-bootstrap/ng-bootstrap";
 import {ProgressBarService} from "../../../../services/progress-bar/progress-bar.service";
@@ -19,8 +18,7 @@ export class ViewBudgetContentComponent {
   isContentReadOnly: boolean = true;
   isEditButtonShown: boolean = true;
 
-  constructor(private formBuilder: FormBuilder,
-              private ngbProgressbarConfig: NgbProgressbarConfig,
+  constructor(private ngbProgressbarConfig: NgbProgressbarConfig,
               public progressBarService: ProgressBarService,
               public priceService: PriceService) {
   }

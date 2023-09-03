@@ -47,7 +47,7 @@ export class AddOrEditAccountContentComponent {
   }
 
   loadOwners() {
-    const home: string = this.userService.getHome;
+    const home: string = this.userService.home;
     this.userService.getAllUsers().subscribe(users => {
       this.owners = users.filter(user => (user.payload.val() as User).home === home).map(user => user.payload.val() as User);
       if (this.account) {

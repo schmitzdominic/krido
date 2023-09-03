@@ -27,7 +27,7 @@ export class HomeService {
   }
 
   joinHome(home: Home) {
-    let user: User = this.userService.getUser;
+    let user: User = this.userService.user;
     user.home = home.searchName;
     delete user['firebaseUser'];
     return this.userService.createOrUpdateUser(user);

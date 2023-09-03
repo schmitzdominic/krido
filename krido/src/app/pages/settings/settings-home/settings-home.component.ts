@@ -11,11 +11,11 @@ export class SettingsHomeComponent {
   home: string = '';
   pin: string = '';
 
-  constructor(private userService: UserService) {
+  constructor(public userService: UserService) {
   }
 
   ngOnInit() {
-    this.home = this.userService.getHome;
+    this.home = this.userService.home;
     this.setPin();
   }
 

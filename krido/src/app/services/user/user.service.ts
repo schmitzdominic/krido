@@ -5,6 +5,7 @@ import {AngularFireAuth} from "@angular/fire/compat/auth";
 import {Router} from "@angular/router";
 import firebase from "firebase/compat";
 import {SnapshotAction} from "@angular/fire/compat/database";
+import {Account} from "../../../shared/interfaces/account.model";
 
 @Injectable({
   providedIn: 'root'
@@ -24,13 +25,21 @@ export class UserService {
     return user !== null;
   }
 
-  get getUser(): User {
+  get user(): User {
     return JSON.parse(localStorage.getItem('user')!) as User;
   }
 
-  get getHome(): string {
-    const home = this.getUser.home;
+  get home(): string {
+    const home = this.user.home;
     return home ? home : '';
+  }
+
+  get mainAccount() {
+    return this.user.mainAccount ? this.user.mainAccount : undefined;
+  }
+
+  updateMainAccount(account: Account) {
+    return this.dbService.update(`users/${this.user.uid}/mainAccount`, account)
   }
 
   getAllUsers() {
@@ -44,16 +53,18 @@ export class UserService {
   getUserObservable(firebaseUser: firebase.User) {
     return this.dbService.read(`users/${firebaseUser.uid}`);
   }
-  async setLocalStorageUser(user: SnapshotAction<any>, firebaseUser: firebase.User | null) {
+  setLocalStorageUser(user: SnapshotAction<any>, firebaseUser: firebase.User | null) {
     if (firebaseUser) {
       if (user.payload.val()) {
         const home = user.payload.val().home;
+        const mainAccount = user.payload.val().mainAccount;
         const userObject: User = {
           uid: firebaseUser.uid,
           email: firebaseUser.email,
           displayName: firebaseUser.displayName,
           home: home,
-          firebaseUser: firebaseUser
+          firebaseUser: firebaseUser,
+          mainAccount: mainAccount ? mainAccount : undefined
         };
         localStorage.setItem('user', JSON.stringify(userObject));
       }

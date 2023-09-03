@@ -14,14 +14,14 @@
     <div class="text">
       <ul class="list-group list-group-flush">
         <li class="list-group-item" id="budget-max">
-          <div style="height: 28px">
+          <div class="custom-list-item">
             <i class="bi bi-cash-coin"></i>
             <span class="name ps-2">Höhe</span>
             <span class="limit position-absolute top-0 end-0 pe-3 pt-2">{{ priceService.convertNumberToEuro(budget?.limit) }}</span>
           </div>
         </li>
         <li class="list-group-item pb-4" id="budget-rest">
-          <div class="pt-2" style="height: 28px">
+          <div class="pt-2 custom-list-item">
             <i class="bi bi-arrow-bar-right"></i>
             <span class="name ps-2">Rest</span>
             <span class="limit position-absolute top-0 end-0 pe-3 pt-3">{{ getRestBudget() }}</span>
