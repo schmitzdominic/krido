@@ -24,7 +24,23 @@
     </ul>
   </div>
   <!-- Add Button -->
-  <div class="position-fixed end-0 bottom-0 me-4 mb-4">
+  <div class="position-fixed end-0 bottom-0 me-4 mb-4" *ngIf="accounts.length > 0">
     <button type="button" class="btn btn-primary" (click)="onButtonAddClick()"><i class="bi bi-plus-lg"></i></button>
+  </div>
+</div>
+<div class="row" *ngIf="accounts.length == 0 && isInitialized">
+  <div class="card">
+    <div class="m-2 mt-3">
+      <img src="assets/img/no-credit-card.gif" class="card-img-top" alt="welcome" style="border-radius: 6px;">
+    </div>
+    <div class="card-body">
+      <h1 class="card-title">Keine Konten</h1>
+      <div class="welcome-card-content">
+        <p class="card-text">Du hast noch keine Konten. Um Abrechnungen erstellen zu können, wird ein Konto benötigt.</p>
+      </div>
+      <div class="position-absolute end-0 bottom-0 me-4 mb-4">
+        <button type="button" class="btn btn-primary" (click)="onButtonAddClick()">Anlegen</button>
+      </div>
+    </div>
   </div>
 </div>
