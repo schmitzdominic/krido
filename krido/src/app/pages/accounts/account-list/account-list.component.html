@@ -5,6 +5,22 @@
   </app-add-or-edit-account-content>
 </ng-template>
 <div class="container">
+  <div class="row">
+    <table class="table table-striped">
+      <tbody>
+      <div *ngFor="let account of accounts" class="card p-1 m-2">
+        <div class="card-body">
+          <div style="height: 28px">
+            <i class="bi bi-bank icon" *ngIf="account.accountType == AccountType.giro"></i>
+            <i class="bi bi-credit-card-2-front icon" *ngIf="account.accountType == AccountType.creditCard"></i>
+            <span class="name ps-2 pt-1"> {{ account.name }} </span>
+            <span class="limit position-absolute top-0 end-0 pt-3 pe-3 value">{{ account.value ? account.value : 0 | currency:'EUR':'symbol' }}</span>
+          </div>
+        </div>
+      </div>
+      </tbody>
+    </table>
+  </div>
   <!-- Add Button -->
   <div class="position-fixed end-0 bottom-0 me-4 mb-4">
     <button type="button" class="btn btn-primary" (click)="onButtonAddClick()"><i class="bi bi-plus-lg"></i></button>

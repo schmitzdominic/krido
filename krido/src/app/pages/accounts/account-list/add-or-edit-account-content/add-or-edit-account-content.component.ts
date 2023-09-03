@@ -85,8 +85,7 @@ export class AddOrEditAccountContentComponent {
       owners: this.selectedOwners
 
     }
-    this.accountService.addAccount(account);
-    this.onClose.emit();
+    this.accountService.addAccount(account).then(() => this.onClose.emit());
   }
 
   onCancel() {

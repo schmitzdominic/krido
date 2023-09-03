@@ -14,4 +14,8 @@ export class AccountService {
   addAccount(account: Account) {
     return this.dbService.createListValue(`${this.rootPath}`, account);
   }
+
+  getAllAccounts() {
+    return this.dbService.readList(`${this.rootPath}`);
+  }
 }

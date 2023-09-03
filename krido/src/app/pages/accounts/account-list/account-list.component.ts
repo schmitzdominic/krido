@@ -1,6 +1,9 @@
 import {Component, ViewChild} from '@angular/core';
 import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap/modal/modal-ref";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
+import {Account} from "../../../../shared/interfaces/account.model";
+import {AccountService} from "../../../services/account/account.service";
+import {AccountType} from "../../../../shared/enums/account-type.enum";
 
 @Component({
   selector: 'app-accounts-list',
@@ -13,7 +16,24 @@ export class AccountListComponent {
 
   addOrEditAccountModalRef: NgbModalRef | undefined;
 
-  constructor(private ngbModal: NgbModal) {
+  accounts: Account[] = [];
+
+  constructor(private ngbModal: NgbModal,
+              private accountService: AccountService) {
+  }
+
+  ngOnInit() {
+    this.loadAccounts();
+  }
+
+  loadAccounts() {
+    this.accountService.getAllAccounts().subscribe(accounts => {
+      this.accounts = [];
+      accounts.forEach(accountRaw => {
+        const account: Account = accountRaw.payload.val() as Account;
+        this.accounts.push(account);
+      });
+    });
   }
 
   openAddOrEditAccountModal(): void {
@@ -34,4 +54,5 @@ export class AccountListComponent {
     this.openAddOrEditAccountModal();
   }
 
+  protected readonly AccountType = AccountType;
 }

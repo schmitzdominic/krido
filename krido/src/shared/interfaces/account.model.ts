@@ -7,4 +7,5 @@ export interface Account {
   name: string;
   owners: User[];
   accountType: AccountType;
+  value?: number;
 }
