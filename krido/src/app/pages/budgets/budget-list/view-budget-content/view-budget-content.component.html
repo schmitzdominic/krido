@@ -12,8 +12,22 @@
   <h1 class="name-title pt-4 ps-3 pe-3">{{ budget?.name }}</h1>
   <div class="modal-body">
     <div class="text">
-      <p>Höhe: {{ budget?.limit | currency:'EUR':'symbol' }}</p>
-      <p>Rest: {{ getRestBudget() }}</p>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item" id="budget-max">
+          <div style="height: 28px">
+            <i class="bi bi-cash-coin"></i>
+            <span class="name ps-2">Höhe</span>
+            <span class="limit position-absolute top-0 end-0 pe-3 pt-2">{{ priceService.convertNumberToEuro(budget?.limit) }}</span>
+          </div>
+        </li>
+        <li class="list-group-item pb-4" id="budget-rest">
+          <div class="pt-2" style="height: 28px">
+            <i class="bi bi-arrow-bar-right"></i>
+            <span class="name ps-2">Rest</span>
+            <span class="limit position-absolute top-0 end-0 pe-3 pt-3">{{ getRestBudget() }}</span>
+          </div>
+        </li>
+      </ul>
       <ngb-progressbar
         [value]="budget?.usedLimit!"
         [max]="budget?.limit!"

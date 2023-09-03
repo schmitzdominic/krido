@@ -4,6 +4,8 @@ import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {Cycle} from "../../../../shared/interfaces/cycle.model";
 import {BudgetService} from "../../../services/budget/budget.service";
 import {PriceService} from "../../../services/price/price.service";
+import {AccountType} from "../../../../shared/enums/account-type.enum";
+import {LoadingService} from "../../../services/loading/loading.service";
 
 @Component({
   selector: 'app-cycle-list',
@@ -15,12 +17,14 @@ export class CycleListComponent {
   @ViewChild('addCycleModal') addCycleModal: NgbModalRef | undefined;
 
   addCycleModalRef: NgbModalRef | undefined;
+  isInitialized: boolean = false;
 
   cycles: Cycle[] = [];
   clickedCycle: Cycle | undefined;
 
   constructor(private ngbModal: NgbModal,
               private budgetService: BudgetService,
+              private loadingService: LoadingService,
               public priceService: PriceService) {
   }
 
@@ -29,6 +33,7 @@ export class CycleListComponent {
   }
 
   loadAllCycles() {
+    this.loadingService.setLoading = true;
     this.budgetService.getAllCycles().subscribe(cycles => {
       this.cycles = [];
       cycles.forEach(cycleRaw => {
@@ -36,6 +41,8 @@ export class CycleListComponent {
         cycle.key = cycleRaw.key!;
         this.cycles.push(cycle);
       });
+      this.loadingService.setLoading = false;
+      this.isInitialized = true;
     });
   }
 
@@ -63,4 +70,5 @@ export class CycleListComponent {
     }
   }
 
+    protected readonly AccountType = AccountType;
 }

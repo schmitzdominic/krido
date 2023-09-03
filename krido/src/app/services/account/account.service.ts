@@ -18,4 +18,8 @@ export class AccountService {
   getAllAccounts() {
     return this.dbService.readList(`${this.rootPath}`);
   }
+
+  updateAccount(account: Account, key: string) {
+    return this.dbService.updateListValue(`${this.rootPath}`, key, account);
+  }
 }

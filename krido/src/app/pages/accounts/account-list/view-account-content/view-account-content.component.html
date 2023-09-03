@@ -1,0 +1,43 @@
+<button *ngIf="isEditButtonShown" type="button" class="btn btn-dark position-absolute end-0 top-0 mt-3 me-3" (click)="onButtonEdit()"><i class="bi bi-pencil"></i></button>
+<!-- Edit -->
+<div *ngIf="!isContentReadOnly">
+  <app-add-or-edit-account-content
+    [account]="account"
+    (onClose)="onButtonCancel()">
+  </app-add-or-edit-account-content>
+</div>
+
+<!-- View -->
+<div *ngIf="isContentReadOnly">
+  <h1 class="name-title pt-4 ps-3 pe-3">{{ account?.name }}</h1>
+  <div class="modal-body">
+    <ul class="list-group list-group-flush pb-3">
+      <li class="list-group-item" id="account-value">
+        <div style="height: 28px">
+          <i class="bi bi-cash-coin"></i>
+          <span class="name ps-2">Kontostand</span>
+          <span class="limit position-absolute top-0 end-0 pe-3 pt-2">{{ priceService.convertNumberToEuro(account!.value) }}</span>
+        </div>
+      </li>
+    </ul>
+    <p>Eigentümer</p>
+    <ul class="list-group list-group-flush">
+      <li class="list-group-item" id="account-owners" *ngFor="let owner of account?.owners">
+        <i class="bi bi-person"></i>
+        <span class="name ps-2">{{ owner.email }}</span>
+      </li>
+    </ul>
+  </div>
+  <ul class="list-group list-group-flush">
+    <li class="list-group-item" id="list-entries">
+      <!-- TODO: Here Entries -->
+    </li>
+  </ul>
+  <div class="modal-footer">
+    <button
+      type="button"
+      class="btn btn-light"
+      (click)="onButtonCancel()">Schließen</button>
+  </div>
+</div>
+

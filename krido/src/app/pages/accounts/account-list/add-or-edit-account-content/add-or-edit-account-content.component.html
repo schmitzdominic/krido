@@ -4,26 +4,26 @@
 <div class="modal-body">
   <form class="needs-validation" [formGroup]="addOrEditAccountFormGroup" (ngSubmit)="onSubmit()" novalidate>
     <div class="col-md-12 mb-3">
-      <label for="add-budget-name" class="form-label">Name</label>
+      <label for="add-account-name" class="form-label">Name</label>
       <div class="input-group has-validation">
-        <input formControlName="name" type="text" class="form-control" id="add-budget-name" aria-describedby="inputGroupPrepend" required>
+        <input formControlName="name" type="text" class="form-control" id="add-account-name" aria-describedby="inputGroupPrepend" required>
         <div class="invalid-feedback">
           Name fehlt!
         </div>
       </div>
     </div>
     <div class="row">
-      <label for="add-budget-type" class="form-label">Kontotyp</label>
+      <label for="add-account-type" class="form-label">Kontotyp</label>
       <div class="mb-3">
-        <select class="form-select" id="add-budget-type" aria-label="Select Owner" formControlName="type">
+        <select class="form-select" id="add-account-type" aria-label="Select Owner" formControlName="type">
           <option *ngFor="let accountType of accountTypes" value="{{ accountType }}">{{ accountType }}</option>
         </select>
       </div>
     </div>
     <div class="row" *ngIf="owners.length > 0">
-      <label for="add-budget-owner" class="form-label">Besitzer</label>
+      <label for="add-account-owner" class="form-label">Besitzer</label>
       <div class="col-10 mb-3">
-        <select class="form-select" id="add-budget-owner" aria-label="Select Owner" formControlName="owners">
+        <select class="form-select" id="add-account-owner" aria-label="Select Owner" formControlName="owners">
           <option *ngFor="let owner of owners" value="{{ owner.uid }}">{{ owner.email }}</option>
         </select>
       </div>
@@ -33,8 +33,8 @@
     </div>
     <div class="row" *ngIf="selectedOwners.length > 0">
       <ul class="list-group list-group-flush p-3">
-        <label for="add-budget-selected-owner" class="form-label">Ausgewählte Besitzer</label>
-        <li class="list-group-item" id="add-budget-selected-owner" *ngFor="let owner of selectedOwners">{{ owner.email }}
+        <label for="add-account-selected-owner" class="form-label">Ausgewählte Besitzer</label>
+        <li class="list-group-item" id="add-account-selected-owner" *ngFor="let owner of selectedOwners">{{ owner.email }}
           <button type="button" class="btn btn btn-dark position-absolute btn-sm end-0 top-0" (click)="onRemoveOwnerButtonClick(owner)"><i class="bi bi-dash-lg"></i></button>
         </li>
       </ul>

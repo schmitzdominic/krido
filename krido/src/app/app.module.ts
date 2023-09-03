@@ -39,6 +39,7 @@ import { AccountListComponent } from './pages/accounts/account-list/account-list
 import { CreditCardListComponent } from './pages/accounts/credit-card-list/credit-card-list.component';
 import { AccountListEntryComponent } from './components/account-list-entry/account-list-entry.component';
 import { AddOrEditAccountContentComponent } from './pages/accounts/account-list/add-or-edit-account-content/add-or-edit-account-content.component';
+import { ViewAccountContentComponent } from './pages/accounts/account-list/view-account-content/view-account-content.component';
 
 @NgModule({
   declarations: [
@@ -66,6 +67,7 @@ import { AddOrEditAccountContentComponent } from './pages/accounts/account-list/
     CreditCardListComponent,
     AccountListEntryComponent,
     AddOrEditAccountContentComponent,
+    ViewAccountContentComponent,
   ],
     imports: [
         BrowserModule,

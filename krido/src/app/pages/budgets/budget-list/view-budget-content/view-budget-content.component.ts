@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {Budget} from "../../../../../shared/interfaces/budget.model";
-import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
+import {FormBuilder} from "@angular/forms";
 import {PriceService} from "../../../../services/price/price.service";
 import {NgbProgressbarConfig} from "@ng-bootstrap/ng-bootstrap";
 import {ProgressBarService} from "../../../../services/progress-bar/progress-bar.service";
@@ -19,21 +19,14 @@ export class ViewBudgetContentComponent {
   isContentReadOnly: boolean = true;
   isEditButtonShown: boolean = true;
 
-  editBudgetFormGroup: FormGroup = new FormGroup({
-    name: new FormControl(''),
-    limit: new FormControl('')
-  });
-
   constructor(private formBuilder: FormBuilder,
               private ngbProgressbarConfig: NgbProgressbarConfig,
               public progressBarService: ProgressBarService,
               public priceService: PriceService) {
-    this.createFormGroup();
   }
 
   ngOnInit(): void {
     this.checkIfLimitIsSet();
-    this.createFormGroup();
     this.loadProgressBarConfig();
   }
 
@@ -42,15 +35,6 @@ export class ViewBudgetContentComponent {
       this.isEditButtonShown = false;
       this.onEdit();
     }
-  }
-
-  createFormGroup(): void {
-    this.editBudgetFormGroup = this.formBuilder.group(
-      {
-        name: ['', Validators.required],
-        limit: ['', Validators.required]
-      }
-    );
   }
 
   loadProgressBarConfig() {
@@ -78,10 +62,6 @@ export class ViewBudgetContentComponent {
 
   onEdit() {
     this.isContentReadOnly = !this.isContentReadOnly;
-  }
-
-  onSubmit(): void {
-
   }
 
   onCancel() {

@@ -4,6 +4,7 @@ import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap/modal/modal-ref";
 import {Budget} from "../../../../shared/interfaces/budget.model";
 import {BudgetService} from "../../../services/budget/budget.service";
 import {PriceService} from "../../../services/price/price.service";
+import {LoadingService} from "../../../services/loading/loading.service";
 
 interface DropdownItem {
   name: string;
@@ -29,10 +30,14 @@ export class BudgetListComponent {
   noTimeLimitBudgets: Budget[] = [];
   monthlyBudgets: Budget[] = [];
 
+  isNoTimeLimitInitialized: boolean = false;
+  isMonthlyInitialized: boolean = false;
+
   clickedBudget: Budget | undefined;
 
   constructor(private ngbModal: NgbModal,
               private budgetService: BudgetService,
+              private loadingService: LoadingService,
               public priceService: PriceService) {
   }
 
@@ -90,6 +95,8 @@ export class BudgetListComponent {
           this.noTimeLimitBudgets.push(budget);
         }
       });
+      this.isNoTimeLimitInitialized = true;
+      if (this.isMonthlyInitialized) this.loadingService.setLoading = false;
     });
   }
 
@@ -105,6 +112,8 @@ export class BudgetListComponent {
           this.monthlyBudgets.push(budget);
         }
       });
+      this.isMonthlyInitialized = true;
+      if (this.isNoTimeLimitInitialized) this.loadingService.setLoading = false;
     });
   }
 }
