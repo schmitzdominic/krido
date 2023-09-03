@@ -1,3 +1,9 @@
+<!-- Modal add or edit account -->
+<ng-template #addOrEditAccountModal let-modal>
+  <app-add-or-edit-account-content
+    (onClose)="onCloseAddOrEditAccountModal()">
+  </app-add-or-edit-account-content>
+</ng-template>
 <div class="container">
   <!-- Add Button -->
   <div class="position-fixed end-0 bottom-0 me-4 mb-4">

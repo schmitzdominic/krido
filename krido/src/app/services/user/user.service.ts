@@ -33,6 +33,10 @@ export class UserService {
     return home ? home : '';
   }
 
+  getAllUsers() {
+    return this.dbService.readList('users');
+  }
+
   get getHomePin() {
     return this.dbService.read(`homes/${this.dbService.home}/pin`);
   }

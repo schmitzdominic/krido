@@ -20,7 +20,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {MatIconModule} from "@angular/material/icon";
 import {MatButtonModule} from '@angular/material/button';
 import { LoginComponent } from './components/login/login.component';
-import {ReactiveFormsModule} from "@angular/forms";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import { HomeSetupComponent } from './components/home-setup/home-setup.component';
 import { ToastsContainerComponent } from './components/toasts-container/toasts-container.component';
 import { BudgetListComponent } from './pages/budgets/budget-list/budget-list.component';
@@ -35,9 +35,10 @@ import { BudgetListEntryComponent } from './components/budget-list-entry/budget-
 import { SettingsComponent } from './pages/settings/settings.component';
 import { SettingsUserComponent } from './pages/settings/settings-user/settings-user.component';
 import { SettingsHomeComponent } from './pages/settings/settings-home/settings-home.component';
-import { AccountsListComponent } from './pages/accounts/accounts-list/accounts-list.component';
+import { AccountListComponent } from './pages/accounts/account-list/account-list.component';
 import { CreditCardListComponent } from './pages/accounts/credit-card-list/credit-card-list.component';
 import { AccountListEntryComponent } from './components/account-list-entry/account-list-entry.component';
+import { AddOrEditAccountContentComponent } from './pages/accounts/account-list/add-or-edit-account-content/add-or-edit-account-content.component';
 
 @NgModule({
   declarations: [
@@ -61,31 +62,33 @@ import { AccountListEntryComponent } from './components/account-list-entry/accou
     SettingsComponent,
     SettingsUserComponent,
     SettingsHomeComponent,
-    AccountsListComponent,
+    AccountListComponent,
     CreditCardListComponent,
     AccountListEntryComponent,
+    AddOrEditAccountContentComponent,
   ],
-  imports: [
-    BrowserModule,
-    AngularFireModule.initializeApp(environment.firebase),
-    NgbModule,
-    AppRoutingModule,
-    CurrencyMaskModule,
-    provideFirebaseApp(() => initializeApp(environment.firebase)),
-    provideAnalytics(() => getAnalytics()),
-    provideAuth(() => getAuth()),
-    provideDatabase(() => getDatabase()),
-    BrowserAnimationsModule,
-    MatIconModule,
-    MatButtonModule,
-    ReactiveFormsModule,
-    ServiceWorkerModule.register('ngsw-worker.js', {
-      enabled: !isDevMode(),
-      // Register the ServiceWorker as soon as the application is stable
-      // or after 30 seconds (whichever comes first).
-      registrationStrategy: 'registerWhenStable:30000'
-    })
-  ],
+    imports: [
+        BrowserModule,
+        AngularFireModule.initializeApp(environment.firebase),
+        NgbModule,
+        AppRoutingModule,
+        CurrencyMaskModule,
+        provideFirebaseApp(() => initializeApp(environment.firebase)),
+        provideAnalytics(() => getAnalytics()),
+        provideAuth(() => getAuth()),
+        provideDatabase(() => getDatabase()),
+        BrowserAnimationsModule,
+        MatIconModule,
+        MatButtonModule,
+        ReactiveFormsModule,
+        ServiceWorkerModule.register('ngsw-worker.js', {
+            enabled: !isDevMode(),
+            // Register the ServiceWorker as soon as the application is stable
+            // or after 30 seconds (whichever comes first).
+            registrationStrategy: 'registerWhenStable:30000'
+        }),
+        FormsModule
+    ],
   providers: [
     ScreenTrackingService,
     UserTrackingService,
