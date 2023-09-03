@@ -36,10 +36,11 @@ import { SettingsComponent } from './pages/settings/settings.component';
 import { SettingsUserComponent } from './pages/settings/settings-user/settings-user.component';
 import { SettingsHomeComponent } from './pages/settings/settings-home/settings-home.component';
 import { AccountListComponent } from './pages/accounts/account-list/account-list.component';
-import { CreditCardListComponent } from './pages/accounts/credit-card-list/credit-card-list.component';
 import { AccountListEntryComponent } from './components/account-list-entry/account-list-entry.component';
 import { AddOrEditAccountContentComponent } from './pages/accounts/account-list/add-or-edit-account-content/add-or-edit-account-content.component';
 import { ViewAccountContentComponent } from './pages/accounts/account-list/view-account-content/view-account-content.component';
+import { EntryListComponent } from './pages/home/entry-list/entry-list.component';
+import { AddOrEditEntryComponent } from './pages/home/entry-list/add-or-edit-entry/add-or-edit-entry.component';
 
 @NgModule({
   declarations: [
@@ -64,10 +65,11 @@ import { ViewAccountContentComponent } from './pages/accounts/account-list/view-
     SettingsUserComponent,
     SettingsHomeComponent,
     AccountListComponent,
-    CreditCardListComponent,
     AccountListEntryComponent,
     AddOrEditAccountContentComponent,
     ViewAccountContentComponent,
+    EntryListComponent,
+    AddOrEditEntryComponent,
   ],
     imports: [
         BrowserModule,

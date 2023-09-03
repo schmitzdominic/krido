@@ -6,6 +6,15 @@
         ".write": "$uid === auth.uid"
       }
     },
+    "homes": {
+      "$home": {
+        "budgets": {
+          "month": {
+            ".indexOn": "validityPeriod"
+          }
+        }
+      }
+    },
     ".read": "auth != null",
     ".write": "auth != null"
   }

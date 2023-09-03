@@ -1,7 +1,64 @@
-<!--<div class="position-fixed end-0 bottom-0 me-4 mb-4">
-  <button type="button" class="btn btn-primary" (click)="onButtonAddClick()"><i class="bi bi-plus-lg"></i></button>
-</div>-->
-<div class="row" *ngIf="true">
+<!-- View Budget -->
+<ng-template #viewBudgetModal let-modal>
+  <app-view-budget-content
+    [budget]="clickedBudget"
+    (onClose)="onCloseViewBudgetModal()">
+  </app-view-budget-content>
+</ng-template>
+<div class="container">
+  <div class="row" *ngIf="allTimeBudgets.length > 0 || monthlyBudgets.length > 0">
+    <!-- No Time Limit -->
+    <h1>Budgets</h1>
+    <table class="table table-striped">
+      <tbody>
+      <div *ngFor="let budget of allTimeBudgets" class="card p-1 m-2" (click)="openViewBudgetModal(budget)">
+        <div class="card-body">
+          <app-budget-list-entry
+            [budget]="budget">
+          </app-budget-list-entry>
+        </div>
+      </div>
+      <div *ngFor="let budget of monthlyBudgets" class="card p-1 m-2" (click)="openViewBudgetModal(budget)">
+        <div class="card-body">
+          <app-budget-list-entry
+            [budget]="budget">
+          </app-budget-list-entry>
+        </div>
+      </div>
+      </tbody>
+    </table>
+  </div>
+  <div class="row">
+    <!-- Entries -->
+    <app-entry-list
+      (isEntriesAvailable)="onEntriesLoaded($event)">
+    </app-entry-list>
+  </div>
+  <div *ngIf="!isEntriesAvailable">
+    <h1 class="card-title placeholder-glow">
+      <span class="placeholder col-6"></span>
+    </h1>
+    <ul class="list-group list-group-flush">
+      <li class="list-group-item" id="list-accounts" *ngFor="let number of [1,2,3,4,5]">
+        <div class="custom-list-item">
+          <p class="card-text placeholder-glow">
+            <span class="placeholder col-7"></span>
+            <span class="placeholder col-4"></span>
+            <span class="placeholder col-4"></span>
+            <span class="placeholder col-6"></span>
+            <span class="placeholder col-8"></span>
+          </p>
+        </div>
+      </li>
+    </ul>
+  </div>
+</div>
+
+
+
+
+<!-- Nothing here pig -->
+<div class="row" *ngIf="false">
   <div class="card">
     <div class="m-2 mt-3">
       <img src="assets/img/pig.gif" class="card-img-top" alt="welcome" style="border-radius: 6px;">
@@ -12,7 +69,7 @@
         <p class="card-text">Du hast noch keine Einträge, Budgets oder Konten angelegt.</p>
       </div>
       <div class="position-absolute end-0 bottom-0 me-4 mb-4">
-        <button type="button" class="btn btn-primary" (click)="onButtonAddClick()">Anlegen</button>
+        <button type="button" class="btn btn-primary">Anlegen</button>
       </div>
     </div>
   </div>

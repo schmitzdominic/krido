@@ -1,0 +1,26 @@
+<div>
+  <h1 class="d-flex align-items-center justify-content-center pt-4">{{ title }}</h1>
+</div>
+<div class="modal-body">
+  <form class="needs-validation" [formGroup]="addOrEditEntryFormGroup" (ngSubmit)="onSubmit()" novalidate>
+    <div class="col-md-12 mb-3">
+      <label for="add-account-name" class="form-label">Name</label>
+      <div class="input-group has-validation">
+        <input formControlName="name" type="text" class="form-control" id="add-account-name" aria-describedby="inputGroupPrepend" required>
+        <div class="invalid-feedback">
+          Name fehlt!
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-dark" (click)="onButtonCancel()">Abbrechen</button>
+  <button
+    type="button"
+    class="btn btn-light"
+    [disabled]="addOrEditEntryFormGroup.invalid"
+    (click)="onSubmit()">{{ submitButtonText }}</button>
+</div>
+
+

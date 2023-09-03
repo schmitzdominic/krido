@@ -29,7 +29,7 @@
         </li>
       </ul>
       <ngb-progressbar
-        [value]="budget?.usedLimit!"
+        [value]="usedLimit"
         [max]="budget?.limit!"
         type="{{ progressBarService.getProgressBarType(budget?.usedLimit!, budget?.limit!) }}"
       >{{ getProgressBarText() }}</ngb-progressbar>

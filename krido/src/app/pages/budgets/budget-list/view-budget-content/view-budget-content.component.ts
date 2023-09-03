@@ -18,6 +18,8 @@ export class ViewBudgetContentComponent {
   isContentReadOnly: boolean = true;
   isEditButtonShown: boolean = true;
 
+  usedLimit: number = 0;
+
   constructor(private ngbProgressbarConfig: NgbProgressbarConfig,
               public progressBarService: ProgressBarService,
               public priceService: PriceService) {
@@ -26,6 +28,7 @@ export class ViewBudgetContentComponent {
   ngOnInit(): void {
     this.checkIfLimitIsSet();
     this.loadProgressBarConfig();
+    this.setUsedLimit();
   }
 
   checkIfLimitIsSet() {
@@ -37,6 +40,14 @@ export class ViewBudgetContentComponent {
 
   loadProgressBarConfig() {
     this.progressBarService.setProgressBarConfig(this.ngbProgressbarConfig);
+  }
+
+  setUsedLimit() {
+    if (this.budget && this.budget.usedLimit) {
+      this.usedLimit = this.budget.usedLimit;
+    } else {
+      this.usedLimit = 0;
+    }
   }
 
   getRestBudget() {
