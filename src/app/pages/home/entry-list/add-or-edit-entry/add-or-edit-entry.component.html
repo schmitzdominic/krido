@@ -1,7 +1,7 @@
 <div>
   <h1 class="d-flex align-items-center justify-content-center pt-4" [ngClass]="{
-            'text-success-emphasis' : selectedEntryType.value === incomeEntryType.value,
-            'text-danger-emphasis' : selectedEntryType.value === expenditureEntryType.value
+            'text-success' : selectedEntryType.value === incomeEntryType.value,
+            'text-danger' : selectedEntryType.value === expenditureEntryType.value
          }">{{ title }}</h1>
 </div>
 <div class="modal-body">
@@ -31,8 +31,7 @@
           aria-describedby="inputGroupPrepend"
           [options]="{ prefix: '', thousands: '', decimal: ',' }"
           inputmode="numeric"
-          pattern="^\d+(\,\d{1,2})?$"
-          required>
+          pattern="^\d+(\,\d{1,2})?$">
         <span class="input-group-text" id="inputGroupPrepend">€</span>
         <div class="invalid-feedback">
           Betrag fehlt!
@@ -75,7 +74,7 @@
   <button
     type="button"
     class="btn btn-light"
-    [disabled]="addOrEditEntryFormGroup.invalid"
+    [disabled]="isNameInvalid || isValueInvalid"
     (click)="onSubmit()">{{ submitButtonText }}</button>
 </div>
 

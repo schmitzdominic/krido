@@ -22,6 +22,16 @@ export class DateService {
     "Dezember"
   ];
 
+  private dayNamesShort = [
+    "So.",
+    "Mo.",
+    "Di.",
+    "Mi.",
+    "Do.",
+    "Fr.",
+    "Sa."
+  ];
+
   constructor() { }
 
   /**
@@ -59,6 +69,16 @@ export class DateService {
   }
 
   /**
+   * Gets the day by a day number.
+   *
+   * @param {number} day starts from 0
+   * @returns {string} the day as short
+   */
+  getDayShortName(day: number): string {
+    return this.dayNamesShort[day];
+  }
+
+  /**
    * Gets the month as short name, by a given month. e.g. Jan. -> January
    *
    * @param {number} month to get the short name from
@@ -92,6 +112,20 @@ export class DateService {
    */
   getActualMonthString(): string {
     return this.getMonthStringFromDate(this.actualDate);
+  }
+
+  /**
+   * Get a month string from the actual Month + offset
+   *
+   * @param {number} offset to set
+   * @returns {string} month string
+   */
+  getMonthStringFromMonth(offset: number): string {
+    const actualMonth: number = new Date().getMonth();
+    const actualYear: number = new Date().getFullYear();
+    const year: number = actualMonth + offset > 11 ? actualYear + 1 : actualYear;
+    const month: number = (new Date().getMonth()+offset)%12;
+    return this.getMonthStringFromDate(new Date(year, month, 1));
   }
 
   /**

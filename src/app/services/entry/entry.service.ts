@@ -7,11 +7,15 @@ import {Entry} from "../../../shared/interfaces/entry.model";
 })
 export class EntryService {
 
-  private rootPath: string =  `homes/${this.dbService.home}/entries`;
+  private rootPath: string = `homes/${this.dbService.home}/entries`;
 
   constructor(private dbService: DbService) { }
 
   addEntry(entry: Entry) {
     return this.dbService.createListValue(`${this.rootPath}`, entry);
+  }
+
+  getAllEntriesByMonthString(monthString: string) {
+    return this.dbService.readFilteredList(`${this.rootPath}`, ref => ref.orderByChild('monthString').equalTo(monthString));
   }
 }

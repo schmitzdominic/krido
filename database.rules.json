@@ -12,6 +12,9 @@
           "month": {
             ".indexOn": "validityPeriod"
           }
+        },
+        "entries": {
+          ".indexOn": "monthString"
         }
       }
     },

@@ -37,11 +37,13 @@ export class AddOrEditEntryComponent {
   selectedDate: NgbDate = this.ngbCalendar.getToday();
   selectedDateTimestamp: number = this.dateService.getTimestampFromNgbDate(this.selectedDate);
 
+  isNameInvalid: boolean = true;
+  isValueInvalid: boolean = true;
 
   addOrEditEntryFormGroup: FormGroup = new FormGroup({
     entryType: new FormControl(''),
     name: new FormControl('', Validators.required),
-    value: new FormControl('', Validators.required),
+    value: new FormControl(''),
     date: new FormControl(''),
     account: new FormControl(''),
     budget: new FormControl(''),
@@ -87,7 +89,7 @@ export class AddOrEditEntryComponent {
       {
         entryType: [this.selectedEntryType.value],
         name: ['', Validators.required],
-        value: ['', Validators.required],
+        value: [''],
         date: [this.selectedDate],
         account: [''],
         budget: ['']
@@ -108,6 +110,12 @@ export class AddOrEditEntryComponent {
         }
       }
       this.title = this.selectedEntryType.label;
+    });
+    this.addOrEditEntryFormGroup.controls['name'].valueChanges.subscribe((name: string) => {
+      this.isNameInvalid = name.length <= 0;
+    });
+    this.addOrEditEntryFormGroup.controls['value'].valueChanges.subscribe(value => {
+      this.isValueInvalid = value <= 0;
     });
   }
 
@@ -162,7 +170,6 @@ export class AddOrEditEntryComponent {
   }
 
   onAdd() {
-    console.dir(this.getEntryObject());
     this.entryService.addEntry(this.getEntryObject()).then(() => this.onClose.emit());
   }
 

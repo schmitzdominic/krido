@@ -36,12 +36,12 @@ import { SettingsComponent } from './pages/settings/settings.component';
 import { SettingsUserComponent } from './pages/settings/settings-user/settings-user.component';
 import { SettingsHomeComponent } from './pages/settings/settings-home/settings-home.component';
 import { AccountListComponent } from './pages/accounts/account-list/account-list.component';
-import { AccountListEntryComponent } from './components/account-list-entry/account-list-entry.component';
 import { AddOrEditAccountContentComponent } from './pages/accounts/account-list/add-or-edit-account-content/add-or-edit-account-content.component';
 import { ViewAccountContentComponent } from './pages/accounts/account-list/view-account-content/view-account-content.component';
 import { EntryListComponent } from './pages/home/entry-list/entry-list.component';
 import { AddOrEditEntryComponent } from './pages/home/entry-list/add-or-edit-entry/add-or-edit-entry.component';
 import {NgbDateCustomParserFormatter} from "../shared/formatter/ngb-date-custom-parser-formatter";
+import { EntryListEntryComponent } from './components/entry-list-entry/entry-list-entry.component';
 
 @NgModule({
   declarations: [
@@ -66,11 +66,11 @@ import {NgbDateCustomParserFormatter} from "../shared/formatter/ngb-date-custom-
     SettingsUserComponent,
     SettingsHomeComponent,
     AccountListComponent,
-    AccountListEntryComponent,
     AddOrEditAccountContentComponent,
     ViewAccountContentComponent,
     EntryListComponent,
     AddOrEditEntryComponent,
+    EntryListEntryComponent,
   ],
     imports: [
         BrowserModule,
