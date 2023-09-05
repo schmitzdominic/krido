@@ -4,6 +4,8 @@
   </app-add-or-edit-entry>
 </ng-template>
 
-<div class="position-fixed end-0 bottom-0 me-4 mb-4">
+<ngb-toast class="position-fixed bottom-0 mb-4" *ngIf="isToastNoAccountShown" [autohide]="false"> Um einen Eintrag zu machen, benötigst du ein Konto. <a [routerLink]="['/accounts']">Hier</a> kannst du ein Konto anlegen. </ngb-toast>
+
+<div class="position-fixed end-0 bottom-0 me-4 mb-4" *ngIf="isAccountAvailable">
   <button type="button" class="btn btn-primary" (click)="onButtonAddClick()"><i class="bi bi-plus-lg"></i></button>
 </div>

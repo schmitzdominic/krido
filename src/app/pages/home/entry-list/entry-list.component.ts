@@ -1,6 +1,7 @@
 import {Component, EventEmitter, Output, ViewChild} from '@angular/core';
 import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap/modal/modal-ref";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
+import {AccountService} from "../../../services/account/account.service";
 
 @Component({
   selector: 'app-entry-list',
@@ -15,11 +16,23 @@ export class EntryListComponent {
 
   addOrEditEntryModalRef: NgbModalRef | undefined;
 
-  constructor(private ngbModal: NgbModal) {
+  isAccountAvailable: boolean = false;
+  isToastNoAccountShown: boolean = false;
+
+  constructor(private ngbModal: NgbModal,
+              private accountService: AccountService) {
   }
 
   ngOnInit() {
     this.isEntriesAvailable.emit(false);
+    this.checkForAccounts();
+  }
+
+  checkForAccounts() {
+    this.accountService.getAllAccounts().subscribe(accounts => {
+      this.isAccountAvailable = accounts.length > 0;
+      this.isToastNoAccountShown = !this.isAccountAvailable;
+    });
   }
 
   openAddOrEditEntryModal(): void {
