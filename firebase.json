@@ -5,7 +5,7 @@
   "hosting": [
     {
       "target": "krido",
-      "public": "public",
+      "public": "dist/krido",
       "ignore": [
         "firebase.json",
         "**/.*",
