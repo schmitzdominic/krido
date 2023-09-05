@@ -1,16 +1,71 @@
 <div>
-  <h1 class="d-flex align-items-center justify-content-center pt-4">{{ title }}</h1>
+  <h1 class="d-flex align-items-center justify-content-center pt-4" [ngClass]="{
+            'text-success-emphasis' : selectedEntryType.name === incomeEntryType.name,
+            'text-danger-emphasis' : selectedEntryType.name === expenditureEntryType.name
+         }">{{ title }}</h1>
 </div>
 <div class="modal-body">
   <form class="needs-validation" [formGroup]="addOrEditEntryFormGroup" (ngSubmit)="onSubmit()" novalidate>
+    <div class="mb-4">
+      <select class="form-select" id="add-entry-type" aria-label="Select entry type" formControlName="entryType">
+        <option *ngFor="let entryType of entryTypes" value="{{ entryType.name }}">{{ entryType.label }}</option>
+      </select>
+    </div>
     <div class="col-md-12 mb-3">
-      <label for="add-account-name" class="form-label">Name</label>
+      <label for="add-entry-name" class="form-label bs-success-text-emphasis">Kurzbeschreibung</label>
       <div class="input-group has-validation">
-        <input formControlName="name" type="text" class="form-control" id="add-account-name" aria-describedby="inputGroupPrepend" required>
+        <input formControlName="name" type="text" class="form-control" id="add-entry-name" aria-describedby="inputGroupPrepend" required>
         <div class="invalid-feedback">
-          Name fehlt!
+          Kurzbeschreibung fehlt!
         </div>
       </div>
+    </div>
+    <div class="col-md-12 mb-3">
+      <label for="add-entry-value" class="form-label">Betrag</label>
+      <div class="input-group has-validation">
+        <input
+          currencyMask
+          class="form-control"
+          id="add-entry-value"
+          formControlName="value"
+          aria-describedby="inputGroupPrepend"
+          [options]="{ prefix: '', thousands: '', decimal: ',' }"
+          inputmode="numeric"
+          pattern="^\d+(\,\d{1,2})?$"
+          required>
+        <span class="input-group-text" id="inputGroupPrepend">€</span>
+        <div class="invalid-feedback">
+          Betrag fehlt!
+        </div>
+      </div>
+    </div>
+    <div class="col-md-12 mb-3">
+      <label for="add-entry-account" class="form-label">Datum</label>
+      <div class="input-group">
+        <input
+          class="form-control"
+          placeholder="{{ selectedDate | date}}"
+          name="date"
+          formControlName="date"
+          ngbDatepicker
+          [showWeekNumbers]="true"
+          (dateSelect)="onDateSelected($event)"
+          #date="ngbDatepicker"
+        />
+        <button class="btn btn-outline-secondary bi bi-calendar3" (click)="date.toggle()" type="button"></button>
+      </div>
+    </div>
+    <div class="col-md-12 mb-3">
+      <label for="add-entry-account" class="form-label">Konto</label>
+      <select class="form-select" id="add-entry-account" aria-label="Select entry type" formControlName="account">
+        <option *ngFor="let account of accounts" value="{{ account.key }}">{{ account.name }}</option>
+      </select>
+    </div>
+    <div class="col-md-12 mb-3">
+      <label for="add-entry-budget" class="form-label">Budget</label>
+      <select class="form-select" id="add-entry-budget" aria-label="Select entry type" formControlName="budget">
+        <option *ngFor="let budget of budgets" value="{{ budget.key }}">{{ budget.name }}</option>
+      </select>
     </div>
   </form>
 </div>

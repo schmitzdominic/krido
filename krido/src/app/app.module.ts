@@ -1,9 +1,9 @@
-import {NgModule, isDevMode, LOCALE_ID} from '@angular/core';
+import {NgModule, isDevMode} from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { NgbModule } from "@ng-bootstrap/ng-bootstrap";
+import {NgbDateParserFormatter, NgbModule} from "@ng-bootstrap/ng-bootstrap";
 import { HomeComponent } from './pages/home/home.component';
 import { MainMenuComponent } from './components/main-menu/main-menu.component';
 import { AccountsComponent } from './pages/accounts/accounts.component';
@@ -41,6 +41,7 @@ import { AddOrEditAccountContentComponent } from './pages/accounts/account-list/
 import { ViewAccountContentComponent } from './pages/accounts/account-list/view-account-content/view-account-content.component';
 import { EntryListComponent } from './pages/home/entry-list/entry-list.component';
 import { AddOrEditEntryComponent } from './pages/home/entry-list/add-or-edit-entry/add-or-edit-entry.component';
+import {NgbDateCustomParserFormatter} from "../shared/formatter/ngb-date-custom-parser-formatter";
 
 @NgModule({
   declarations: [
@@ -96,10 +97,7 @@ import { AddOrEditEntryComponent } from './pages/home/entry-list/add-or-edit-ent
   providers: [
     ScreenTrackingService,
     UserTrackingService,
-    {
-      provide: LOCALE_ID,
-      useValue: 'de-DE'
-    },
+    { provide: NgbDateParserFormatter, useClass: NgbDateCustomParserFormatter },
   ],
   bootstrap: [AppComponent]
 })
