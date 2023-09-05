@@ -1,14 +1,14 @@
 <div>
   <h1 class="d-flex align-items-center justify-content-center pt-4" [ngClass]="{
-            'text-success-emphasis' : selectedEntryType.name === incomeEntryType.name,
-            'text-danger-emphasis' : selectedEntryType.name === expenditureEntryType.name
+            'text-success-emphasis' : selectedEntryType.value === incomeEntryType.value,
+            'text-danger-emphasis' : selectedEntryType.value === expenditureEntryType.value
          }">{{ title }}</h1>
 </div>
 <div class="modal-body">
   <form class="needs-validation" [formGroup]="addOrEditEntryFormGroup" (ngSubmit)="onSubmit()" novalidate>
     <div class="mb-4">
       <select class="form-select" id="add-entry-type" aria-label="Select entry type" formControlName="entryType">
-        <option *ngFor="let entryType of entryTypes" value="{{ entryType.name }}">{{ entryType.label }}</option>
+        <option *ngFor="let entryType of entryTypes" value="{{ entryType.value }}">{{ entryType.label }}</option>
       </select>
     </div>
     <div class="col-md-12 mb-3">
@@ -40,11 +40,12 @@
       </div>
     </div>
     <div class="col-md-12 mb-3">
-      <label for="add-entry-account" class="form-label">Datum</label>
+      <label for="add-entry-date" class="form-label">Datum</label>
       <div class="input-group">
         <input
+          id="add-entry-date"
           class="form-control"
-          placeholder="{{ selectedDate | date}}"
+          placeholder="{{ selectedDateTimestamp | date: 'dd.MM.yyyy'}}"
           name="date"
           formControlName="date"
           ngbDatepicker

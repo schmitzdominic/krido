@@ -1,4 +1,5 @@
 import {Injectable} from '@angular/core';
+import {NgbDate} from "@ng-bootstrap/ng-bootstrap";
 
 @Injectable({
   providedIn: 'root'
@@ -90,9 +91,40 @@ export class DateService {
    * @returns {string} year + month e.g. 202301
    */
   getActualMonthString(): string {
-    const month: string = String(this.actualDate.getMonth());
-    const year: string = String(this.actualDate.getFullYear());
+    return this.getMonthStringFromDate(this.actualDate);
+  }
+
+  /**
+   * Get a month string from Date object.
+   *
+   * @param {Date} date to convert.
+   * @returns {string} monthString
+   */
+  getMonthStringFromDate(date: Date): string {
+    const month: string = String(date.getMonth());
+    const year: string = String(date.getFullYear());
     return year + (month.length == 1 ? '0' + month : month);
+  }
+
+  /**
+   * Get a Timestamp from NgbDate object.
+   *
+   * @param {NgbDate} ngbDate to convert to timestamp
+   * @returns {number} timestamp
+   */
+  getTimestampFromNgbDate(ngbDate: NgbDate): number {
+    const date: Date = new Date(ngbDate.year, ngbDate.month - 1, ngbDate.day);
+    return date.getTime();
+  }
+
+  /**
+   * Get Date Object from timestamp.
+   *
+   * @param {number} timestamp to convert.
+   * @returns {Date} from timestamp
+   */
+  getDateFromTimestamp(timestamp: number): Date {
+    return new Date(timestamp);
   }
 
   /**

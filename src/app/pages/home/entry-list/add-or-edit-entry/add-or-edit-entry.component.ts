@@ -9,10 +9,13 @@ import {Budget} from "../../../../../shared/interfaces/budget.model";
 import {BudgetService} from "../../../../services/budget/budget.service";
 import {SnapshotAction} from "@angular/fire/compat/database";
 import {DateService} from "../../../../services/date/date.service";
-import {NgbDate} from "@ng-bootstrap/ng-bootstrap";
+import {NgbCalendar, NgbDate} from "@ng-bootstrap/ng-bootstrap";
+import {Entry} from "../../../../../shared/interfaces/entry.model";
+import {HelperService} from "../../../../services/helper/helper.service";
+import {EntryService} from "../../../../services/entry/entry.service";
 
 interface EntryTypeInterface {
-  name: EntryType,
+  value: EntryType,
   label: string,
 }
 @Component({
@@ -24,14 +27,16 @@ export class AddOrEditEntryComponent {
 
   @Output() onClose: EventEmitter<any> = new EventEmitter<any>();
 
-  expenditureEntryType: EntryTypeInterface = {name: EntryType.outcome, label: 'Ausgabe'};
-  incomeEntryType: EntryTypeInterface = {name: EntryType.income, label: 'Einnahme'}
+  expenditureEntryType: EntryTypeInterface = {value: EntryType.outcome, label: 'Ausgabe'};
+  incomeEntryType: EntryTypeInterface = {value: EntryType.income, label: 'Einnahme'}
   selectedEntryType: EntryTypeInterface = this.expenditureEntryType;
   entryTypes: EntryTypeInterface[] = [this.expenditureEntryType, this.incomeEntryType]
   accounts: Account[] = [];
   budgets: Budget[] = [];
   noBudgetKey: string = 'noBudget';
-  selectedDate: number = Date.now();
+  selectedDate: NgbDate = this.ngbCalendar.getToday();
+  selectedDateTimestamp: number = this.dateService.getTimestampFromNgbDate(this.selectedDate);
+
 
   addOrEditEntryFormGroup: FormGroup = new FormGroup({
     entryType: new FormControl(''),
@@ -64,7 +69,10 @@ export class AddOrEditEntryComponent {
               private accountService: AccountService,
               private userService: UserService,
               private budgetService: BudgetService,
-              private dateService: DateService) {
+              private dateService: DateService,
+              private helperService: HelperService,
+              private ngbCalendar: NgbCalendar,
+              private entryService: EntryService) {
   }
 
   ngOnInit() {
@@ -77,10 +85,10 @@ export class AddOrEditEntryComponent {
   private createFormGroup() {
     this.addOrEditEntryFormGroup = this.formBuilder.group(
       {
-        entryType: [this.selectedEntryType.name],
+        entryType: [this.selectedEntryType.value],
         name: ['', Validators.required],
         value: ['', Validators.required],
-        date: [''],
+        date: [this.selectedDate],
         account: [''],
         budget: ['']
       }
@@ -90,11 +98,11 @@ export class AddOrEditEntryComponent {
   private createListeners() {
     this.addOrEditEntryFormGroup.controls['entryType'].valueChanges.subscribe(entryTypeName => {
       switch (entryTypeName) {
-        case this.expenditureEntryType.name: {
+        case this.expenditureEntryType.value: {
           this.selectedEntryType = this.expenditureEntryType;
           break;
         }
-        case this.incomeEntryType.name: {
+        case this.incomeEntryType.value: {
           this.selectedEntryType = this.incomeEntryType;
           break;
         }
@@ -145,16 +153,54 @@ export class AddOrEditEntryComponent {
     this.budgets.push(budget);
   }
 
-  onDateSelected(date: NgbDate) {
-    console.dir(date);
+  onDateSelected(ngbDate: NgbDate) {
+    this.selectedDateTimestamp = this.dateService.getTimestampFromNgbDate(ngbDate);
   }
 
   onSubmit() {
+    this.onAdd();
+  }
 
+  onAdd() {
+    console.dir(this.getEntryObject());
+    this.entryService.addEntry(this.getEntryObject()).then(() => this.onClose.emit());
+  }
+
+  getEntryObject(): Entry {
+    const name: string = this.addOrEditEntryFormGroup.value.name;
+    const value: number = this.addOrEditEntryFormGroup.value.value;
+    const entry: Entry = {
+      type: this.selectedEntryType.value,
+      name: name,
+      searchName: this.helperService.createSearchName(name),
+      value: value,
+      date: this.selectedDateTimestamp,
+      account: this.selectedAccount,
+      budgetKey: this.selectedBudget ? this.selectedBudget.key : undefined,
+      monthString: this.dateService.getMonthStringFromDate(new Date(this.selectedDateTimestamp))
+    }
+    if (entry.budgetKey) {
+      return entry;
+    } else {
+      delete entry['budgetKey'];
+      return entry;
+    }
   }
 
   onButtonCancel() {
     this.onClose.emit();
   }
 
+  get selectedAccount(): Account {
+    const account = this.accounts.find((account: Account) => account.key === this.addOrEditEntryFormGroup.value.account);
+    return account ? account : this.noAccountValue;
+  }
+
+  get selectedBudget() {
+    const budget = this.budgets.find((budget: Budget) => budget.key === this.addOrEditEntryFormGroup.value.budget);
+    if (budget && budget.key === this.noBudgetKey) {
+      return undefined;
+    }
+    return budget;
+  }
 }
