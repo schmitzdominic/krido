@@ -53,6 +53,13 @@ export class EntryListComponent {
         entry.key = entryRaw.key ? entry.key : '';
         entryList.push(entry);
       });
+      this.sortEntriesByDate(entryList);
+    });
+  }
+
+  private sortEntriesByDate(entries: Entry[]) {
+    entries.sort((one, two) => {
+      return one.date < two.date ? -1 : 1;
     });
   }
 
