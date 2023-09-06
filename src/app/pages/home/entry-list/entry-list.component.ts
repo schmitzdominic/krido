@@ -96,7 +96,7 @@ export class EntryListComponent {
     this.addOrEditEntryModalRef = this.ngbModal.open(
       this.addOrEditEntryModal,
       {
-        size: 'sm'
+        size: 'md'
       });
   }
 

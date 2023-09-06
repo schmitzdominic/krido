@@ -58,7 +58,7 @@ export class BudgetListComponent {
     this.addBudgetModalRef = this.ngbModal.open(
       this.addBudgetModal,
       {
-        size: 'sm'
+        size: 'md'
       });
   }
 
@@ -67,7 +67,7 @@ export class BudgetListComponent {
     this.editBudgetModalRef = this.ngbModal.open(
       this.editBudgetModal,
       {
-        size: 'sm'
+        size: 'md'
       });
   }
 

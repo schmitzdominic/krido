@@ -92,7 +92,7 @@ export class BudgetArchiveListComponent {
     this.editBudgetModalRef = this.ngbModal.open(
       this.editBudgetModal,
       {
-        size: 'sm'
+        size: 'md'
       });
   }
 

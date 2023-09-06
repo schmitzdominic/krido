@@ -31,6 +31,7 @@ export class HomeComponent {
   allTimeBudgets: Budget[] = [];
 
   monthlyBudgets: Budget[] = [];
+
   constructor(private menuTitleService: MenuTitleService,
               private dateService: DateService,
               private budgetService: BudgetService,
@@ -82,7 +83,7 @@ export class HomeComponent {
     this.viewBudgetModalRef = this.ngbModal.open(
       this.viewBudgetModal,
       {
-        size: 'sm'
+        size: 'md'
       });
   }
 

@@ -59,7 +59,7 @@ export class CycleListComponent {
     this.addCycleModalRef = this.ngbModal.open(
       this.addCycleModal,
       {
-        size: 'sm'
+        size: 'md'
       });
   }
 

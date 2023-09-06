@@ -105,7 +105,7 @@ export class AppComponent {
       this.loadingModal,
       {
         centered: true,
-        size: 'sm',
+        size: 'md',
         keyboard: false,
         backdrop: 'static'
       });

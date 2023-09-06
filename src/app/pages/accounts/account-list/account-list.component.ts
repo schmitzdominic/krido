@@ -61,7 +61,7 @@ export class AccountListComponent {
     this.addOrEditAccountModalRef = this.ngbModal.open(
       this.addOrEditAccountModal,
       {
-        size: 'sm'
+        size: 'md'
       });
   }
 
@@ -69,7 +69,7 @@ export class AccountListComponent {
     this.viewAccountModalRef = this.ngbModal.open(
       this.viewAccountModal,
       {
-        size: 'sm'
+        size: 'md'
       });
   }
 
