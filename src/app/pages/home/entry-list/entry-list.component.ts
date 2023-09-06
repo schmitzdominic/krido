@@ -5,6 +5,7 @@ import {AccountService} from "../../../services/account/account.service";
 import {EntryService} from "../../../services/entry/entry.service";
 import {DateService} from "../../../services/date/date.service";
 import {Entry} from "../../../../shared/interfaces/entry.model";
+import {LoadingService} from "../../../services/loading/loading.service";
 
 @Component({
   selector: 'app-entry-list',
@@ -22,6 +23,7 @@ export class EntryListComponent {
   addOrEditEntryModalRef: NgbModalRef | undefined;
 
   actualMonthName: string = this.dateService.getActualMonthName();
+  nextMonthName: string = this.dateService.getMonthName(this.dateService.getMonthStringFromMonth(1));
 
   actualMonthEntries: Entry[] = [];
   nextMonthEntries: Entry[] = [];
@@ -30,10 +32,14 @@ export class EntryListComponent {
   isToastNoAccountShown: boolean = false;
   isNoEntriesThisMonth: boolean = true;
 
+  loadedLists: number = 0;
+  endLoadingOnList: number = 2;
+
   constructor(private ngbModal: NgbModal,
               private accountService: AccountService,
               private entryService: EntryService,
-              private dateService: DateService) {
+              private dateService: DateService,
+              private loadingService: LoadingService) {
   }
 
   ngOnInit() {
@@ -43,6 +49,7 @@ export class EntryListComponent {
   }
 
   loadEntries() {
+    this.loadingService.setLoading = true;
     this.loadMonthEntries(this.dateService.getActualMonthString(), this.actualMonthEntries);
     this.loadMonthEntries(this.dateService.getMonthStringFromMonth(1), this.nextMonthEntries);
   }
@@ -56,6 +63,7 @@ export class EntryListComponent {
         entryList.push(entry);
       });
       this.sortEntriesByDate(entryList);
+      if (++this.loadedLists == this.endLoadingOnList) {this.loadingService.setLoading = false;}
     });
   }
 

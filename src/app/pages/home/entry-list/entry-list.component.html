@@ -6,9 +6,17 @@
 </ng-template>
 <!-- Entry list -->
 <div>
-  <ul class="list-group list-group-flush">
-    <h1>{{ actualMonthName }}</h1>
+  <ul class="list-group list-group-flush pb-3">
+    <h1 *ngIf="actualMonthEntries.length > 0">{{ actualMonthName }}</h1>
     <li class="list-group-item" id="entry-list-actual-month" *ngFor="let entry of actualMonthEntries" (click)="onEntryClick(entry)">
+      <app-entry-list-entry
+        [entry]="entry">
+      </app-entry-list-entry>
+    </li>
+  </ul>
+  <ul class="list-group list-group-flush">
+    <h1 *ngIf="nextMonthEntries.length > 0">{{ nextMonthName }}</h1>
+    <li class="list-group-item" id="entry-list-next-month" *ngFor="let entry of nextMonthEntries" (click)="onEntryClick(entry)">
       <app-entry-list-entry
         [entry]="entry">
       </app-entry-list-entry>
