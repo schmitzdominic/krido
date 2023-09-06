@@ -31,15 +31,20 @@
       <ngb-progressbar
         [value]="usedLimit"
         [max]="budget?.limit!"
-        type="{{ progressBarService.getProgressBarType(budget?.usedLimit!, budget?.limit!) }}"
+        type="{{ progressBarService.getProgressBarType(usedLimit, budget?.limit!) }}"
       >{{ getProgressBarText() }}</ngb-progressbar>
     </div>
+    <div class="pt-4">
+      <ul class="list-group list-group-flush">
+        <h1 *ngIf="entries.length > 0">Einträge</h1>
+        <li class="list-group-item" id="entry-list-actual-month" *ngFor="let entry of entries">
+          <app-entry-list-entry
+            [entry]="entry">
+          </app-entry-list-entry>
+        </li>
+      </ul>
+    </div>
   </div>
-  <table class="table table-striped">
-    <tbody>
-    <!-- TODO: Here Entries -->
-    </tbody>
-  </table>
   <div class="modal-footer">
     <button
       type="button"

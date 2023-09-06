@@ -5,6 +5,5 @@
 <ngb-progressbar
   [value]="usedLimit"
   [max]="budget?.limit!"
-  [showValue]="true"
   type="{{progressBarService.getProgressBarType(usedLimit, budget?.limit!)}}"
-></ngb-progressbar>
+>{{ getProgressBarText() }}</ngb-progressbar>

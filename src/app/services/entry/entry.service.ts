@@ -16,7 +16,9 @@ export class EntryService {
   }
 
   updateEntry(entry: Entry, key: string) {
-    return this.dbService.updateListValue(`${this.rootPath}`, key, entry);
+    return this.dbService.deleteListValue(`${this.rootPath}`, key).then(() => {
+      return this.dbService.updateListValue(`${this.rootPath}`, key, entry);
+    });
   }
 
   getAllEntriesByMonthString(monthString: string) {
