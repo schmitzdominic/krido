@@ -89,6 +89,15 @@ export class DateService {
   }
 
   /**
+   * Gets the actual day timestamp.
+   *
+   * @returns {number} actual day as timestamp
+   */
+  getActualDayTimestamp(): number {
+    return new Date(this.actualDate.getFullYear(), this.actualDate.getMonth(), this.actualDate.getDate()).getTime();
+  }
+
+  /**
    * Gets the year name by a monthString.
    *
    * @param {String} monthString e.g. 202201

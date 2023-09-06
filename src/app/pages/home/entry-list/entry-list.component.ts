@@ -31,6 +31,7 @@ export class EntryListComponent {
   isAccountAvailable: boolean = false;
   isToastNoAccountShown: boolean = false;
   isNoEntriesThisMonth: boolean = true;
+  isShowAll: boolean = false;
 
   loadedLists: number = 0;
   endLoadingOnList: number = 2;
@@ -50,6 +51,7 @@ export class EntryListComponent {
 
   loadEntries() {
     this.loadingService.setLoading = true;
+    this.loadedLists = 0;
     this.loadMonthEntries(this.dateService.getActualMonthString(), this.actualMonthEntries);
     this.loadMonthEntries(this.dateService.getMonthStringFromMonth(1), this.nextMonthEntries);
   }
@@ -60,11 +62,21 @@ export class EntryListComponent {
       entries.forEach(entryRaw => {
         const entry: Entry = entryRaw.payload.val() as Entry;
         entry.key = entryRaw.key ? entryRaw.key : '';
-        entryList.push(entry);
+        this.pushEntryToList(entry, entryList);
       });
       this.sortEntriesByDate(entryList);
       if (++this.loadedLists == this.endLoadingOnList) {this.loadingService.setLoading = false;}
     });
+  }
+
+  private pushEntryToList(entry: Entry, entries: Entry[]) {
+    if (this.isShowAll) {
+      entries.push(entry);
+    } else {
+      if (entry.date >= this.dateService.getActualDayTimestamp()) {
+        entries.push(entry);
+      }
+    }
   }
 
   private sortEntriesByDate(entries: Entry[]) {
@@ -102,6 +114,11 @@ export class EntryListComponent {
 
   onButtonAddClick() {
     this.openAddOrEditEntryModal();
+  }
+
+  onButtonShowAllClick() {
+    this.isShowAll = !this.isShowAll;
+    this.loadEntries();
   }
 
 }
