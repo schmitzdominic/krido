@@ -1,5 +1,6 @@
 <ng-template #addOrEditEntryModal let-modal>
   <app-add-or-edit-entry
+    [entry]="selectedEntry"
     (onClose)="onCloseAddOrEditEntryModal()">
   </app-add-or-edit-entry>
 </ng-template>
@@ -7,7 +8,7 @@
 <div>
   <ul class="list-group list-group-flush">
     <h1>{{ actualMonthName }}</h1>
-    <li class="list-group-item" id="entry-list-actual-month" *ngFor="let entry of actualMonthEntries">
+    <li class="list-group-item" id="entry-list-actual-month" *ngFor="let entry of actualMonthEntries" (click)="onEntryClick(entry)">
       <app-entry-list-entry
         [entry]="entry">
       </app-entry-list-entry>

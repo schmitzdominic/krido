@@ -15,7 +15,19 @@ export class EntryService {
     return this.dbService.createListValue(`${this.rootPath}`, entry);
   }
 
+  updateEntry(entry: Entry, key: string) {
+    return this.dbService.updateListValue(`${this.rootPath}`, key, entry);
+  }
+
   getAllEntriesByMonthString(monthString: string) {
     return this.dbService.readFilteredList(`${this.rootPath}`, ref => ref.orderByChild('monthString').equalTo(monthString));
+  }
+
+  getAllEntriesByBudgetKey(key: string) {
+    return this.dbService.readFilteredList(`${this.rootPath}`, ref => ref.orderByChild('budgetKey').equalTo(key));
+  }
+
+  getAllEntriesByAccountKey(key: string) {
+    return this.dbService.readFilteredList(`${this.rootPath}`, ref => ref.orderByChild('account/key').equalTo(key));
   }
 }

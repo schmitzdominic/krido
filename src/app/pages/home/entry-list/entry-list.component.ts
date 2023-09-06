@@ -17,6 +17,8 @@ export class EntryListComponent {
 
   @ViewChild('addOrEditEntryModal') addOrEditEntryModal: NgbModalRef | undefined;
 
+  selectedEntry: Entry | undefined;
+
   addOrEditEntryModalRef: NgbModalRef | undefined;
 
   actualMonthName: string = this.dateService.getActualMonthName();
@@ -50,7 +52,7 @@ export class EntryListComponent {
       entryList.length = 0;
       entries.forEach(entryRaw => {
         const entry: Entry = entryRaw.payload.val() as Entry;
-        entry.key = entryRaw.key ? entry.key : '';
+        entry.key = entryRaw.key ? entryRaw.key : '';
         entryList.push(entry);
       });
       this.sortEntriesByDate(entryList);
@@ -81,7 +83,13 @@ export class EntryListComponent {
   onCloseAddOrEditEntryModal(): void {
     if (this.addOrEditEntryModalRef) {
       this.addOrEditEntryModalRef.close();
+      this.selectedEntry = undefined;
     }
+  }
+
+  onEntryClick(entry: Entry) {
+    this.selectedEntry = entry;
+    this.openAddOrEditEntryModal();
   }
 
   onButtonAddClick() {

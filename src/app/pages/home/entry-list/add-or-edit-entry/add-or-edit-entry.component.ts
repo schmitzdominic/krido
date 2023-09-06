@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Output} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {EntryType} from "../../../../../shared/enums/entry-type.enum";
 import {AccountService} from "../../../../services/account/account.service";
@@ -24,6 +24,8 @@ interface EntryTypeInterface {
   styleUrls: ['./add-or-edit-entry.component.scss']
 })
 export class AddOrEditEntryComponent {
+
+  @Input() entry: Entry | undefined;
 
   @Output() onClose: EventEmitter<any> = new EventEmitter<any>();
 
@@ -82,19 +84,30 @@ export class AddOrEditEntryComponent {
     this.createListeners();
     this.loadAccounts();
     this.loadBudgets();
+    this.fillFormIfEntryIsAvailable();
   }
 
   private createFormGroup() {
     this.addOrEditEntryFormGroup = this.formBuilder.group(
       {
-        entryType: [this.selectedEntryType.value],
-        name: ['', Validators.required],
-        value: [''],
-        date: [this.selectedDate],
-        account: [''],
-        budget: ['']
+        entryType: [this.entry ? this.entry.type : this.selectedEntryType.value],
+        name: [this.entry ? this.entry.name : '', Validators.required],
+        value: [this.entry ? this.entry.value : ''],
+        date: [this.entry ? this.entry.date : this.selectedDate],
+        account: [this.entry ? this.entry.account.key : ''],
+        budget: [this.entry?.budgetKey ? this.entry.budgetKey : '']
       }
     );
+  }
+
+  private fillFormIfEntryIsAvailable() {
+    if (this.entry) {
+      this.isNameInvalid = false;
+      this.isValueInvalid = false;
+      const date: Date = this.dateService.getDateFromTimestamp(this.entry.date);
+      this.selectedDate = new NgbDate(date.getFullYear(), date.getMonth() + 1, date.getDate());
+      this.selectedDateTimestamp = this.entry.date;
+    }
   }
 
   private createListeners() {
@@ -126,15 +139,17 @@ export class AddOrEditEntryComponent {
         account.key = accountRaw.key ? accountRaw.key : '';
         this.accounts.push(account);
       });
-      if (accounts.length == 0) {
-        this.accounts.push(this.noAccountValue);
-        this.addOrEditEntryFormGroup.controls['account'].setValue(this.accounts[0].key);
-      }
-      if (this.userService.mainAccount) {
-        this.addOrEditEntryFormGroup.controls['account'].setValue(this.userService.mainAccount.key);
-      } else {
-        if (this.accounts.length > 0) {
+      if (!this.entry) {
+        if (accounts.length == 0) {
+          this.accounts.push(this.noAccountValue);
           this.addOrEditEntryFormGroup.controls['account'].setValue(this.accounts[0].key);
+        }
+        if (this.userService.mainAccount) {
+          this.addOrEditEntryFormGroup.controls['account'].setValue(this.userService.mainAccount.key);
+        } else {
+          if (this.accounts.length > 0) {
+            this.addOrEditEntryFormGroup.controls['account'].setValue(this.accounts[0].key);
+          }
         }
       }
     });
@@ -142,7 +157,7 @@ export class AddOrEditEntryComponent {
 
   private loadBudgets() {
     this.budgets.push(this.noBudgetValue);
-    this.addOrEditEntryFormGroup.controls['budget'].setValue(this.budgets[0].key);
+    if (!this.entry?.budgetKey) { this.addOrEditEntryFormGroup.controls['budget'].setValue(this.budgets[0].key); }
     this.budgetService.getAllThisMonthBudgets(this.dateService.getActualMonthString()).subscribe(budgets => {
       budgets.forEach(budgetRaw => {
         this.addBudgetToBudgets(budgetRaw);
@@ -166,7 +181,17 @@ export class AddOrEditEntryComponent {
   }
 
   onSubmit() {
-    this.onAdd();
+    if (this.entry) {
+      this.onEdit();
+    } else {
+      this.onAdd();
+    }
+  }
+
+  onEdit() {
+    if (this.entry!.key) {
+      this.entryService.updateEntry(this.getEntryObject(), this.entry!.key).then(() => this.onClose.emit());
+    }
   }
 
   onAdd() {

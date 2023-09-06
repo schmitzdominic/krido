@@ -14,7 +14,7 @@
           }
         },
         "entries": {
-          ".indexOn": "monthString"
+          ".indexOn": ["monthString","budgetKey","account/key"]
         }
       }
     },
