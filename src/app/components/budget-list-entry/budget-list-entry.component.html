@@ -3,8 +3,8 @@
   <span class="limit position-absolute top-0 end-0 pt-3 pe-3">{{ budget?.limit ? priceService.convertNumberToEuro(budget?.limit!) : 'Bitte Limit setzen' }}</span>
 </div>
 <ngb-progressbar
-  [value]="budget?.usedLimit!"
+  [value]="usedLimit"
   [max]="budget?.limit!"
   [showValue]="true"
-  type="{{progressBarService.getProgressBarType(budget?.usedLimit!, budget?.limit!)}}"
+  type="{{progressBarService.getProgressBarType(usedLimit, budget?.limit!)}}"
 ></ngb-progressbar>

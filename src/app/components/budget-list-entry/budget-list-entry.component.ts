@@ -3,6 +3,9 @@ import {Budget} from "../../../shared/interfaces/budget.model";
 import {ProgressBarService} from "../../services/progress-bar/progress-bar.service";
 import {NgbProgressbarConfig} from "@ng-bootstrap/ng-bootstrap";
 import {PriceService} from "../../services/price/price.service";
+import {EntryService} from "../../services/entry/entry.service";
+import {Entry} from "../../../shared/interfaces/entry.model";
+import {BudgetService} from "../../services/budget/budget.service";
 
 @Component({
   selector: 'app-budget-list-entry',
@@ -13,13 +16,29 @@ export class BudgetListEntryComponent {
 
   @Input({ required: true }) budget: Budget | undefined;
 
+  usedLimit: number = 0;
+
   constructor(private ngbProgressbarConfig: NgbProgressbarConfig,
               public progressBarService: ProgressBarService,
-              public priceService: PriceService) {
+              public priceService: PriceService,
+              public entryService: EntryService,
+              public budgetService: BudgetService) {
   }
 
   ngOnInit() {
     this.progressBarService.setProgressBarConfig(this.ngbProgressbarConfig);
+    this.calculateUsedLimit();
+  }
+
+  calculateUsedLimit() {
+    if (this.budget!.key) {
+      this.entryService.getAllEntriesByBudgetKey(this.budget!.key).subscribe(entries => {
+        entries.forEach(entryRAW => {
+          const entry: Entry = entryRAW.payload.val() as Entry;
+          this.usedLimit = this.usedLimit + entry.value;
+        });
+      });
+    }
   }
 
 }
