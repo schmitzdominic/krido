@@ -11,8 +11,11 @@
       <div class="col-8">
         <h1 *ngIf="actualMonthEntries.length > 0">Aktuell</h1>
       </div>
-      <div class="col-4">
+      <div class="col-4" *ngIf="!isShowAll">
         <button type="button" class="btn btn btn-dark position-absolute end-0 me-4" (click)="onButtonShowAllClick()"><i class="bi bi-arrow-90deg-left"></i></button>
+      </div>
+      <div class="col-4" *ngIf="isShowAll">
+        <button type="button" class="btn btn btn-dark position-absolute end-0 me-4" (click)="onButtonShowAllClick()"><i class="bi bi-arrow-90deg-down"></i></button>
       </div>
     </div>
     <li class="list-group-item" id="entry-list-actual-month" *ngFor="let entry of actualMonthEntries" (click)="onEntryClick(entry)">
