@@ -109,6 +109,7 @@ export class AddOrEditEntryComponent {
       const date: Date = this.dateService.getDateFromTimestamp(this.entry.date);
       this.selectedDate = new NgbDate(date.getFullYear(), date.getMonth() + 1, date.getDate());
       this.selectedDateTimestamp = this.entry.date;
+      this.submitButtonText = 'Ändern'
     }
   }
 
@@ -180,6 +181,12 @@ export class AddOrEditEntryComponent {
 
   onDateSelected(ngbDate: NgbDate) {
     this.selectedDateTimestamp = this.dateService.getTimestampFromNgbDate(ngbDate);
+  }
+
+  onButtonDelete() {
+    if (this.entry) {
+      this.entryService.deleteEntry(this.entry.key!).then(() => this.onClose.emit());
+    }
   }
 
   onSubmit() {

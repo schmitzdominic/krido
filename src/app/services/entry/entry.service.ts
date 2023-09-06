@@ -15,10 +15,13 @@ export class EntryService {
     return this.dbService.createListValue(`${this.rootPath}`, entry);
   }
 
-  updateEntry(entry: Entry, key: string) {
-    return this.dbService.deleteListValue(`${this.rootPath}`, key).then(() => {
-      return this.dbService.updateListValue(`${this.rootPath}`, key, entry);
-    });
+  deleteEntry(key: string) {
+    return this.dbService.delete(`${this.rootPath}/${key}`);
+  }
+
+  async updateEntry(entry: Entry, key: string) {
+    await this.dbService.deleteListValue(`${this.rootPath}`, key);
+    return await this.dbService.updateListValue(`${this.rootPath}`, key, entry);
   }
 
   getAllEntriesByMonthString(monthString: string) {
