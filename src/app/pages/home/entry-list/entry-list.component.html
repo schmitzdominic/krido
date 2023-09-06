@@ -7,7 +7,7 @@
 <!-- Entry list -->
 <div>
   <ul class="list-group list-group-flush pb-3">
-    <h1 *ngIf="actualMonthEntries.length > 0">{{ actualMonthName }}</h1>
+    <h1 *ngIf="actualMonthEntries.length > 0">Aktuell</h1>
     <li class="list-group-item" id="entry-list-actual-month" *ngFor="let entry of actualMonthEntries" (click)="onEntryClick(entry)">
       <app-entry-list-entry
         [entry]="entry">

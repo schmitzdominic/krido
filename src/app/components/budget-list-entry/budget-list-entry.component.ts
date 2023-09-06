@@ -23,10 +23,10 @@ export class BudgetListEntryComponent {
               public priceService: PriceService,
               public entryService: EntryService,
               public budgetService: BudgetService) {
+    this.progressBarService.setProgressBarConfig(this.ngbProgressbarConfig);
   }
 
   ngOnInit() {
-    this.progressBarService.setProgressBarConfig(this.ngbProgressbarConfig);
     this.calculateUsedLimit();
   }
 

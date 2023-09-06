@@ -104,6 +104,8 @@ export class AddOrEditEntryComponent {
     if (this.entry) {
       this.isNameInvalid = false;
       this.isValueInvalid = false;
+      this.selectedEntryType = this.entry.type === EntryType.income ? this.incomeEntryType : this.expenditureEntryType;
+      this.title = this.entry.type === EntryType.income ? this.incomeEntryType.label : this.expenditureEntryType.label;
       const date: Date = this.dateService.getDateFromTimestamp(this.entry.date);
       this.selectedDate = new NgbDate(date.getFullYear(), date.getMonth() + 1, date.getDate());
       this.selectedDateTimestamp = this.entry.date;
