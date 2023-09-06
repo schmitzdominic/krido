@@ -13,6 +13,7 @@ import {EntryType} from "../../../shared/enums/entry-type.enum";
 export class EntryListEntryComponent {
 
   @Input() entry: Entry | undefined;
+  @Input() withMonth: boolean = false;
 
   protected readonly AccountType = AccountType;
 
@@ -30,7 +31,8 @@ export class EntryListEntryComponent {
   getDateFromTimestamp(timestamp: number): string {
     const date: Date = this.dateService.getDateFromTimestamp(timestamp);
     const dayShort: string = this.dateService.getDayShortName(date.getDay())
-    return `${date.getDate()}. ${dayShort}`
+    const monthShort: string = this.dateService.getMonthShortName(date.getMonth());
+    return `${date.getDate()}. ${dayShort} ${this.withMonth ? monthShort : ''}`
   }
 
   protected readonly EntryType = EntryType;

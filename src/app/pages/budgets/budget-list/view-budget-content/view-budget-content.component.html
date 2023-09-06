@@ -39,6 +39,7 @@
         <h1 *ngIf="entries.length > 0">Einträge</h1>
         <li class="list-group-item" id="entry-list-actual-month" *ngFor="let entry of entries">
           <app-entry-list-entry
+            [withMonth]="true"
             [entry]="entry">
           </app-entry-list-entry>
         </li>
