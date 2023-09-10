@@ -7,6 +7,7 @@ import {RegularlyService} from "../../../services/regularly/regularly.service";
 import {RegularlyCycleType} from "../../../../shared/enums/regularly-cycle-type.enum";
 import {AccountService} from "../../../services/account/account.service";
 import {LoadingService} from "../../../services/loading/loading.service";
+import {DateService} from "../../../services/date/date.service";
 
 @Component({
   selector: 'app-regularly-list',
@@ -35,7 +36,8 @@ export class RegularlyListComponent {
   constructor(private ngbModal: NgbModal,
               private regularlyService: RegularlyService,
               private accountService: AccountService,
-              private loadingService: LoadingService) {
+              private loadingService: LoadingService,
+              private dateService: DateService) {
   }
 
   ngOnInit() {
@@ -46,26 +48,57 @@ export class RegularlyListComponent {
     this.loadYear();
   }
 
-  loadMonth() {
+  private loadMonth() {
     this.loadRegularities(RegularlyCycleType.month, this.monthRegularities);
   }
 
-  loadQuarter() {
+  private loadQuarter() {
     this.loadRegularities(RegularlyCycleType.quarter, this.quarterRegularities);
   }
 
-  loadYear() {
+  private loadYear() {
     this.loadRegularities(RegularlyCycleType.year, this.yearRegularities);
   }
 
-  checkForAccounts() {
+  private checkForAccounts() {
     this.accountService.getAllAccounts().subscribe(accounts => {
       this.isAccountAvailable = accounts.length > 0;
       this.isToastNoAccountShown = !this.isAccountAvailable;
     });
   }
 
-  loadRegularities(regularlyCycleType: RegularlyCycleType, list: Regularly[]) {
+  private sortRegularly(cycleType: RegularlyCycleType, regularities: Regularly[]) {
+    switch (cycleType) {
+      case RegularlyCycleType.month: {
+        regularities.sort((one, two) => {
+          if (one.monthDay && two.monthDay) {
+            return one.monthDay < two.monthDay ? -1 : 1;
+          }
+          return -1;
+        });
+        break;
+      }
+      case RegularlyCycleType.quarter: {
+        break;
+      }
+      case RegularlyCycleType.year: {
+        regularities.sort((one, two) => {
+          if (one.date && two.date) {
+            const actualDate: Date = new Date();
+            const oneDate: Date = this.dateService.getDateFromTimestamp(one.date);
+            const twoDate: Date = this.dateService.getDateFromTimestamp(two.date);
+            oneDate.setFullYear(actualDate.getFullYear());
+            twoDate.setFullYear(actualDate.getFullYear());
+            return oneDate.getTime() < twoDate.getTime() ? -1 : 1;
+          }
+          return -1;
+        });
+        break;
+      }
+    }
+  }
+
+  private loadRegularities(regularlyCycleType: RegularlyCycleType, list: Regularly[]) {
     this.regularlyService.getAllByCycleType(regularlyCycleType).subscribe(regularities => {
       list.length = 0;
       regularities.forEach(regularlyRaw => {
@@ -73,6 +106,7 @@ export class RegularlyListComponent {
         regularly.key = regularlyRaw.key ? regularlyRaw.key : '';
         list.push(regularly);
       });
+      this.sortRegularly(regularlyCycleType, list);
       if (++this.loadedLists == this.endLoadingOnList) {this.loadingService.setLoading = false;}
     });
   }

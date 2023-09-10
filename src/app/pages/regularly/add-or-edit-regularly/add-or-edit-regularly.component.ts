@@ -247,6 +247,7 @@ export class AddOrEditRegularlyComponent {
   get regularlyObject(): Regularly {
     const name: string = this.addOrEditRegularlyFormGroup.value.name;
     const value: number = this.addOrEditRegularlyFormGroup.value.value;
+    const isEndOfMonth: boolean = this.addOrEditRegularlyFormGroup.value.lastDay;
     return {
       entryType: this.selectedEntryType.value,
       type: this.type,
@@ -254,10 +255,22 @@ export class AddOrEditRegularlyComponent {
       name: name,
       searchName: this.helperService.createSearchName(name),
       value: value,
-      monthDay: this.isMonthDayNeeded ? this.addOrEditRegularlyFormGroup.value.monthDay : 0,
+      monthDay: this.monthDay,
       date: this.selectedCycleType === this.yearCycleType ? this.selectedDateTimestamp : 0,
       account: this.selectedAccount,
-      isEndOfMonth: this.addOrEditRegularlyFormGroup.value.lastDay
+      isEndOfMonth: isEndOfMonth
+    }
+  }
+
+  private get monthDay() {
+    if (this.isMonthDayNeeded) {
+      if (this.addOrEditRegularlyFormGroup.value.lastDay) {
+        return 999;
+      } else {
+        return this.addOrEditRegularlyFormGroup.value.monthDay;
+      }
+    } else {
+      return 999;
     }
   }
 
