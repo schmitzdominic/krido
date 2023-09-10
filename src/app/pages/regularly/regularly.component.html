@@ -1,1 +1,18 @@
-<p>regularly works!</p>
+<ul ngbNav #nav="ngbNav" [(activeId)]="active" class="nav-tabs">
+  <li [ngbNavItem]="'regularly'">
+    <button ngbNavLink>Regelmäßig</button>
+    <ng-template ngbNavContent>
+      <app-regularly-list>
+      </app-regularly-list>
+    </ng-template>
+  </li>
+  <li [ngbNavItem]="'birthday'">
+    <button ngbNavLink>Geburtstage</button>
+    <ng-template ngbNavContent>
+      <app-birthday-list>
+      </app-birthday-list>
+    </ng-template>
+  </li>
+</ul>
+
+<div [ngbNavOutlet]="nav" class="mt-2"></div>

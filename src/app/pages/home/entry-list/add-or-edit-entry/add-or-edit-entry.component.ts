@@ -4,7 +4,6 @@ import {EntryType} from "../../../../../shared/enums/entry-type.enum";
 import {AccountService} from "../../../../services/account/account.service";
 import {Account} from "../../../../../shared/interfaces/account.model";
 import {UserService} from "../../../../services/user/user.service";
-import {AccountType} from "../../../../../shared/enums/account-type.enum";
 import {Budget} from "../../../../../shared/interfaces/budget.model";
 import {BudgetService} from "../../../../services/budget/budget.service";
 import {SnapshotAction} from "@angular/fire/compat/database";
@@ -50,14 +49,6 @@ export class AddOrEditEntryComponent {
     account: new FormControl(''),
     budget: new FormControl(''),
   });
-
-  noAccountValue: Account = {
-    key: 'key',
-    name: 'Kein Konto angelegt',
-    searchName: 'keinKontoAngelegt',
-    owners: [this.userService.user],
-    accountType: AccountType.giro
-  }
 
   noBudgetValue: Budget = {
     key: this.noBudgetKey,
@@ -144,7 +135,7 @@ export class AddOrEditEntryComponent {
       });
       if (!this.entry) {
         if (accounts.length == 0) {
-          this.accounts.push(this.noAccountValue);
+          this.accounts.push(this.accountService.noAccountValue);
           this.addOrEditEntryFormGroup.controls['account'].setValue(this.accounts[0].key);
         }
         if (this.userService.mainAccount) {
@@ -234,7 +225,7 @@ export class AddOrEditEntryComponent {
 
   get selectedAccount(): Account {
     const account = this.accounts.find((account: Account) => account.key === this.addOrEditEntryFormGroup.value.account);
-    return account ? account : this.noAccountValue;
+    return account ? account : this.accountService.noAccountValue;
   }
 
   get selectedBudget() {

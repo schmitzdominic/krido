@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import {DbService} from "../db.service";
 import {Account} from "../../../shared/interfaces/account.model";
+import {AccountType} from "../../../shared/enums/account-type.enum";
+import {UserService} from "../user/user.service";
 
 @Injectable({
   providedIn: 'root'
@@ -9,7 +11,16 @@ export class AccountService {
 
   private rootPath: string =  `homes/${this.dbService.home}/accounts`;
 
-  constructor(private dbService: DbService) { }
+  noAccountValue: Account = {
+    key: 'key',
+    name: 'Kein Konto angelegt',
+    searchName: 'keinKontoAngelegt',
+    owners: [this.userService.user],
+    accountType: AccountType.giro
+  }
+
+  constructor(private dbService: DbService,
+              private userService: UserService) { }
 
   addAccount(account: Account) {
     return this.dbService.createListValue(`${this.rootPath}`, account);

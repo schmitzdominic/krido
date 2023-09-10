@@ -2,10 +2,7 @@
   <div class="row">
     <div class="col-1 list-icon">
       <div class="position-absolute start-0 top-0 ps-3 pt-3">
-        <i class="bi bi-bank" *ngIf="entry!.account.accountType === AccountType.giro"></i>
-      </div>
-      <div class="position-absolute start-0 top-0 ps-3 pt-3">
-        <i class="bi bi-credit-card-2-front" *ngIf="entry!.account.accountType === AccountType.creditCard"></i>
+        <i class="bi bi-calendar2-week"></i>
       </div>
     </div>
     <div class="col-11">
@@ -13,25 +10,25 @@
         <!-- upside -->
         <div class="row upside">
           <div class="col-9 name">
-            {{ entry!.name }}
+            {{ regularly!.name }}
           </div>
           <div class="col-3">
             <div class="position-absolute end-0" [ngClass]="{
-            'text-success' : entry!.type === EntryType.income,
-            'text-danger' : entry!.type === EntryType.outcome
+            'text-success' : regularly!.entryType === EntryType.income,
+            'text-danger' : regularly!.entryType === EntryType.outcome
          }">
-              {{ getPrice(entry!) }}
+              {{ getPrice(regularly!) }}
             </div>
           </div>
         </div>
         <!-- downside -->
         <div class="row downside text-white-50">
           <div class="col-9 name">
-            {{ entry!.account.name }}
+            {{ regularly!.account.name }}
           </div>
           <div class="col-3">
             <div class="position-absolute end-0">
-              {{ getDateFromTimestamp(entry!.date) }}
+              {{ regularly?.cycle === RegularlyCycleType.year ? getDateFromTimestamp(regularly!.date!) : dayOfMonth }}
             </div>
           </div>
         </div>

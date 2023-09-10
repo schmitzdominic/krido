@@ -34,7 +34,7 @@ export class MainMenuComponent {
     });
     this.menuTitleService.activeId.subscribe(newActiveId => {
       this.activeId = newActiveId;
-    })
+    });
   }
 
   navigateToAccounts(): void {

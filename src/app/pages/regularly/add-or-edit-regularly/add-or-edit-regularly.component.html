@@ -1,0 +1,110 @@
+<div>
+  <h1 class="d-flex align-items-center justify-content-center pt-4" [ngClass]="{
+            'text-success' : selectedEntryType.value === incomeEntryType.value,
+            'text-danger' : selectedEntryType.value === expenditureEntryType.value
+         }">{{ title }}</h1>
+</div>
+<div class="modal-body">
+  <form class="needs-validation" [formGroup]="addOrEditRegularlyFormGroup" (ngSubmit)="onSubmit()" novalidate>
+    <div class="mb-4">
+      <select class="form-select" id="add-regularly-entry-type" aria-label="Select entry type" formControlName="entryType">
+        <option *ngFor="let entryType of entryTypes" value="{{ entryType.value }}">{{ entryType.label }}</option>
+      </select>
+    </div>
+    <div class="mb-4">
+      <select class="form-select" id="add-regularly-cycle-type" aria-label="Select cycle type" formControlName="cycleType">
+        <option *ngFor="let cycleType of cycleTypes" value="{{ cycleType.value }}">{{ cycleType.label }}</option>
+      </select>
+    </div>
+    <div class="col-md-12 mb-3">
+      <label for="add-regularly-name" class="form-label bs-success-text-emphasis">Kurzbeschreibung</label>
+      <div class="input-group has-validation">
+        <input formControlName="name" type="text" class="form-control" id="add-regularly-name" aria-describedby="inputGroupPrepend" required>
+        <div class="invalid-feedback">
+          Kurzbeschreibung fehlt!
+        </div>
+      </div>
+    </div>
+    <div class="col-md-12 mb-3">
+      <label for="add-regularly-value" class="form-label">Betrag</label>
+      <div class="input-group has-validation">
+        <input
+          currencyMask
+          class="form-control"
+          id="add-regularly-value"
+          formControlName="value"
+          aria-describedby="inputGroupPrepend"
+          [options]="{ prefix: '', thousands: '', decimal: ',' }"
+          inputmode="numeric"
+          pattern="^\d+(\,\d{1,2})?$">
+        <span class="input-group-text" id="add-regularly-value-symbol">€</span>
+        <div class="invalid-feedback">
+          Betrag fehlt!
+        </div>
+      </div>
+    </div>
+    <div class="col-md-12 mb-3">
+      <label for="add-entry-account" class="form-label">Konto</label>
+      <select class="form-select" id="add-entry-account" aria-label="Select entry type" formControlName="account">
+        <option *ngFor="let account of accounts" value="{{ account.key }}">{{ account.name }}</option>
+      </select>
+    </div>
+    <div class="col-md-12 mb-3" *ngIf="selectedCycleType === yearCycleType">
+      <label for="add-entry-date" class="form-label">Datum</label>
+      <div class="input-group">
+        <input
+          id="add-entry-date"
+          class="form-control"
+          placeholder="{{ selectedDateTimestamp | date: 'dd.MM'}}"
+          name="date"
+          formControlName="date"
+          ngbDatepicker
+          value="{{ selectedDateTimestamp | date: 'dd.MM'}}"
+          [showWeekNumbers]="true"
+          (dateSelect)="onDateSelected($event)"
+          #date="ngbDatepicker"
+        />
+        <button class="btn btn-outline-secondary bi bi-calendar3" (click)="date.toggle()" type="button"></button>
+      </div>
+    </div>
+    <div class="col-md-12 mb-3" *ngIf="!isLastDay && isMonthDayNeeded">
+      <label for="add-regularly-month-day-number" class="form-label">Tag im Monat</label>
+      <div class="input-group has-validation">
+        <input
+          currencyMask
+          class="form-control"
+          id="add-regularly-month-day-number"
+          formControlName="monthDay"
+          aria-describedby="inputGroupPrepend"
+          [max]="28"
+          maxlength="2"
+          [options]="{ prefix: '', allowNegative: false, precision: 0 }"
+          inputmode="numeric"
+          pattern="">
+      </div>
+    </div>
+    <div class="col-12 mb-3" *ngIf="isMonthDayNeeded">
+      <div class="form-check">
+        <input formControlName="lastDay" class="form-check-input" type="checkbox" value="" id="add-regularly-month-last-day">
+        <label class="form-check-label ps-1" for="add-regularly-month-last-day">
+          Letzter Tag im Monat
+        </label>
+      </div>
+    </div>
+  </form>
+  <!-- TODO: Delete -->
+  <!--<div class="pt-2">
+    <button type="button" class="btn btn-danger" *ngIf="entry" (click)="onButtonDelete()"><i class="bi bi-trash pe-2"></i>Löschen</button>
+  </div>-->
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-dark" (click)="onButtonCancel()">Abbrechen</button>
+  <button
+    type="button"
+    class="btn btn-light"
+    [disabled]="isNameInvalid || isValueInvalid || isMonthDayInvalid"
+    (click)="onSubmit()">{{ submitButtonText }}</button>
+</div>
+
+
+

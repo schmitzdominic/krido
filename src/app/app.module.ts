@@ -42,6 +42,10 @@ import { EntryListComponent } from './pages/home/entry-list/entry-list.component
 import { AddOrEditEntryComponent } from './pages/home/entry-list/add-or-edit-entry/add-or-edit-entry.component';
 import {NgbDateCustomParserFormatter} from "../shared/formatter/ngb-date-custom-parser-formatter";
 import { EntryListEntryComponent } from './components/entry-list-entry/entry-list-entry.component';
+import { RegularlyListComponent } from './pages/regularly/regularly-list/regularly-list.component';
+import { BirthdayListComponent } from './pages/regularly/birthday-list/birthday-list.component';
+import { RegularlyListEntryComponent } from './components/regularly-list-entry/regularly-list-entry.component';
+import { AddOrEditRegularlyComponent } from './pages/regularly/add-or-edit-regularly/add-or-edit-regularly.component';
 
 @NgModule({
   declarations: [
@@ -71,6 +75,10 @@ import { EntryListEntryComponent } from './components/entry-list-entry/entry-lis
     EntryListComponent,
     AddOrEditEntryComponent,
     EntryListEntryComponent,
+    RegularlyListComponent,
+    BirthdayListComponent,
+    RegularlyListEntryComponent,
+    AddOrEditRegularlyComponent,
   ],
     imports: [
         BrowserModule,

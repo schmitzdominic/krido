@@ -1,0 +1,55 @@
+<!-- Add or Edit Regularly Modal -->
+<ng-template #addOrEditRegularlyModal let-modal>
+  <app-add-or-edit-regularly
+    [type]="RegularlyType.regularly"
+    (onClose)="onCloseAddOrEditRegularlyModal()">
+  </app-add-or-edit-regularly>
+</ng-template>
+<div class="container pt-3">
+  <div class="row" *ngIf="monthRegularities.length > 0">
+    <ul class="list-group list-group-flush pb-3">
+      <div class="row">
+        <div class="col-8">
+          <h1>Monatlich</h1>
+        </div>
+      </div>
+      <li class="list-group-item" id="entry-list-month-regularities" *ngFor="let regularly of monthRegularities">
+        <app-regularly-list-entry [regularly]="regularly"
+          >
+        </app-regularly-list-entry>
+      </li>
+    </ul>
+  </div>
+  <div class="row" *ngIf="quarterRegularities.length > 0">
+    <ul class="list-group list-group-flush pb-3">
+      <div class="row">
+        <div class="col-8">
+          <h1>Quartal</h1>
+        </div>
+      </div>
+      <li class="list-group-item" id="entry-list-quarter-regularities" *ngFor="let regularly of quarterRegularities">
+        <app-regularly-list-entry [regularly]="regularly"
+        >
+        </app-regularly-list-entry>
+      </li>
+    </ul>
+  </div>
+  <div class="row" *ngIf="yearRegularities.length > 0">
+    <ul class="list-group list-group-flush pb-3">
+      <div class="row">
+        <div class="col-8">
+          <h1>Jährlich</h1>
+        </div>
+      </div>
+      <li class="list-group-item" id="entry-list-year-regularities" *ngFor="let regularly of yearRegularities">
+        <app-regularly-list-entry [regularly]="regularly"
+        >
+        </app-regularly-list-entry>
+      </li>
+    </ul>
+  </div>
+  <!-- Add Button -->
+  <div class="position-fixed end-0 bottom-0 me-4 mb-4">
+    <button type="button" class="btn btn-primary" (click)="openAddOrEditRegularlyModal()"><i class="bi bi-plus-lg"></i></button>
+  </div>
+</div>

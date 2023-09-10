@@ -8,6 +8,8 @@ import {MenuTitleService} from "../../../shared/behavior/menu-title/menu-title.s
 })
 export class RegularlyComponent {
 
+  active: string = 'regularly';
+
   constructor(private menuTitleService: MenuTitleService) {
   }
 
