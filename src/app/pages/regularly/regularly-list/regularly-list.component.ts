@@ -5,6 +5,8 @@ import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {RegularlyType} from "../../../../shared/enums/regularly-type.enum";
 import {RegularlyService} from "../../../services/regularly/regularly.service";
 import {RegularlyCycleType} from "../../../../shared/enums/regularly-cycle-type.enum";
+import {AccountService} from "../../../services/account/account.service";
+import {LoadingService} from "../../../services/loading/loading.service";
 
 @Component({
   selector: 'app-regularly-list',
@@ -21,11 +23,22 @@ export class RegularlyListComponent {
   quarterRegularities: Regularly[] = [];
   yearRegularities: Regularly[] = [];
 
+  isAccountAvailable: boolean = false;
+  isToastNoAccountShown: boolean = false;
+
+  loadedLists: number = 0;
+  endLoadingOnList: number = 3;
+
+  protected readonly RegularlyType = RegularlyType;
+
   constructor(private ngbModal: NgbModal,
-              private regularlyService: RegularlyService) {
+              private regularlyService: RegularlyService,
+              private accountService: AccountService,
+              private loadingService: LoadingService) {
   }
 
   ngOnInit() {
+    this.loadingService.setLoading = true;
     this.loadMonth();
     this.loadQuarter();
     this.loadYear();
@@ -43,6 +56,13 @@ export class RegularlyListComponent {
     this.loadRegularities(RegularlyCycleType.year, this.yearRegularities);
   }
 
+  checkForAccounts() {
+    this.accountService.getAllAccounts().subscribe(accounts => {
+      this.isAccountAvailable = accounts.length > 0;
+      this.isToastNoAccountShown = !this.isAccountAvailable;
+    });
+  }
+
   loadRegularities(regularlyCycleType: RegularlyCycleType, list: Regularly[]) {
     this.regularlyService.getAllByCycleType(regularlyCycleType).subscribe(regularities => {
       list.length = 0;
@@ -51,6 +71,10 @@ export class RegularlyListComponent {
         regularly.key = regularlyRaw.key ? regularlyRaw.key : '';
         list.push(regularly);
       });
+      if (++this.loadedLists == this.endLoadingOnList) {
+        this.loadingService.setLoading = false;
+        console.log('stop loading');
+      }
     });
   }
 
@@ -67,6 +91,4 @@ export class RegularlyListComponent {
       this.addOrEditRegularlyModalRef.close();
     }
   }
-
-  protected readonly RegularlyType = RegularlyType;
 }
