@@ -81,6 +81,7 @@ export class AddOrEditRegularlyComponent {
     this.createFormGroup();
     this.createListeners();
     this.loadAccounts();
+    this.fillFormIfRegularlyIsAvailable();
   }
 
   private createFormGroup() {
@@ -88,14 +89,54 @@ export class AddOrEditRegularlyComponent {
       {
         entryType: [this.selectedEntryType.value],
         cycleType: [this.selectedCycleType.value],
-        name: ['', Validators.required],
-        value: [''],
+        name: [this.regularly ? this.regularly.name : '', Validators.required],
+        value: [this.regularly ? this.regularly.value : ''],
         monthDay: [1],
-        lastDay: [''],
-        account: [''],
+        lastDay: [this.regularly?.isEndOfMonth],
+        account: [this.regularly ? this.regularly.account.key : ''],
         date: [''],
       }
     );
+  }
+
+  private fillFormIfRegularlyIsAvailable() {
+    if (this.regularly) {
+
+      this.isNameInvalid = false;
+      this.isValueInvalid = false;
+      this.isMonthDayInvalid = false;
+
+      this.submitButtonText = 'Ändern'
+
+      this.selectedEntryType = this.regularly.entryType === EntryType.income ? this.incomeEntryType : this.expenditureEntryType;
+      this.title = this.regularly.entryType === EntryType.income ? this.incomeEntryType.label : this.expenditureEntryType.label;
+      this.isLastDay = this.regularly.isEndOfMonth ? this.regularly.isEndOfMonth : false;
+
+      switch(this.regularly.cycle) {
+        case RegularlyCycleType.month: this.selectedCycleType = this.monthCycleType; break;
+        case RegularlyCycleType.quarter: this.selectedCycleType = this.quarterCycleType; break;
+        case RegularlyCycleType.year: this.selectedCycleType = this.yearCycleType; break;
+      }
+
+      this.addOrEditRegularlyFormGroup.controls['cycleType'].setValue(this.selectedCycleType.value);
+
+      switch(this.regularly.cycle) {
+        case RegularlyCycleType.month: {
+          this.addOrEditRegularlyFormGroup.controls['monthDay'].setValue(this.regularly.monthDay);
+          break;
+        }
+        case RegularlyCycleType.quarter: {
+          this.addOrEditRegularlyFormGroup.controls['monthDay'].setValue(this.regularly.monthDay);
+          break;
+        }
+        case RegularlyCycleType.year: {
+          const date: Date = this.dateService.getDateFromTimestamp(this.regularly.date!);
+          this.selectedDate = new NgbDate(date.getFullYear(), date.getMonth() + 1, date.getDate());
+          this.selectedDateTimestamp = this.regularly.date!;
+          break;
+        }
+      }
+    }
   }
 
   private createListeners() {
@@ -192,7 +233,7 @@ export class AddOrEditRegularlyComponent {
   }
 
   onEdit() {
-
+    this.regularlyService.updateRegularly(this.regularlyObject, this.regularly!.key!).then(() => this.onClose.emit());
   }
 
   get regularlyObject(): Regularly {

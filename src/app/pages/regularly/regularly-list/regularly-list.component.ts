@@ -17,6 +17,7 @@ export class RegularlyListComponent {
 
   @ViewChild('addOrEditRegularlyModal') addOrEditRegularlyModal: NgbModalRef | undefined;
 
+  selectedRegularly: Regularly | undefined;
   addOrEditRegularlyModalRef: NgbModalRef | undefined;
 
   monthRegularities: Regularly[] = [];
@@ -39,6 +40,7 @@ export class RegularlyListComponent {
 
   ngOnInit() {
     this.loadingService.setLoading = true;
+    this.checkForAccounts();
     this.loadMonth();
     this.loadQuarter();
     this.loadYear();
@@ -71,11 +73,13 @@ export class RegularlyListComponent {
         regularly.key = regularlyRaw.key ? regularlyRaw.key : '';
         list.push(regularly);
       });
-      if (++this.loadedLists == this.endLoadingOnList) {
-        this.loadingService.setLoading = false;
-        console.log('stop loading');
-      }
+      if (++this.loadedLists == this.endLoadingOnList) {this.loadingService.setLoading = false;}
     });
+  }
+
+  onRegularlyClicked(regularly: Regularly) {
+    this.selectedRegularly = regularly;
+    this.openAddOrEditRegularlyModal();
   }
 
   openAddOrEditRegularlyModal(): void {
@@ -89,6 +93,7 @@ export class RegularlyListComponent {
   onCloseAddOrEditRegularlyModal(): void {
     if (this.addOrEditRegularlyModalRef) {
       this.addOrEditRegularlyModalRef.close();
+      this.selectedRegularly = undefined;
     }
   }
 }

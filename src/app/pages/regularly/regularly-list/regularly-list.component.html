@@ -1,6 +1,7 @@
 <!-- Add or Edit Regularly Modal -->
 <ng-template #addOrEditRegularlyModal let-modal>
   <app-add-or-edit-regularly
+    [regularly]="selectedRegularly"
     [type]="RegularlyType.regularly"
     (onClose)="onCloseAddOrEditRegularlyModal()">
   </app-add-or-edit-regularly>
@@ -13,7 +14,7 @@
           <h1>Monatlich</h1>
         </div>
       </div>
-      <li class="list-group-item" id="entry-list-month-regularities" *ngFor="let regularly of monthRegularities">
+      <li class="list-group-item" id="entry-list-month-regularities" *ngFor="let regularly of monthRegularities" (click)="onRegularlyClicked(regularly)">
         <app-regularly-list-entry [regularly]="regularly"
           >
         </app-regularly-list-entry>
@@ -27,7 +28,7 @@
           <h1>Quartal</h1>
         </div>
       </div>
-      <li class="list-group-item" id="entry-list-quarter-regularities" *ngFor="let regularly of quarterRegularities">
+      <li class="list-group-item" id="entry-list-quarter-regularities" *ngFor="let regularly of quarterRegularities" (click)="onRegularlyClicked(regularly)">
         <app-regularly-list-entry [regularly]="regularly"
         >
         </app-regularly-list-entry>
@@ -41,7 +42,7 @@
           <h1>Jährlich</h1>
         </div>
       </div>
-      <li class="list-group-item" id="entry-list-year-regularities" *ngFor="let regularly of yearRegularities">
+      <li class="list-group-item" id="entry-list-year-regularities" *ngFor="let regularly of yearRegularities" (click)="onRegularlyClicked(regularly)">
         <app-regularly-list-entry [regularly]="regularly"
         >
         </app-regularly-list-entry>

@@ -19,4 +19,8 @@ export class RegularlyService {
   getAllByCycleType(cycleType: RegularlyCycleType) {
     return this.dbService.readFilteredList(`${this.rootPath}`, ref => ref.orderByChild('cycle').equalTo(cycleType));
   }
+
+  updateRegularly(regularly: Regularly, key: string) {
+    return this.dbService.updateListValue(`${this.rootPath}`, key, regularly);
+  }
 }
