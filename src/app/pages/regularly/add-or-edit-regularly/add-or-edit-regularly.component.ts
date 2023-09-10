@@ -258,6 +258,10 @@ export class AddOrEditRegularlyComponent {
     return account ? account : this.accountService.noAccountValue;
   }
 
+  onButtonDelete() {
+    this.regularlyService.deleteRegularly(this.regularly!.key!).then(() => this.onClose.emit());
+  }
+
   onButtonCancel() {
     this.onClose.emit();
   }

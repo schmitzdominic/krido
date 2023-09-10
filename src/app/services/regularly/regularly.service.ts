@@ -23,4 +23,8 @@ export class RegularlyService {
   updateRegularly(regularly: Regularly, key: string) {
     return this.dbService.updateListValue(`${this.rootPath}`, key, regularly);
   }
+
+  deleteRegularly(key: string) {
+    return this.dbService.delete(`${this.rootPath}/${key}`);
+  }
 }

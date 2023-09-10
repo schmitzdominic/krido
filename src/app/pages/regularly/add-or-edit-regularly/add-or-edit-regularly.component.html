@@ -92,10 +92,9 @@
       </div>
     </div>
   </form>
-  <!-- TODO: Delete -->
-  <!--<div class="pt-2">
-    <button type="button" class="btn btn-danger" *ngIf="entry" (click)="onButtonDelete()"><i class="bi bi-trash pe-2"></i>Löschen</button>
-  </div>-->
+  <div class="pt-2">
+    <button type="button" class="btn btn-danger" *ngIf="regularly" (click)="onButtonDelete()"><i class="bi bi-trash pe-2"></i>Löschen</button>
+  </div>
 </div>
 <div class="modal-footer">
   <button type="button" class="btn btn-dark" (click)="onButtonCancel()">Abbrechen</button>
