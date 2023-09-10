@@ -42,6 +42,17 @@ export class DateService {
   }
 
   /**
+   * Get the last Day of month.
+   *
+   * @param {Date} date to get the last day
+   * @returns {number} last day
+   */
+  getLastDayOfMonth(date: Date): number {
+    date.setDate(0)
+    return date.getDate();
+  }
+
+  /**
    * Gets the month name by a monthString.
    *
    * @param {String} monthString e.g. 202201 -> Januar
@@ -135,6 +146,19 @@ export class DateService {
     const year: number = actualMonth + offset > 11 ? actualYear + 1 : actualYear;
     const month: number = (new Date().getMonth()+offset)%12;
     return this.getMonthStringFromDate(new Date(year, month, 1));
+  }
+
+  /**
+   * Set the next month on a date object.
+   *
+   * @param {Date} date object to set
+   */
+  setNextMonth(date: Date) {
+    const monthStringFromMonth: string = this.getMonthStringFromMonth(1);
+    const month: number = Number(monthStringFromMonth.slice(-2));
+    const year: number = Number(monthStringFromMonth.slice(0, 4));
+    date.setFullYear(year);
+    date.setMonth(month);
   }
 
   /**

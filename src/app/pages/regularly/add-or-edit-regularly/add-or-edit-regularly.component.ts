@@ -10,6 +10,8 @@ import {RegularlyService} from "../../../services/regularly/regularly.service";
 import {RegularlyType} from "../../../../shared/enums/regularly-type.enum";
 import {NgbCalendar, NgbDate} from "@ng-bootstrap/ng-bootstrap";
 import {DateService} from "../../../services/date/date.service";
+import {Entry} from "../../../../shared/interfaces/entry.model";
+import {EntryService} from "../../../services/entry/entry.service";
 
 interface EntryTypeInterface {
   value: EntryType,
@@ -42,7 +44,7 @@ export class AddOrEditRegularlyComponent {
   quarterCycleType: CycleTypeInterface = {value: RegularlyCycleType.quarter, label: 'Quartal'}
   yearCycleType: CycleTypeInterface = {value: RegularlyCycleType.year, label: 'Jährlich'}
   selectedCycleType: CycleTypeInterface = this.monthCycleType;
-  cycleTypes: CycleTypeInterface[] = [this.monthCycleType, this.quarterCycleType, this.yearCycleType];
+  cycleTypes: CycleTypeInterface[] = [this.monthCycleType, this.yearCycleType]; // TODO: Add this.quarterCycleType
 
   selectedDate: NgbDate = this.ngbCalendar.getToday();
   selectedDateTimestamp: number = this.dateService.getTimestampFromNgbDate(this.selectedDate);
@@ -74,7 +76,8 @@ export class AddOrEditRegularlyComponent {
               private helperService: HelperService,
               private regularlyService: RegularlyService,
               private dateService: DateService,
-              private ngbCalendar: NgbCalendar) {
+              private ngbCalendar: NgbCalendar,
+              private entryService: EntryService) {
   }
 
   ngOnInit() {
@@ -82,6 +85,7 @@ export class AddOrEditRegularlyComponent {
     this.createListeners();
     this.loadAccounts();
     this.fillFormIfRegularlyIsAvailable();
+    this.dateService.getLastDayOfMonth(new Date(2023, 9));
   }
 
   private createFormGroup() {
@@ -229,11 +233,15 @@ export class AddOrEditRegularlyComponent {
   }
 
   onAdd() {
-    this.regularlyService.addRegularly(this.regularlyObject).then(() => this.onClose.emit());
+    this.regularlyService.addRegularly(this.regularlyObject).then(() => {
+      this.checkIfEntryMustBeCreated();
+    });
   }
 
   onEdit() {
-    this.regularlyService.updateRegularly(this.regularlyObject, this.regularly!.key!).then(() => this.onClose.emit());
+    this.regularlyService.updateRegularly(this.regularlyObject, this.regularly!.key!).then(() => {
+      this.onClose.emit();
+    });
   }
 
   get regularlyObject(): Regularly {
@@ -250,6 +258,78 @@ export class AddOrEditRegularlyComponent {
       date: this.selectedCycleType === this.yearCycleType ? this.selectedDateTimestamp : 0,
       account: this.selectedAccount,
       isEndOfMonth: this.addOrEditRegularlyFormGroup.value.lastDay
+    }
+  }
+
+  private checkIfEntryMustBeCreated() {
+    const actualDate: Date = new Date();
+    const nextMonthDate: Date = this.dateForEntry;
+    this.dateService.setNextMonth(nextMonthDate);
+    switch(this.selectedCycleType.value) {
+      case RegularlyCycleType.month: {
+        const monthDay: number = this.addOrEditRegularlyFormGroup.value.monthDay;
+        if (actualDate.getDate() <= monthDay) {
+          // This month
+          this.createEntry(this.dateForEntry);
+        }
+        // Next month
+        this.createEntry(nextMonthDate);
+        break;
+      }
+      case RegularlyCycleType.quarter: {
+        // TODO: Implement to identify if we are at the moment in the cycle! If yes, create
+        this.onClose.emit();
+        break;
+      }
+      case RegularlyCycleType.year: {
+        const selectedDate: Date = this.dateService.getDateFromTimestamp(this.selectedDateTimestamp);
+        if (actualDate.getMonth() ==  selectedDate.getMonth() && actualDate.getDate() <= selectedDate.getDate()) {
+          this.createEntry(this.dateForEntry);
+        } else {
+          this.onClose.emit();
+        }
+      }
+    }
+  }
+
+  private createEntry(date: Date) {
+    this.entryService.addEntry(this.getEntryObject(date)).then(() => this.onClose.emit());
+  }
+
+  getEntryObject(date: Date): Entry {
+    const name: string = this.addOrEditRegularlyFormGroup.value.name;
+    const value: number = this.addOrEditRegularlyFormGroup.value.value;
+    return {
+      type: this.selectedEntryType.value,
+      name: name,
+      searchName: this.helperService.createSearchName(name),
+      value: value,
+      date: date.getTime(),
+      account: this.selectedAccount,
+      monthString: this.dateService.getMonthStringFromDate(date)
+    }
+  }
+
+  private get dateForEntry(): Date {
+    switch(this.selectedCycleType.value) {
+      case RegularlyCycleType.month:
+      case RegularlyCycleType.quarter: {
+        const date: Date = new Date();
+        date.setMilliseconds(0);
+        date.setSeconds(0);
+        date.setMinutes(0);
+        date.setHours(0);
+        if (this.isLastDay) {
+          date.setDate(0);
+        } else {
+          date.setDate(this.addOrEditRegularlyFormGroup.value.monthDay);
+        }
+        return date;
+      }
+      case RegularlyCycleType.year: {
+        return this.dateService.getDateFromTimestamp(this.selectedDateTimestamp);
+      }
+      default: return new Date();
     }
   }
 
