@@ -66,7 +66,7 @@
     </div>
   </div>
   <!-- No Account Toast and Add Button -->
-  <ngb-toast class="position-fixed bottom-0 mb-4" *ngIf="isToastNoAccountShown" [autohide]="false"> Um einen Regelmäßige Ein- oder Ausgabe zu anzulegen, benötigst du ein Konto. <a [routerLink]="['/accounts']">Hier</a> kannst du ein Konto anlegen. </ngb-toast>
+  <ngb-toast class="position-fixed bottom-0 mb-4" *ngIf="isToastNoAccountShown" [autohide]="false"> Um eine regelmäßige Ein- oder Ausgabe anzulegen, benötigst du ein Konto. <a [routerLink]="['/accounts']">Hier</a> kannst du ein Konto anlegen. </ngb-toast>
   <div class="position-fixed end-0 bottom-0 me-4 mb-4" *ngIf="isAccountAvailable && !isNoContentAvailable()">
     <button type="button" class="btn btn-primary" (click)="openAddOrEditRegularlyModal()"><i class="bi bi-plus-lg"></i></button>
   </div>
