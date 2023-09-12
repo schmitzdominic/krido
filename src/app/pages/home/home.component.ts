@@ -6,6 +6,7 @@ import {Budget} from "../../../shared/interfaces/budget.model";
 import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap/modal/modal-ref";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {AccountType} from "../../../shared/enums/account-type.enum";
+import {LoadingService} from "../../services/loading/loading.service";
 
 @Component({
   selector: 'app-actual-month',
@@ -25,17 +26,21 @@ export class HomeComponent {
 
   actualYear: number = this.dateService.getActualYear();
 
+  isAllTimeBudgetsAvailable: boolean = false;
+  isMonthlyBudgetsAvailable: boolean = false;
   isEntriesAvailable: boolean = false;
+  isNotLoading: boolean = false;
 
   clickedBudget: Budget | undefined;
-  allTimeBudgets: Budget[] = [];
 
+  allTimeBudgets: Budget[] = [];
   monthlyBudgets: Budget[] = [];
 
   constructor(private menuTitleService: MenuTitleService,
               private dateService: DateService,
               private budgetService: BudgetService,
-              private ngbModal: NgbModal) {
+              private ngbModal: NgbModal,
+              private loadingService: LoadingService) {
   }
 
   ngOnInit(): void {
@@ -64,6 +69,7 @@ export class HomeComponent {
         budget.key = budgetRaw.key ? budgetRaw.key : '';
         this.allTimeBudgets.push(budget);
       });
+      this.isAllTimeBudgetsAvailable = this.allTimeBudgets.length > 0;
     });
   }
 
@@ -75,6 +81,13 @@ export class HomeComponent {
         budget.key = budgetRaw.key ? budgetRaw.key : '';
         this.monthlyBudgets.push(budget);
       });
+      this.isMonthlyBudgetsAvailable = this.monthlyBudgets.length > 0;
+    });
+  }
+
+  checkIfLoading() {
+    this.loadingService.isLoading.subscribe(isLoading => {
+      this.isNotLoading = !isLoading;
     });
   }
 
@@ -95,5 +108,9 @@ export class HomeComponent {
 
   onEntriesLoaded(isEntriesAvailable: boolean) {
     this.isEntriesAvailable = isEntriesAvailable;
+  }
+
+  isContentAvailable(): boolean {
+    return this.isMonthlyBudgetsAvailable || this.isAllTimeBudgetsAvailable || this.isEntriesAvailable;
   }
 }

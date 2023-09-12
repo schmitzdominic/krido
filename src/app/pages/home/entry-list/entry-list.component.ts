@@ -65,7 +65,10 @@ export class EntryListComponent {
         this.pushEntryToList(entry, entryList);
       });
       this.sortEntriesByDate(entryList);
-      if (++this.loadedLists == this.endLoadingOnList) {this.loadingService.setLoading = false;}
+      if (++this.loadedLists == this.endLoadingOnList) {
+        this.loadingService.setLoading = false;
+        this.isEntriesAvailable.emit(true);
+      }
     });
   }
 

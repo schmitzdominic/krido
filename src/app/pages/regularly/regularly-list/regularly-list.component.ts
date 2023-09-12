@@ -130,4 +130,8 @@ export class RegularlyListComponent {
       this.selectedRegularly = undefined;
     }
   }
+
+  isNoContentAvailable() {
+    return this.monthRegularities.length == 0 && this.quarterRegularities.length == 0 && this.yearRegularities.length == 0;
+  }
 }
