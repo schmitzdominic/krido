@@ -20,6 +20,10 @@ export class BudgetService {
     return this.dbService.createListValue(`${this.rootPath}/month`, budget);
   }
 
+  addMonthBudgetNoLoading(budget: Budget) {
+    return this.dbService.createListValue(`${this.rootPath}/month`, budget);
+  }
+
   addCycle(cycle: Cycle) {
     return this.dbService.createListValue(`${this.rootPath}/cycle`, cycle);
   }
@@ -37,11 +41,11 @@ export class BudgetService {
   }
 
   updateNoTimeLimitBudget(budget: Budget, key: string) {
-    return this.dbService.updateListValue(`${this.rootPath}/general`, key, budget);
+    return this.dbService.updateListValue(`${this.rootPath}/general`, key, budget, false);
   }
 
   updateMonthBudget(budget: Budget, key: string) {
-    return this.dbService.updateListValue(`${this.rootPath}/month`, key, budget);
+    return this.dbService.updateListValue(`${this.rootPath}/month`, key, budget, false);
   }
 
   updateCycle(cycle: Cycle, key: string) {
@@ -56,11 +60,15 @@ export class BudgetService {
     return this.dbService.readList(`${this.rootPath}/month`);
   }
 
-  getAllThisMonthBudgets(monthString: string) {
+  getAllMonthBudgetsByMonthString(monthString: string) {
     return this.dbService.readFilteredList(`${this.rootPath}/month`, ref => ref.orderByChild('validityPeriod').equalTo(monthString));
   }
 
   getAllCycles() {
     return this.dbService.readList(`${this.rootPath}/cycle`);
+  }
+
+  getCycle(key: string) {
+    return this.dbService.read(`${this.rootPath}/cycle/${key}`);
   }
 }

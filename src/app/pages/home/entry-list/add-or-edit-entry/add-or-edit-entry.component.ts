@@ -152,7 +152,7 @@ export class AddOrEditEntryComponent {
   private loadBudgets() {
     this.budgets.push(this.noBudgetValue);
     if (!this.entry?.budgetKey) { this.addOrEditEntryFormGroup.controls['budget'].setValue(this.budgets[0].key); }
-    this.budgetService.getAllThisMonthBudgets(this.dateService.getActualMonthString()).subscribe(budgets => {
+    this.budgetService.getAllMonthBudgetsByMonthString(this.dateService.getActualMonthString()).subscribe(budgets => {
       budgets.forEach(budgetRaw => {
         this.addBudgetToBudgets(budgetRaw);
       });

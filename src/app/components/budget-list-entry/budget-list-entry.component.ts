@@ -40,6 +40,15 @@ export class BudgetListEntryComponent {
           const entry: Entry = entryRAW.payload.val() as Entry;
           this.calculate(entry);
         });
+
+        if (this.budget?.limit) {
+          this.budget!.usedLimit = this.usedLimit;
+          if (this.budget!.validityPeriod) {
+            this.budgetService.updateMonthBudget(this.budget!, this.budget!.key!).then();
+          } else {
+            this.budgetService.updateNoTimeLimitBudget(this.budget!, this.budget!.key!).then();
+          }
+        }
       });
     }
   }

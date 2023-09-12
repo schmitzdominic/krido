@@ -3,6 +3,7 @@ import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {HomeService} from "../../services/home/home.service";
 import {Home} from "../../../shared/interfaces/home.model";
 import {ToastService} from "../../services/toast/toast.service";
+import {HelperService} from "../../services/helper/helper.service";
 
 @Component({
   selector: 'app-home-setup',
@@ -29,6 +30,7 @@ export class HomeSetupComponent {
 
   constructor(private formBuilder: FormBuilder,
               private homeService: HomeService,
+              private helperService: HelperService,
               private toastService: ToastService) {
   }
 
@@ -97,7 +99,7 @@ export class HomeSetupComponent {
 
   onJoin(): void {
 
-    const searchName: string = this.homeService.convertToSearchName(this.joinFormGroup.value.joinHomeName);
+    const searchName: string = this.helperService.createSearchName(this.joinFormGroup.value.joinHomeName);
     const pin: number = this.joinFormGroup.value.joinHomePin;
     const isHomeExisting: Home | undefined = this.homes.find(home => home.searchName === searchName);
 
@@ -110,6 +112,7 @@ export class HomeSetupComponent {
           pin: pin
         };
         this.homeService.joinHome(home).then(() => {
+          window.location.reload();
           this.toastService.showSuccess(`${this.joinFormGroup.value.joinHomeName} erfolgreich beigetreten`, 5000);
         });
       } else {
@@ -122,7 +125,7 @@ export class HomeSetupComponent {
 
   onCreate(): void {
 
-    const searchName: string = this.homeService.convertToSearchName(this.createFormGroup.value.createHomeName);
+    const searchName: string = this.helperService.createSearchName(this.createFormGroup.value.createHomeName);
 
     if (this.homes.find(home => home.searchName === searchName)) {
       this.toastService.showDanger(`${this.createFormGroup.value.createHomeName} existiert bereits`)
@@ -135,6 +138,7 @@ export class HomeSetupComponent {
       };
       this.homeService.createHome(home).then(() => {
         this.homeService.joinHome(home).then(() => {
+          window.location.reload();
           this.toastService.showSuccess(`${this.createFormGroup.value.createHomeName} erfolgreich erstellt`, 5000);
         });
       });

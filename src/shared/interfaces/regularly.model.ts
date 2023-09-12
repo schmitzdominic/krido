@@ -11,7 +11,7 @@ export interface Regularly {
   type?: RegularlyType;
   cycle: RegularlyCycleType;
   monthDay: number;
-  value?: number;
+  value: number;
   account: Account;
   date?: number;
   isEndOfMonth?: boolean;

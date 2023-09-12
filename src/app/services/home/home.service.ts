@@ -3,16 +3,18 @@ import {DbService} from "../db.service";
 import {Home} from "../../../shared/interfaces/home.model";
 import {UserService} from "../user/user.service";
 import {User} from "../../../shared/interfaces/user.model";
+import {DateService} from "../date/date.service";
 
 @Injectable({
   providedIn: 'root'
 })
 export class HomeService {
 
-  rootPath = '/homes'
+  rootPath: string = '/homes'
 
   constructor(private dbService: DbService,
-              private userService: UserService) { }
+              private userService: UserService,
+              private dateService: DateService) { }
 
   get getAllHomes() {
     return this.dbService.readList(this.rootPath);
@@ -20,10 +22,6 @@ export class HomeService {
 
   get generatePin(): number {
     return Math.floor(1000 + Math.random() * 9000);
-  }
-
-  convertToSearchName(name: string) {
-    return name.replaceAll(' ', '').toLowerCase();
   }
 
   joinHome(home: Home) {
@@ -34,5 +32,13 @@ export class HomeService {
   }
   createHome(home: Home) {
     return this.dbService.update(`${this.rootPath}/${home.searchName}`, home);
+  }
+
+  getActualMonthString() {
+    return this.dbService.read(`${this.rootPath}/${this.userService.home}/actualMonthString`)
+  }
+
+  setActualMonthString() {
+    return this.dbService.update(`${this.rootPath}/${this.userService.home}`, {'actualMonthString': this.dateService.getActualMonthString()}, false);
   }
 }

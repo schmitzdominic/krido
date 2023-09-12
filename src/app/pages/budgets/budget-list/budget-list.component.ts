@@ -88,7 +88,7 @@ export class BudgetListComponent {
       this.noTimeLimitBudgets = [];
       budgets.forEach(budgetRaw => {
         let budget: Budget = budgetRaw.payload.val() as Budget;
-        budget.key = budgetRaw.key!;
+        budget.key = budgetRaw.key ? budgetRaw.key : '';
         budget.usedLimit = budget.usedLimit ? budget.usedLimit : 0;
         budget.limit = budget.limit ? Number(budget.limit) : undefined;
         if (!budget.isArchived) {
@@ -105,7 +105,7 @@ export class BudgetListComponent {
       this.monthlyBudgets = [];
       budgets.forEach(budgetRaw => {
         let budget: Budget = budgetRaw.payload.val() as Budget;
-        budget.key = budgetRaw.key!;
+        budget.key = budgetRaw.key ? budgetRaw.key : '';
         budget.usedLimit = budget.usedLimit ? budget.usedLimit : 0;
         budget.limit = budget.limit ? Number(budget.limit) : undefined;
         if (!budget.isArchived) {

@@ -66,7 +66,7 @@ export class HomeComponent {
   }
 
   private loadMonthlyBudgets() {
-    this.budgetService.getAllThisMonthBudgets(this.dateService.getActualMonthString()).subscribe(budgets => {
+    this.budgetService.getAllMonthBudgetsByMonthString(this.dateService.getActualMonthString()).subscribe(budgets => {
       this.monthlyBudgets = [];
       budgets.filter(budgetRaw => !(budgetRaw.payload.val() as Budget).isArchived).forEach(budgetRaw => {
         const budget: Budget = budgetRaw.payload.val() as Budget;

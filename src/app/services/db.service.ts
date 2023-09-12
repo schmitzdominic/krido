@@ -35,8 +35,12 @@ export class DbService {
     return this.db.list(path, queryFn).snapshotChanges();
   }
 
-  update(path: string, object: any): Promise<void> {
-    this.loadingService.setLoading = true;
+  update(path: string, object: any, loading: boolean = true): Promise<void> {
+    this.loadingService.setLoading = loading;
+    return this.db.object(path).update(object).finally(() => {this.loadingService.setLoading = false;});
+  }
+
+  updateNoLoading(path: string, object: any) {
     return this.db.object(path).update(object).finally(() => {this.loadingService.setLoading = false;});
   }
 
@@ -59,8 +63,8 @@ export class DbService {
     return this.db.list(path).push(object);
   }
 
-  updateListValue(path: string, key: string, object: any) {
-    this.loadingService.setLoading = true;
+  updateListValue(path: string, key: string, object: any, loading: boolean = true) {
+    this.loadingService.setLoading = loading;
     return this.db.list(path).update(key, object).finally(() => {this.loadingService.setLoading = false;});
   }
 

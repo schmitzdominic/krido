@@ -47,7 +47,7 @@ export class DateService {
    * @param {Date} date to get the last day
    * @returns {number} last day
    */
-  getLastDayOfMonth(date: Date): number {
+  setDateToLastDayOfMonth(date: Date): number {
     date.setDate(0)
     return date.getDate();
   }
@@ -217,5 +217,45 @@ export class DateService {
       return this.getActualMonthString() == monthString;
     }
     return false;
+  }
+
+  /**
+   * Gets the next available weekday (date of month) from date.
+   *
+   * saturday or sunday before month change -> friday before
+   * sunday no month change -> monday
+   * saturday no month change -> friday
+   *
+   * @param {number} timestamp to check
+   * @return {number} timestamp as described
+   */
+  getAvailableWeekdayAsTimestampFromTimestamp(timestamp: number): number {
+
+    const date: Date = this.getDateFromTimestamp(timestamp);
+
+    // If it is already a weekday
+    if (date.getDay() !== 0 && date.getDay() !== 6) {
+      return date.getTime();
+
+    } else {
+
+      const lastDayInMonth: number = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+
+      if (date.getDay() === 6) {
+        // Saturday
+        // If it is not Saturday the first -> Return the Friday before
+        if (date.getDate() > 1) { date.setDate(date.getDate() - 1); }
+        // Else it is Saturday the first -> Return the next Monday -> 1. Saturday, 2. Sunday, -> 3. Monday
+        else { date.setDate(3); }
+      } else {
+        // Sunday
+        // If it is not Sunday the last of the month -> Return the monday after
+        if (date.getDate() < lastDayInMonth) { return date.setDate(date.getDate() + 1); }
+        // Else it is Sunday the last of the month -> Return the Friday before -> last day. Sunday, -1 Saturday, -2 Friday
+        else { return date.setDate(date.getDate() - 2); }
+      }
+
+      return date.getTime();
+    }
   }
 }

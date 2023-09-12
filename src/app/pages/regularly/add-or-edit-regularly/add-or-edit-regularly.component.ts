@@ -85,7 +85,7 @@ export class AddOrEditRegularlyComponent {
     this.createListeners();
     this.loadAccounts();
     this.fillFormIfRegularlyIsAvailable();
-    this.dateService.getLastDayOfMonth(new Date(2023, 9));
+    this.dateService.setDateToLastDayOfMonth(new Date(2023, 9));
   }
 
   private createFormGroup() {

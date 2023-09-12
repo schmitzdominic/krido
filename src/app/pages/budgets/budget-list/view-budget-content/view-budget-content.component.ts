@@ -5,7 +5,6 @@ import {NgbProgressbarConfig} from "@ng-bootstrap/ng-bootstrap";
 import {ProgressBarService} from "../../../../services/progress-bar/progress-bar.service";
 import {Entry} from "../../../../../shared/interfaces/entry.model";
 import {EntryService} from "../../../../services/entry/entry.service";
-import {EntryType} from "../../../../../shared/enums/entry-type.enum";
 
 @Component({
   selector: 'app-view-budget-content',
@@ -64,18 +63,10 @@ export class ViewBudgetContentComponent {
         entries.forEach(entryRaw => {
           const entry: Entry = entryRaw.payload.val() as Entry;
           entry.key = entryRaw.key ? entryRaw.key : '';
-          this.calculateUsedLimit(entry);
           this.entries.push(entry);
         });
         this.sortEntriesByDate(this.entries);
       });
-    }
-  }
-
-  calculateUsedLimit(entry: Entry) {
-    switch (entry.type) {
-      case EntryType.income: this.usedLimit = this.usedLimit - entry.value; break;
-      case EntryType.outcome: this.usedLimit = this.usedLimit + entry.value; break;
     }
   }
 

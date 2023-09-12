@@ -1,4 +1,4 @@
-import {NgModule, isDevMode} from '@angular/core';
+import {NgModule, isDevMode, APP_INITIALIZER} from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -46,6 +46,8 @@ import { RegularlyListComponent } from './pages/regularly/regularly-list/regular
 import { BirthdayListComponent } from './pages/regularly/birthday-list/birthday-list.component';
 import { RegularlyListEntryComponent } from './components/regularly-list-entry/regularly-list-entry.component';
 import { AddOrEditRegularlyComponent } from './pages/regularly/add-or-edit-regularly/add-or-edit-regularly.component';
+import {PredictService} from "./services/predict/predict.service";
+import {appInitializer} from "../shared/helper/app.initializer";
 
 @NgModule({
   declarations: [
@@ -106,6 +108,7 @@ import { AddOrEditRegularlyComponent } from './pages/regularly/add-or-edit-regul
     ScreenTrackingService,
     UserTrackingService,
     { provide: NgbDateParserFormatter, useClass: NgbDateCustomParserFormatter },
+    { provide: APP_INITIALIZER, useFactory: appInitializer, multi: true, deps: [PredictService] },
   ],
   bootstrap: [AppComponent]
 })
