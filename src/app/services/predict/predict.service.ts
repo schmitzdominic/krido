@@ -10,6 +10,7 @@ import {Regularly} from "../../../shared/interfaces/regularly.model";
 import {Entry} from "../../../shared/interfaces/entry.model";
 import {EntryService} from "../entry/entry.service";
 import {ToastService} from "../toast/toast.service";
+import {UserService} from "../user/user.service";
 
 @Injectable({
   providedIn: 'root'
@@ -20,6 +21,7 @@ export class PredictService {
   private nextMonthString: string = '';
 
   constructor(private budgetService: BudgetService,
+              private userService: UserService,
               private homeService: HomeService,
               private dateService: DateService,
               private regularlyService: RegularlyService,
@@ -27,24 +29,28 @@ export class PredictService {
               private toastService: ToastService) { }
 
   public createEntries() {
-    this.homeService.getActualMonthString().subscribe(dbMonthString => {
-      if (dbMonthString.payload.val()) {
-        // if the db monthString is lower than the actual one
+    if (this.userService.home) {
+      this.homeService.getActualMonthString().subscribe(dbMonthString => {
+        if (dbMonthString.payload.val()) {
+          // if the db monthString is lower than the actual one
 
-        if ((dbMonthString.payload.val() as number) < (Number(this.dateService.getMonthStringFromMonth(0)))) {
-          this.lastMonthString = this.dateService.getMonthStringFromMonth(-1);
+          if ((dbMonthString.payload.val() as number) < (Number(this.dateService.getMonthStringFromMonth(0)))) {
+            this.lastMonthString = this.dateService.getMonthStringFromMonth(-1);
 
-          this.nextMonthString = this.dateService.getMonthStringFromMonth(1);
-          this.homeService.setActualMonthString().then(() => {
+            this.nextMonthString = this.dateService.getMonthStringFromMonth(1);
+            this.homeService.setActualMonthString().then(() => {
 
-            this.createBudgets();
-            this.createRegularEntries();
+              this.createBudgets();
+              this.createRegularEntries();
 
-            this.toastService.showSuccess('Nächster Monat wurde angelegt', 3000);
-          });
+              this.toastService.showSuccess('Nächster Monat wurde angelegt', 3000);
+            });
+          }
+        } else {
+          this.homeService.setActualMonthString().then();
         }
-      }
-    });
+      });
+    }
   }
 
   private createBudgets() {

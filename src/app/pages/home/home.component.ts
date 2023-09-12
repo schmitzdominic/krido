@@ -6,6 +6,7 @@ import {Budget} from "../../../shared/interfaces/budget.model";
 import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap/modal/modal-ref";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {AccountType} from "../../../shared/enums/account-type.enum";
+import {PredictService} from "../../services/predict/predict.service";
 
 @Component({
   selector: 'app-actual-month',
@@ -33,10 +34,12 @@ export class HomeComponent {
   constructor(private menuTitleService: MenuTitleService,
               private dateService: DateService,
               private budgetService: BudgetService,
-              private ngbModal: NgbModal) {
+              private ngbModal: NgbModal,
+              private predictService: PredictService) {
   }
 
   ngOnInit(): void {
+    this.predictService.createEntries();
     this.setInitialValues();
     this.loadBudgets();
   }
