@@ -75,6 +75,7 @@ export class UserService {
     this.angularFireAuth.signOut().then(() => {
       localStorage.removeItem('user');
       this.router.navigate(['/login']);
+      window.location.reload();
     });
   }
 }
