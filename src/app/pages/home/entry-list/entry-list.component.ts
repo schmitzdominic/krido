@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Output, ViewChild} from '@angular/core';
+import {Component, ViewChild} from '@angular/core';
 import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap/modal/modal-ref";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {AccountService} from "../../../services/account/account.service";
@@ -14,8 +14,6 @@ import {LoadingService} from "../../../services/loading/loading.service";
 })
 export class EntryListComponent {
 
-  @Output() isEntriesAvailable: EventEmitter<boolean> = new EventEmitter<boolean>();
-
   @ViewChild('addOrEditEntryModal') addOrEditEntryModal: NgbModalRef | undefined;
 
   selectedEntry: Entry | undefined;
@@ -28,9 +26,11 @@ export class EntryListComponent {
   actualMonthEntries: Entry[] = [];
   nextMonthEntries: Entry[] = [];
 
+  totalActualMonthEntries: number = -1;
+  totalNextMonthEntries: number = -1;
+
   isAccountAvailable: boolean = false;
   isToastNoAccountShown: boolean = false;
-  isNoEntriesThisMonth: boolean = true;
   isShowAll: boolean = false;
 
   loadedLists: number = 0;
@@ -44,7 +44,6 @@ export class EntryListComponent {
   }
 
   ngOnInit() {
-    this.isEntriesAvailable.emit(false);
     this.checkForAccounts();
     this.loadEntries();
   }
@@ -52,23 +51,35 @@ export class EntryListComponent {
   loadEntries() {
     this.loadingService.setLoading = true;
     this.loadedLists = 0;
-    this.loadMonthEntries(this.dateService.getActualMonthString(), this.actualMonthEntries);
-    this.loadMonthEntries(this.dateService.getMonthStringFromMonth(1), this.nextMonthEntries);
+    this.loadActualMonthEntries();
+    this.loadNextMonthEntries();
   }
 
-  loadMonthEntries(monthString: string, entryList: Entry[]) {
-    this.entryService.getAllEntriesByMonthString(monthString).subscribe(entries => {
-      entryList.length = 0;
+  loadActualMonthEntries() {
+    this.entryService.getAllEntriesByMonthString(this.dateService.getActualMonthString()).subscribe(entries => {
+      this.actualMonthEntries.length = 0;
+      this.totalActualMonthEntries = entries.length;
       entries.forEach(entryRaw => {
         const entry: Entry = entryRaw.payload.val() as Entry;
         entry.key = entryRaw.key ? entryRaw.key : '';
-        this.pushEntryToList(entry, entryList);
+        this.pushEntryToList(entry, this.actualMonthEntries);
       });
-      this.sortEntriesByDate(entryList);
-      if (++this.loadedLists == this.endLoadingOnList) {
-        this.loadingService.setLoading = false;
-        this.isEntriesAvailable.emit(true);
-      }
+      this.sortEntriesByDate(this.actualMonthEntries);
+      if (++this.loadedLists == this.endLoadingOnList) {this.loadingService.setLoading = false;}
+    });
+  }
+
+  loadNextMonthEntries() {
+    this.entryService.getAllEntriesByMonthString(this.dateService.getMonthStringFromMonth(1)).subscribe(entries => {
+      this.nextMonthEntries.length = 0;
+      this.totalNextMonthEntries = entries.length;
+      entries.forEach(entryRaw => {
+        const entry: Entry = entryRaw.payload.val() as Entry;
+        entry.key = entryRaw.key ? entryRaw.key : '';
+        this.pushEntryToList(entry, this.nextMonthEntries);
+      });
+      this.sortEntriesByDate(this.nextMonthEntries);
+      if (++this.loadedLists == this.endLoadingOnList) {this.loadingService.setLoading = false;}
     });
   }
 

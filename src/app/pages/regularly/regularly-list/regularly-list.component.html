@@ -52,11 +52,11 @@
   <div class="row" *ngIf="isNoContentAvailable()">
     <div class="card">
       <div class="m-2 mt-3">
-        <img src="assets/img/no-account.gif" class="card-img-top" alt="no budget" style="border-radius: 6px;">
+        <img src="assets/img/no-account.gif" class="card-img-top" alt="no regularly" style="border-radius: 6px;">
       </div>
       <div class="card-body">
         <h1 class="card-title">Keine Regelmäßigen Einträge</h1>
-        <div class="no-budget-card-content">
+        <div class="no-regularly-card-content">
           <p class="card-text">Du hast noch keine regelmäßigen Aus- oder Eingaben angelegt. Lege jetzt direkt welche an.</p>
         </div>
         <div class="position-absolute end-0 bottom-0 me-4 mb-4">
@@ -66,7 +66,7 @@
     </div>
   </div>
   <!-- No Account Toast and Add Button -->
-  <ngb-toast class="position-fixed bottom-0 mb-4" *ngIf="isToastNoAccountShown" [autohide]="false"> Um einen Regelmäßigen Eintrag zu machen, benötigst du ein Konto. <a [routerLink]="['/accounts']">Hier</a> kannst du ein Konto anlegen. </ngb-toast>
+  <ngb-toast class="position-fixed bottom-0 mb-4" *ngIf="isToastNoAccountShown" [autohide]="false"> Um einen Regelmäßige Ein- oder Ausgabe zu anzulegen, benötigst du ein Konto. <a [routerLink]="['/accounts']">Hier</a> kannst du ein Konto anlegen. </ngb-toast>
   <div class="position-fixed end-0 bottom-0 me-4 mb-4" *ngIf="isAccountAvailable && !isNoContentAvailable()">
     <button type="button" class="btn btn-primary" (click)="openAddOrEditRegularlyModal()"><i class="bi bi-plus-lg"></i></button>
   </div>
