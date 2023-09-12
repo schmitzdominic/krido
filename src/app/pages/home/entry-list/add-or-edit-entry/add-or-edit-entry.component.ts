@@ -138,7 +138,7 @@ export class AddOrEditEntryComponent {
           this.accounts.push(this.accountService.noAccountValue);
           this.addOrEditEntryFormGroup.controls['account'].setValue(this.accounts[0].key);
         }
-        if (this.userService.mainAccount) {
+        else if (this.userService.mainAccount) {
           this.addOrEditEntryFormGroup.controls['account'].setValue(this.userService.mainAccount.key);
         } else {
           if (this.accounts.length > 0) {

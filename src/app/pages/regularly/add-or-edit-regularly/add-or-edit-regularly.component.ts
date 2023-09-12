@@ -296,7 +296,7 @@ export class AddOrEditRegularlyComponent {
       }
       case RegularlyCycleType.year: {
         const selectedDate: Date = this.dateService.getDateFromTimestamp(this.selectedDateTimestamp);
-        if (actualDate.getMonth() ==  selectedDate.getMonth() && actualDate.getDate() <= selectedDate.getDate()) {
+        if (actualDate.getMonth() ==  selectedDate.getMonth() || this.dateService.getNextMonthNumber() == selectedDate.getMonth()) {
           this.createEntry(this.dateForEntry);
         } else {
           this.onClose.emit();

@@ -144,8 +144,17 @@ export class DateService {
     const actualMonth: number = new Date().getMonth();
     const actualYear: number = new Date().getFullYear();
     const year: number = actualMonth + offset > 11 ? actualYear + 1 : actualYear;
-    const month: number = (new Date().getMonth()+offset)%12;
+    const month: number = (new Date().getMonth() + offset)%12;
     return this.getMonthStringFromDate(new Date(year, month, 1));
+  }
+
+  /**
+   * Gets the number of the next month.
+   *
+   * @returns {number} of the next month
+   */
+  getNextMonthNumber(): number {
+    return (new Date().getMonth()+1)%12;
   }
 
   /**
