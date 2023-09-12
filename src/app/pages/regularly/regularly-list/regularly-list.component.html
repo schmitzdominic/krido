@@ -59,7 +59,7 @@
         <div class="no-regularly-card-content">
           <p class="card-text">Du hast noch keine regelmäßigen Aus- oder Eingaben angelegt. Lege jetzt direkt welche an.</p>
         </div>
-        <div class="position-absolute end-0 bottom-0 me-4 mb-4">
+        <div class="position-absolute end-0 bottom-0 me-4 mb-4" *ngIf="isAccountAvailable">
           <button type="button" class="btn btn-primary" (click)="openAddOrEditRegularlyModal()">Anlegen</button>
         </div>
       </div>

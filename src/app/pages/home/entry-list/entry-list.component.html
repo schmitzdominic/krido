@@ -43,7 +43,7 @@
       <div class="no-entry-card-content">
         <p class="card-text">Du hast noch keine Ein- oder Ausgaben angelegt. Lege jetzt direkt welche an.</p>
       </div>
-      <div class="position-absolute end-0 bottom-0 me-4 mb-4">
+      <div class="position-absolute end-0 bottom-0 me-4 mb-4" *ngIf="isAccountAvailable">
         <button type="button" class="btn btn-primary" (click)="onButtonAddClick()">Anlegen</button>
       </div>
     </div>
