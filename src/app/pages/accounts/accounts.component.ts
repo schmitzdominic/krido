@@ -22,6 +22,6 @@ export class AccountsComponent {
    */
   setInitialValues(): void {
     this.menuTitleService.setTitle('Konten');
-    this.menuTitleService.setActiveId(4);
+    this.menuTitleService.setActiveId(5);
   }
 }

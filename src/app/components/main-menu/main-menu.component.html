@@ -18,7 +18,7 @@
             ngbNavLink
             data-bs-toggle="collapse"
             data-bs-target=".navbar-collapse.show"
-            (click)="navigateToRegularly()"><i class="bi bi-arrow-repeat pe-2"></i> Regelmäßig</button>
+            (click)="navigateToInvoice()"><i class="bi bi-cash-coin pe-2"></i> Abrechnung</button>
         </li>
         <li [ngbNavItem]="3">
           <button
@@ -32,16 +32,23 @@
             ngbNavLink
             data-bs-toggle="collapse"
             data-bs-target=".navbar-collapse.show"
-            (click)="navigateToAccounts()"><i class="bi bi-bank pe-2"></i> Konten</button>
+            (click)="navigateToRegularly()"><i class="bi bi-arrow-repeat pe-2"></i> Regelmäßig</button>
         </li>
         <li [ngbNavItem]="5">
           <button
             ngbNavLink
             data-bs-toggle="collapse"
             data-bs-target=".navbar-collapse.show"
-            (click)="navigateToBudgets()"><i class="bi bi-bag pe-2"></i> Budgets</button>
+            (click)="navigateToAccounts()"><i class="bi bi-bank pe-2"></i> Konten</button>
         </li>
         <li [ngbNavItem]="6">
+          <button
+            ngbNavLink
+            data-bs-toggle="collapse"
+            data-bs-target=".navbar-collapse.show"
+            (click)="navigateToBudgets()"><i class="bi bi-bag pe-2"></i> Budgets</button>
+        </li>
+        <li [ngbNavItem]="7">
           <button
             ngbNavLink
             data-bs-toggle="collapse"

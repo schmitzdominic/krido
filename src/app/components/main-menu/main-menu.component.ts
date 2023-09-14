@@ -44,6 +44,10 @@ export class MainMenuComponent {
     this.router.navigate(['/home']);
   }
 
+  navigateToInvoice(): void {
+    this.router.navigate(['/invoice']);
+  }
+
   navigateToBudgets(): void {
     this.router.navigate(['/budgets']);
   }

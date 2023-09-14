@@ -2,11 +2,11 @@ import { Component } from '@angular/core';
 import {MenuTitleService} from "../../../shared/behavior/menu-title/menu-title.service";
 
 @Component({
-  selector: 'app-settings',
-  templateUrl: './settings.component.html',
-  styleUrls: ['./settings.component.scss']
+  selector: 'app-invoice',
+  templateUrl: './invoice.component.html',
+  styleUrls: ['./invoice.component.scss']
 })
-export class SettingsComponent {
+export class InvoiceComponent {
 
   constructor(private menuTitleService: MenuTitleService) {
   }
@@ -19,7 +19,8 @@ export class SettingsComponent {
    * Set initial values.
    */
   setInitialValues(): void {
-    this.menuTitleService.setTitle('Einstellungen');
-    this.menuTitleService.setActiveId(7);
+    this.menuTitleService.setTitle('Abrechnung');
+    this.menuTitleService.setActiveId(2);
   }
+
 }

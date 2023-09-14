@@ -46,6 +46,7 @@ import { RegularlyListComponent } from './pages/regularly/regularly-list/regular
 import { BirthdayListComponent } from './pages/regularly/birthday-list/birthday-list.component';
 import { RegularlyListEntryComponent } from './components/regularly-list-entry/regularly-list-entry.component';
 import { AddOrEditRegularlyComponent } from './pages/regularly/add-or-edit-regularly/add-or-edit-regularly.component';
+import { InvoiceComponent } from './pages/invoice/invoice.component';
 
 @NgModule({
   declarations: [
@@ -79,6 +80,7 @@ import { AddOrEditRegularlyComponent } from './pages/regularly/add-or-edit-regul
     BirthdayListComponent,
     RegularlyListEntryComponent,
     AddOrEditRegularlyComponent,
+    InvoiceComponent,
   ],
     imports: [
         BrowserModule,

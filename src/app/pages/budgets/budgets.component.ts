@@ -27,7 +27,7 @@ export class BudgetsComponent {
    */
   setInitialValues(): void {
     this.menuTitleService.setTitle('Budgets');
-    this.menuTitleService.setActiveId(5);
+    this.menuTitleService.setActiveId(6);
   }
 
   checkForArchive() {

@@ -8,10 +8,12 @@ import {RegularlyComponent} from "./pages/regularly/regularly.component";
 import {LoginComponent} from "./components/login/login.component";
 import {AuthGuard} from "./services/auth/auth.guard";
 import {SettingsComponent} from "./pages/settings/settings.component";
+import {InvoiceComponent} from "./pages/invoice/invoice.component";
 
 const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: 'home', component: HomeComponent, canActivate: [AuthGuard] },
+  { path: 'invoice', component: InvoiceComponent, canActivate: [AuthGuard] },
   { path: 'regularly', component: RegularlyComponent, canActivate: [AuthGuard] },
   { path: 'accounts', component: AccountsComponent, canActivate: [AuthGuard] },
   { path: 'budgets', component: BudgetsComponent, canActivate: [AuthGuard] },

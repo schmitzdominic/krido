@@ -22,6 +22,6 @@ export class RegularlyComponent {
    */
   setInitialValues(): void {
     this.menuTitleService.setTitle('Regelmäßig');
-    this.menuTitleService.setActiveId(2);
+    this.menuTitleService.setActiveId(4);
   }
 }
