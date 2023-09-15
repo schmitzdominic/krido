@@ -10,4 +10,5 @@ export interface Account {
   value?: number;
   creditDay?: number;
   creditLastDay?: boolean;
+  referenceAccount?: Account;
 }

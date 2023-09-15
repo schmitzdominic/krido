@@ -24,6 +24,8 @@ export class AddOrEditAccountContentComponent {
   submitButtonText: string = 'Erstellen';
 
   accountTypes: AccountType[] = [AccountType.giro, AccountType.creditCard];
+  referenceAccount: Account | undefined;
+  referenceAccounts: Account[] = [];
   owners: User[] = [];
   selectedOwners: User[] = [];
 
@@ -37,7 +39,8 @@ export class AddOrEditAccountContentComponent {
     type: new FormControl(''),
     owners: new FormControl(''),
     creditDay: new FormControl(''),
-    creditLastDay: new FormControl('')
+    creditLastDay: new FormControl(''),
+    referenceAccount: new FormControl('')
   });
 
   constructor(private formBuilder: FormBuilder,
@@ -49,6 +52,7 @@ export class AddOrEditAccountContentComponent {
   ngOnInit() {
     this.createFormGroup();
     this.loadOwners();
+    this.loadReferenceAccounts();
     this.createListeners();
     this.fillFormIfAccountIsAvailable();
   }
@@ -61,6 +65,17 @@ export class AddOrEditAccountContentComponent {
         this.removeAlreadySelectedOwners(this.selectedOwners, this.owners);
       }
       if (this.owners.length > 0) this.selectedOwner = this.owners[0];
+    });
+  }
+
+  loadReferenceAccounts() {
+    this.accountService.getAllAccountsFilteredByAccountType(AccountType.giro).subscribe(accounts => {
+      this.referenceAccounts.length = 0;
+      accounts.forEach(accountRaw => {
+        const account: Account = accountRaw.payload.val() as Account;
+        account.key = accountRaw.key ? accountRaw.key : '';
+        this.referenceAccounts.push(account);
+      });
     });
   }
 
@@ -85,7 +100,8 @@ export class AddOrEditAccountContentComponent {
         type: [this.account ? this.account.accountType : ''],
         owners: [''],
         creditDay: [this.account ? this.account.creditDay: 1],
-        creditLastDay: [this.account ? this.account.creditLastDay: false]
+        creditLastDay: [this.account ? this.account.creditLastDay: false],
+        referenceAccount: [this.account && this.account.accountType === AccountType.creditCard ? this.account.referenceAccount!.key : '']
       }
     );
   }
@@ -118,6 +134,11 @@ export class AddOrEditAccountContentComponent {
   }
 
   onSubmit() {
+
+    // To pretend cycle dependency, the reference Account inside the reference acount will be deleted
+    const referenceAccount: Account | undefined = this.selectedReferenceAccount;
+    if (referenceAccount) { delete referenceAccount['referenceAccount']; }
+
     const account: Account = {
       name: this.selectedName,
       searchName: this.helperService.createSearchName(this.selectedName),
@@ -125,7 +146,8 @@ export class AddOrEditAccountContentComponent {
       owners: this.selectedOwners,
       value: 0,
       creditDay: this.isLastDay ? 1 : this.creditDay,
-      creditLastDay: this.isLastDay
+      creditLastDay: this.isLastDay,
+      referenceAccount: referenceAccount
     }
     if (this.account) {
       // on Edit
@@ -146,6 +168,10 @@ export class AddOrEditAccountContentComponent {
 
   private set selectedOwner(user: User) {
     this.addOrEditAccountFormGroup.controls['owners'].setValue(user.uid);
+  }
+
+  public get selectedReferenceAccount(): Account | undefined {
+    return this.referenceAccounts.find(account => account.key == this.addOrEditAccountFormGroup.value.referenceAccount);
   }
 
   private get selectedName(): string {

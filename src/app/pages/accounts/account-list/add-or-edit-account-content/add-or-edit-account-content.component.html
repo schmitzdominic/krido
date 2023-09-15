@@ -20,6 +20,14 @@
         </select>
       </div>
     </div>
+    <div class="row" *ngIf="selectedType === AccountType.creditCard">
+      <label for="add-account-credit-card-reference-account" class="form-label">Referenzkonto</label>
+      <div class="col-12 mb-3">
+        <select class="form-select" id="add-account-credit-card-reference-account" aria-label="Select Owner" formControlName="referenceAccount">
+          <option *ngFor="let referenceAccount of referenceAccounts" value="{{ referenceAccount.key }}">{{ referenceAccount.name }}</option>
+        </select>
+      </div>
+    </div>
     <div class="col-md-12 mb-3" *ngIf="selectedType === AccountType.creditCard && !isLastDay">
       <label for="add-account-credit-card-day-number" class="form-label">Tag der Abrechnung</label>
       <div class="input-group has-validation">
@@ -70,7 +78,7 @@
   <button
     type="button"
     class="btn btn-light"
-    [disabled]="addOrEditAccountFormGroup.invalid || selectedOwners.length == 0 || isMonthDayInvalid"
+    [disabled]="addOrEditAccountFormGroup.invalid || selectedOwners.length == 0 || isMonthDayInvalid || (selectedType === AccountType.creditCard && !selectedReferenceAccount)"
     (click)="onSubmit()">{{ submitButtonText }}</button>
 </div>
 

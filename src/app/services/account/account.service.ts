@@ -30,6 +30,10 @@ export class AccountService {
     return this.dbService.readList(`${this.rootPath}`);
   }
 
+  getAllAccountsFilteredByAccountType(accountType: AccountType) {
+    return this.dbService.readFilteredList(`${this.rootPath}`, ref => ref.orderByChild('accountType').equalTo(accountType));
+  }
+
   updateAccount(account: Account, key: string) {
     return this.dbService.updateListValue(`${this.rootPath}`, key, account);
   }
