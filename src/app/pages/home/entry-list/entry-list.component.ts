@@ -49,7 +49,7 @@ export class EntryListComponent {
   }
 
   loadEntries() {
-    this.loadingService.setLoading = true;
+    // this.loadingService.setLoading = true;
     this.loadedLists = 0;
     this.loadActualMonthEntries();
     this.loadNextMonthEntries();
