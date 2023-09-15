@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import {MenuTitleService} from "../../../shared/behavior/menu-title/menu-title.service";
+import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
 
 @Component({
   selector: 'app-expenditures',
@@ -8,11 +9,40 @@ import {MenuTitleService} from "../../../shared/behavior/menu-title/menu-title.s
 })
 export class HistoryComponent {
 
-  constructor(private menuTitleService: MenuTitleService) {
+  searchValue: string = '';
+  isLastMonth: boolean = false;
+
+  searchFormGroup: FormGroup = new FormGroup({
+    search: new FormControl('')
+  });
+
+  constructor(private menuTitleService: MenuTitleService,
+              private formBuilder: FormBuilder) {
   }
 
   ngOnInit(): void {
     this.setInitialValues();
+    this.createFormGroup();
+    this.createListeners();
+  }
+
+  createFormGroup(): void {
+    this.searchFormGroup = this.formBuilder.group(
+      {
+        search: ['']
+      }
+    );
+  }
+
+  createListeners() {
+    this.searchFormGroup.controls['search'].valueChanges.subscribe(searchValue => {
+      if (searchValue.length > 3) { this.isLastMonth = false }
+      this.searchValue = searchValue;
+    });
+  }
+
+  onClickLastMonth() {
+    this.isLastMonth = !this.isLastMonth;
   }
 
   /**

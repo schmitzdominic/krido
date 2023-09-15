@@ -1,1 +1,19 @@
-<p>expenditures works!</p>
+<form class="needs-validation" [formGroup]="searchFormGroup" novalidate>
+  <div class="col-md-12 mb-3">
+    <div class="input-group has-validation">
+      <input formControlName="search" type="text" placeholder="Suche" class="form-control" id="invoice-input-search" aria-describedby="inputGroupPrepend" required>
+      <span class="input-group-text" id="inputGroupPrepend"><i class="bi bi-search"></i></span>
+      <div class="invalid-feedback">
+      </div>
+    </div>
+  </div>
+</form>
+<div class="row" *ngIf="!isLastMonth">
+  <div class="col-2">
+    <span class="badge bg-light-subtle" style="font-size: 16px" (click)="onClickLastMonth()">Letzter Monat</span>
+  </div>
+</div>
+<app-history-list
+  [searchValue]="searchValue"
+  [isLastMonth]="isLastMonth">
+</app-history-list>
