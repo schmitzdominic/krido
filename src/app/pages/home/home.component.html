@@ -6,6 +6,11 @@
   </app-view-budget-content>
 </ng-template>
 <div class="container">
+  <div class="row">
+    <!-- Info area -->
+    <app-info-area>
+    </app-info-area>
+  </div>
   <div class="row" *ngIf="allTimeBudgets.length > 0 || monthlyBudgets.length > 0">
     <!-- No Time Limit -->
     <h1>Budgets</h1>

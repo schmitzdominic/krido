@@ -48,6 +48,9 @@ import { RegularlyListEntryComponent } from './components/regularly-list-entry/r
 import { AddOrEditRegularlyComponent } from './pages/regularly/add-or-edit-regularly/add-or-edit-regularly.component';
 import { InvoiceComponent } from './pages/invoice/invoice.component';
 import { HistoryListComponent } from './pages/history/history-list/history-list.component';
+import { InfoAreaComponent } from './pages/home/info-area/info-area.component';
+import { InfoListEntryComponent } from './components/info-list-entry/info-list-entry.component';
+import { UpdateAccountValueComponent } from './pages/home/info-area/update-account-value/update-account-value.component';
 
 @NgModule({
   declarations: [
@@ -83,6 +86,9 @@ import { HistoryListComponent } from './pages/history/history-list/history-list.
     AddOrEditRegularlyComponent,
     InvoiceComponent,
     HistoryListComponent,
+    InfoAreaComponent,
+    InfoListEntryComponent,
+    UpdateAccountValueComponent,
   ],
     imports: [
         BrowserModule,

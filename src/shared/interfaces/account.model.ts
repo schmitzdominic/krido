@@ -11,4 +11,6 @@ export interface Account {
   creditDay?: number;
   creditLastDay?: boolean;
   referenceAccount?: Account;
+  updatedDate?: number;
+  valueLeft?: number;
 }

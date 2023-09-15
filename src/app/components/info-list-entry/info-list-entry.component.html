@@ -1,0 +1,42 @@
+<div class="container">
+  <div class="row">
+    <div class="col-1 list-icon">
+      <div class="position-absolute start-0 top-0 ps-3 pt-3">
+        <i class="bi bi-bank" *ngIf="account?.accountType === AccountType.giro"></i>
+      </div>
+      <div class="position-absolute start-0 top-0 ps-3 pt-3">
+        <i class="bi bi-credit-card-2-front" *ngIf="account?.accountType === AccountType.creditCard"></i>
+      </div>
+    </div>
+    <div class="col-11">
+      <div class="container">
+        <!-- upside -->
+        <div class="row upside">
+          <div class="col-9 name">
+            {{ account!.name }}
+          </div>
+          <div class="col-3">
+            <div class="position-absolute end-0" [ngClass]="{
+            'text-success' : account?.value! > 0,
+            'text-danger' : account?.value! < 0
+         }">
+              {{ getPrice(account!) }}
+            </div>
+          </div>
+        </div>
+        <!-- downside -->
+        <div class="row downside text-white-50" *ngIf="account?.updatedDate">
+          <div class="col-9 name">
+            Rest ab {{ getDate() }}
+          </div>
+          <div class="col-3">
+            <div class="position-absolute end-0">
+              {{ priceService.convertNumberToEuro(calculateOverallRest())}}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

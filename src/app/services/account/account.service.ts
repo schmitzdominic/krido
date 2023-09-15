@@ -37,4 +37,8 @@ export class AccountService {
   updateAccount(account: Account, key: string) {
     return this.dbService.updateListValue(`${this.rootPath}`, key, account);
   }
+
+  setValue(date: number, value: number, key: string) {
+    return this.dbService.update(`${this.rootPath}/${key}`,{updatedDate: date, value: value});
+  }
 }

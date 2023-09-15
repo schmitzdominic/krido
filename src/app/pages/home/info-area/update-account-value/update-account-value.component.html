@@ -1,0 +1,52 @@
+<div>
+  <h1 class="d-flex align-items-center justify-content-center pt-4">Kontostand anpassen</h1>
+</div>
+<div class="modal-body">
+  <form class="needs-validation" [formGroup]="updateAccountValueFormGroup" (ngSubmit)="onSubmit()" novalidate>
+    <div class="col-md-12 mb-3">
+      <label for="update-account-date" class="form-label">Datum</label>
+      <div class="input-group">
+        <input
+          id="update-account-date"
+          class="form-control"
+          placeholder="{{ selectedDateTimestamp | date: 'dd.MM.yyyy'}}"
+          name="date"
+          formControlName="date"
+          ngbDatepicker
+          [readOnly]="true"
+          value="{{ selectedDateTimestamp | date: 'dd.MM.yyyy'}}"
+          [showWeekNumbers]="true"
+          (dateSelect)="onDateSelected($event)"
+          #date="ngbDatepicker"
+        />
+        <button class="btn btn-outline-secondary bi bi-calendar3" (click)="date.toggle()" type="button"></button>
+      </div>
+    </div>
+    <div class="col-md-12 mb-3">
+      <label for="update-account-value" class="form-label">Betrag</label>
+      <div class="input-group has-validation">
+        <input
+          currencyMask
+          class="form-control"
+          id="update-account-value"
+          formControlName="value"
+          aria-describedby="inputGroupPrepend"
+          [options]="{ prefix: '', thousands: '', decimal: ',' }"
+          inputmode="numeric"
+          pattern="^\d+(\,\d{1,2})?$">
+        <span class="input-group-text" id="inputGroupPrepend">€</span>
+        <div class="invalid-feedback">
+          Betrag fehlt!
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-dark" (click)="onButtonCancel()">Abbrechen</button>
+  <button
+    type="button"
+    class="btn btn-light"
+    [disabled]="isValueInvalid"
+    (click)="onSubmit()">Anpassen</button>
+</div>

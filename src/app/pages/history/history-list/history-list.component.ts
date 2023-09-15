@@ -63,8 +63,16 @@ export class HistoryListComponent {
         this.entries.push(entry);
       });
       if (this.entries.length === 0) {
-        this.title = 'Nicht gefunden!'
+        this.title = 'Nichts gefunden!'
+      } else {
+        this.sortEntriesByDate(this.entries);
       }
+    });
+  }
+
+  private sortEntriesByDate(entries: Entry[]) {
+    entries.sort((one, two) => {
+      return one.date > two.date ? -1 : 1;
     });
   }
 
