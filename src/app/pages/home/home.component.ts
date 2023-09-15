@@ -48,7 +48,8 @@ export class HomeComponent {
    * Set initial values.
    */
   setInitialValues(): void {
-    this.menuTitleService.setTitle(this.actualMonth + ' ' + this.actualYear);
+    const actualDate: Date = this.dateService.getActualDate();
+    this.menuTitleService.setTitle(this.dateService.getDayShortName(actualDate.getDay()) + ' ' + actualDate.getDate() + '. ' + this.actualMonth + ' ' + this.actualYear);
     this.menuTitleService.setActiveId(1);
   }
 

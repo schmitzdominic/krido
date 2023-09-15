@@ -23,6 +23,16 @@
         [entry]="entry">
       </app-entry-list-entry>
     </li>
+    <div class="card" *ngIf="actualMonthEntries.length === 0">
+      <div class="m-2 mt-2">
+        <img src="assets/img/party.gif" class="card-img-top" alt="nothing left" style="border-radius: 6px;">
+      </div>
+      <div class="card-body">
+        <h1 class="card-title">Gratulation!</h1>
+        <p class="card-text">Diesen Monat gibt es weder Ausgaben noch Einnahmen. Möchtest du diesen Monat nochmal anschauen?</p>
+        <a (click)="onButtonShowAllClick()" class="btn btn-primary">Dieser Monat</a>
+      </div>
+    </div>
   </ul>
   <ul class="list-group list-group-flush" *ngIf="totalNextMonthEntries > 0">
     <h1>{{ nextMonthName }}</h1>

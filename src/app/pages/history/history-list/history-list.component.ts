@@ -62,6 +62,9 @@ export class HistoryListComponent {
         entry.key = result.key ? result.key : '';
         this.entries.push(entry);
       });
+      if (this.entries.length === 0) {
+        this.title = 'Nicht gefunden!'
+      }
     });
   }
 
