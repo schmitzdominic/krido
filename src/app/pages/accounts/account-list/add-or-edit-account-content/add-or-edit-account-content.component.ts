@@ -18,6 +18,8 @@ export class AddOrEditAccountContentComponent {
 
   @Output() onClose: EventEmitter<any> = new EventEmitter<any>();
 
+  protected readonly AccountType = AccountType;
+
   title: string = 'Konto erstellen';
   submitButtonText: string = 'Erstellen';
 
@@ -27,11 +29,15 @@ export class AddOrEditAccountContentComponent {
 
   isNameInvalid: boolean = true;
   isOwnerInvalid: boolean = true;
+  isMonthDayInvalid: boolean = false;
+  isLastDay: boolean = false;
 
   addOrEditAccountFormGroup: FormGroup = new FormGroup({
     name: new FormControl('', Validators.required),
     type: new FormControl(''),
-    owners: new FormControl('')
+    owners: new FormControl(''),
+    creditDay: new FormControl(''),
+    creditLastDay: new FormControl('')
   });
 
   constructor(private formBuilder: FormBuilder,
@@ -43,6 +49,7 @@ export class AddOrEditAccountContentComponent {
   ngOnInit() {
     this.createFormGroup();
     this.loadOwners();
+    this.createListeners();
     this.fillFormIfAccountIsAvailable();
   }
 
@@ -57,12 +64,28 @@ export class AddOrEditAccountContentComponent {
     });
   }
 
+  createListeners() {
+    this.addOrEditAccountFormGroup.controls['creditLastDay'].valueChanges.subscribe(lastDay => {
+      this.isLastDay = lastDay;
+      if (this.isLastDay) {
+        this.isMonthDayInvalid = false;
+      } else {
+        this.checkMonthDayValidity(this.creditDay);
+      }
+    });
+    this.addOrEditAccountFormGroup.controls['creditDay'].valueChanges.subscribe((monthDay: number) => {
+      this.checkMonthDayValidity(monthDay);
+    });
+  }
+
   createFormGroup() {
     this.addOrEditAccountFormGroup = this.formBuilder.group(
       {
         name: [this.account ? this.account.name : '', Validators.required],
         type: [this.account ? this.account.accountType : ''],
-        owners: ['']
+        owners: [''],
+        creditDay: [this.account ? this.account.creditDay: 1],
+        creditLastDay: [this.account ? this.account.creditLastDay: false]
       }
     );
   }
@@ -73,6 +96,7 @@ export class AddOrEditAccountContentComponent {
       this.submitButtonText = 'Ändern';
 
       this.selectedOwners = this.account.owners;
+      this.isLastDay = this.account.creditLastDay!;
     } else {
       this.selectedType = AccountType.giro;
     }
@@ -99,7 +123,9 @@ export class AddOrEditAccountContentComponent {
       searchName: this.helperService.createSearchName(this.selectedName),
       accountType: this.selectedType,
       owners: this.selectedOwners,
-      value: 0
+      value: 0,
+      creditDay: this.isLastDay ? 1 : this.creditDay,
+      creditLastDay: this.isLastDay
     }
     if (this.account) {
       // on Edit
@@ -126,12 +152,16 @@ export class AddOrEditAccountContentComponent {
     return this.addOrEditAccountFormGroup.value.name;
   }
 
-  private get selectedType(): AccountType {
+  public get selectedType(): AccountType {
     return this.addOrEditAccountFormGroup.value.type;
   }
 
   private get selectedOwnerOid(): string {
     return this.addOrEditAccountFormGroup.value.owners;
+  }
+
+  private get creditDay(): number {
+    return this.addOrEditAccountFormGroup.value.creditDay;
   }
 
   private removeUserFromList(user: User, list: User[]) {
@@ -146,5 +176,13 @@ export class AddOrEditAccountContentComponent {
       const foundOwner = owners.find(owner => owner.uid === selectedOwner.uid);
       if (foundOwner) this.removeUserFromList(selectedOwner, owners);
     });
+  }
+
+  private checkMonthDayValidity(monthDay: number) {
+    if (!this.isLastDay) {
+      this.isMonthDayInvalid = !(monthDay > 0 && monthDay <= 28);
+    } else {
+      this.isMonthDayInvalid = false;
+    }
   }
 }

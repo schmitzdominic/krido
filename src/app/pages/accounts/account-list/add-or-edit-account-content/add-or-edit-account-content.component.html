@@ -20,6 +20,30 @@
         </select>
       </div>
     </div>
+    <div class="col-md-12 mb-3" *ngIf="selectedType === AccountType.creditCard && !isLastDay">
+      <label for="add-account-credit-card-day-number" class="form-label">Tag der Abrechnung</label>
+      <div class="input-group has-validation">
+        <input
+          currencyMask
+          class="form-control"
+          id="add-account-credit-card-day-number"
+          formControlName="creditDay"
+          aria-describedby="inputGroupPrepend"
+          [max]="28"
+          maxlength="2"
+          [options]="{ prefix: '', allowNegative: false, precision: 0 }"
+          inputmode="numeric"
+          pattern="">
+      </div>
+    </div>
+    <div class="col-12 mb-3" *ngIf="selectedType === AccountType.creditCard">
+      <div class="form-check">
+        <input formControlName="creditLastDay" class="form-check-input" type="checkbox" value="" id="add-account-credit-card-last-day">
+        <label class="form-check-label ps-1" for="add-account-credit-card-last-day">
+          Letzter Tag im Monat
+        </label>
+      </div>
+    </div>
     <div class="row" *ngIf="owners.length > 0">
       <label for="add-account-owner" class="form-label">Besitzer</label>
       <div class="col-10 mb-3">
@@ -46,7 +70,7 @@
   <button
     type="button"
     class="btn btn-light"
-    [disabled]="addOrEditAccountFormGroup.invalid || selectedOwners.length == 0"
+    [disabled]="addOrEditAccountFormGroup.invalid || selectedOwners.length == 0 || isMonthDayInvalid"
     (click)="onSubmit()">{{ submitButtonText }}</button>
 </div>
 
