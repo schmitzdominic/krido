@@ -26,8 +26,8 @@
       <li class="list-group-item" id="credit-day" *ngIf="account?.accountType === AccountType.creditCard">
         <i class="bi bi-arrow-right" *ngIf="!account?.creditLastDay"></i>
         <i class="bi bi-box-arrow-in-right" *ngIf="account?.creditLastDay"></i>
-        <span class="name ps-2" *ngIf="!account?.creditLastDay">Abrechnung am {{ account?.creditDay }}.</span>
-        <span class="name ps-2" *ngIf="account?.creditLastDay">Abrechnung am letzten Tag im Monat</span>
+        <span class="name ps-2" *ngIf="!account?.creditLastDay">Abbuchung am {{ account?.creditDay }}.</span>
+        <span class="name ps-2" *ngIf="account?.creditLastDay">Abbuchung am letzten Tag im Monat</span>
       </li>
     </ul>
     <p>Eigentümer</p>

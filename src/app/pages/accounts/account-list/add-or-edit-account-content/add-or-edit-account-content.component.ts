@@ -149,6 +149,9 @@ export class AddOrEditAccountContentComponent {
       creditLastDay: this.isLastDay,
       referenceAccount: referenceAccount
     }
+
+    if (this.selectedType === AccountType.giro) { delete account['referenceAccount']; }
+
     if (this.account) {
       // on Edit
       this.accountService.updateAccount(account, this.account.key!).then(() => this.onClose.emit());

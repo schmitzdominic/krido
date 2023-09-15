@@ -11,6 +11,11 @@ import {Entry} from "../../../shared/interfaces/entry.model";
 import {EntryService} from "../entry/entry.service";
 import {ToastService} from "../toast/toast.service";
 import {UserService} from "../user/user.service";
+import {AccountService} from "../account/account.service";
+import {AccountType} from "../../../shared/enums/account-type.enum";
+import {Account} from "../../../shared/interfaces/account.model";
+import {EntryType} from "../../../shared/enums/entry-type.enum";
+import {Subscription} from "rxjs";
 
 @Injectable({
   providedIn: 'root'
@@ -20,13 +25,20 @@ export class PredictService {
   private lastMonthString: string = '';
   private nextMonthString: string = '';
 
+  budgetSubscription: Subscription | undefined;
+  cycleSubscription: Subscription | undefined;
+  regularlyMonthSubscription: Subscription | undefined;
+  regularlyYearSubscription: Subscription | undefined;
+  accountsSubscription: Subscription | undefined;
+
   constructor(private budgetService: BudgetService,
               private userService: UserService,
               private homeService: HomeService,
               private dateService: DateService,
               private regularlyService: RegularlyService,
               private entryService: EntryService,
-              private toastService: ToastService) { }
+              private toastService: ToastService,
+              private accountService: AccountService) { }
 
   public createEntries() {
     if (this.userService.home) {
@@ -42,6 +54,7 @@ export class PredictService {
 
               this.createBudgets();
               this.createRegularEntries();
+              this.createCreditCardEntries();
 
               this.toastService.showSuccess('Nächster Monat wurde angelegt', 3000);
             });
@@ -54,7 +67,7 @@ export class PredictService {
   }
 
   private createBudgets() {
-    this.budgetService.getAllMonthBudgetsByMonthString(this.lastMonthString).subscribe(budgets => {
+    this.budgetSubscription = this.budgetService.getAllMonthBudgetsByMonthString(this.lastMonthString).subscribe(budgets => {
       budgets.forEach(budgetRaw => {
         const budget: Budget = budgetRaw.payload.val() as Budget;
         budget.key = budgetRaw.key ? budgetRaw.key : '';
@@ -62,17 +75,23 @@ export class PredictService {
           this.updateBudget(budget);
         }
       });
+      if (this.budgetSubscription) {
+        this.budgetSubscription.unsubscribe();
+      }
     });
   }
 
   private updateBudget(budget: Budget) {
     this.setBudgetValues(budget);
     budget.isArchived = true;
-    this.budgetService.getCycle(budget.cycleKey!).subscribe(cycleRaw => {
+    this.cycleSubscription = this.budgetService.getCycle(budget.cycleKey!).subscribe(cycleRaw => {
       const cycle: Cycle = cycleRaw.payload.val() as Cycle;
       this.budgetService.updateMonthBudget(budget, budget.key!).then(() => {
         this.createNewBudgetFromOldBudget(budget, cycle.isTransfer);
       });
+      if (this.cycleSubscription) {
+        this.cycleSubscription.unsubscribe();
+      }
     });
   }
 
@@ -99,23 +118,29 @@ export class PredictService {
   private createRegularEntries() {
 
     // Month
-    this.regularlyService.getAllByCycleType(RegularlyCycleType.month).subscribe(regularities => {
+    this.regularlyMonthSubscription = this.regularlyService.getAllByCycleType(RegularlyCycleType.month).subscribe(regularities => {
       regularities.forEach(regularlyRaw => {
         const regularly: Regularly = regularlyRaw.payload.val() as Regularly;
         regularly.key = regularlyRaw.key ? regularlyRaw.key : '';
         this.checkRegularMonth(regularly);
       });
+      if (this.regularlyMonthSubscription) {
+        this.regularlyMonthSubscription.unsubscribe();
+      }
     });
 
     // TODO: Quarter
 
     // Year
-    this.regularlyService.getAllByCycleType(RegularlyCycleType.year).subscribe(regularities => {
+    this.regularlyYearSubscription = this.regularlyService.getAllByCycleType(RegularlyCycleType.year).subscribe(regularities => {
       regularities.forEach(regularlyRaw => {
         const regularly: Regularly = regularlyRaw.payload.val() as Regularly;
         regularly.key = regularlyRaw.key ? regularlyRaw.key : '';
         this.checkRegularYear(regularly);
       });
+      if (this.regularlyYearSubscription) {
+        this.regularlyYearSubscription.unsubscribe();
+      }
     });
   }
 
@@ -124,10 +149,10 @@ export class PredictService {
     // Calculate Time for monthly regular entry
     const year: number = this.dateService.getYear(this.nextMonthString);
     const month: number = this.dateService.getNextMonthNumber();
-    const day: number = regularly.isEndOfMonth ? this.dateService.setDateToLastDayOfMonth(new Date()) : regularly.monthDay;
+    const day: number = regularly.isEndOfMonth ? this.dateService.setDateToLastDayOfMonth(new Date(year, month)) : regularly.monthDay;
 
     const date: Date = new Date(year, month, day);
-    const entry: Entry = this.createEntryObject(regularly, this.dateService.getAvailableWeekdayAsTimestampFromTimestamp(date.getTime()), this.nextMonthString);
+    const entry: Entry = this.createEntryObjectFromRegularly(regularly, this.dateService.getAvailableWeekdayAsTimestampFromTimestamp(date.getTime()), this.nextMonthString);
 
     this.entryService.addEntry(entry);
   }
@@ -136,13 +161,13 @@ export class PredictService {
     if (regularly.date) {
       const dateFromTimestamp: Date = this.dateService.getDateFromTimestamp(regularly.date);
       if (this.dateService.getNextMonthNumber() == dateFromTimestamp.getMonth()) {
-        const entry: Entry = this.createEntryObject(regularly, this.dateService.getAvailableWeekdayAsTimestampFromTimestamp(regularly.date), this.nextMonthString);
+        const entry: Entry = this.createEntryObjectFromRegularly(regularly, this.dateService.getAvailableWeekdayAsTimestampFromTimestamp(regularly.date), this.nextMonthString);
         this.entryService.addEntry(entry);
       }
     }
   }
 
-  private createEntryObject(regularly: Regularly, date: number, monthString: string): Entry {
+  private createEntryObjectFromRegularly(regularly: Regularly, date: number, monthString: string): Entry {
     return {
       name: regularly.name,
       searchName: regularly.searchName,
@@ -152,5 +177,47 @@ export class PredictService {
       date: date,
       monthString: monthString
     }
+  }
+
+  private createEntryObjectFromAccount(account: Account, date: number, monthString: string): Entry {
+    const value: number = account.value ? account.value : 0;
+    const referenceAccount: Account = account.referenceAccount ? account.referenceAccount : this.accountService.noAccountValue;
+    return {
+      name: account.name,
+      searchName: account.searchName,
+      type: value > 0 ? EntryType.outcome : EntryType.income,
+      value: value,
+      account: referenceAccount,
+      date: date,
+      monthString: monthString
+    }
+  }
+
+  private createCreditCardEntries() {
+    this.accountsSubscription = this.accountService.getAllAccountsFilteredByAccountType(AccountType.creditCard).subscribe(accounts => {
+      accounts.forEach(accountRaw => {
+        const account: Account = accountRaw.payload.val() as Account;
+        account.key = accountRaw.key ? accountRaw.key : '';
+        this.checkAccountAndCreateEntry(account);
+      });
+      if (this.accountsSubscription) {
+        this.accountsSubscription.unsubscribe();
+      }
+    });
+  }
+
+  private checkAccountAndCreateEntry(account: Account) {
+    // Calculate Time for monthly regular entry
+    const year: number = this.dateService.getYear(this.nextMonthString);
+    const month: number = this.dateService.getNextMonthNumber();
+    const day: number = account.creditLastDay ? this.dateService.setDateToLastDayOfMonth(new Date(year, month)) : account.creditDay!;
+
+    const date: Date = new Date(year, month, day);
+    const entry: Entry = this.createEntryObjectFromAccount(account, this.dateService.getAvailableWeekdayAsTimestampFromTimestamp(date.getTime()), this.nextMonthString);
+    this.entryService.addEntry(entry);
+  }
+
+  ngOnDestroy() {
+    console.log('Service destroy')
   }
 }
