@@ -34,7 +34,7 @@ export class InfoListEntryComponent {
   }
 
   getPrice(account: Account) {
-    return `${account.value! < 0 ? '-' : ''} ${this.priceService.convertNumberToEuro(account.value)}`
+    return `${account.value! < 0 ? '-' : ''} ${this.priceService.convertNumberToEuro(Math.abs(account.value!))}`
   }
 
   getDate() {

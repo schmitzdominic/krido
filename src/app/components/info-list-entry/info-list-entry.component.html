@@ -16,11 +16,10 @@
             {{ account!.name }}
           </div>
           <div class="col-3">
-            <div class="position-absolute end-0" [ngClass]="{
+            <div class="position-absolute end-0 top-0 pt-2" [ngClass]="{
             'text-success' : account?.value! > 0,
             'text-danger' : account?.value! < 0
-         }">
-              {{ getPrice(account!) }}
+         }">{{ getPrice(account!) }}
             </div>
           </div>
         </div>
@@ -30,7 +29,7 @@
             Rest ab {{ getDate() }}
           </div>
           <div class="col-3">
-            <div class="position-absolute end-0">
+            <div class="position-absolute end-0 top-0 pt-4">
               {{ priceService.convertNumberToEuro(calculateOverallRest())}}
             </div>
           </div>

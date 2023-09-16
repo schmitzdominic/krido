@@ -1,11 +1,11 @@
 <div class="container">
   <div class="row">
     <div class="col-1 list-icon">
-      <div class="position-absolute start-0 top-0 ps-3 pt-3">
-        <i class="bi bi-bank" *ngIf="entry!.account.accountType === AccountType.giro"></i>
+      <div class="position-absolute start-0 top-0 ps-3 pt-3" *ngIf="entry!.account.accountType === AccountType.giro">
+        <i class="bi bi-bank"></i>
       </div>
-      <div class="position-absolute start-0 top-0 ps-3 pt-3">
-        <i class="bi bi-credit-card-2-front" *ngIf="entry!.account.accountType === AccountType.creditCard"></i>
+      <div class="position-absolute start-0 top-0 ps-3 pt-3" *ngIf="entry!.account.accountType === AccountType.creditCard">
+        <i class="bi bi-credit-card-2-front"></i>
       </div>
     </div>
     <div class="col-11">
@@ -16,7 +16,7 @@
             {{ entry!.name }}
           </div>
           <div class="col-3">
-            <div class="position-absolute end-0" [ngClass]="{
+            <div class="position-absolute end-0 top-0 pt-2" [ngClass]="{
             'text-success' : entry!.type === EntryType.income,
             'text-danger' : entry!.type === EntryType.outcome
          }">
@@ -30,7 +30,7 @@
             {{ entry!.account.name }}
           </div>
           <div class="col-3">
-            <div class="position-absolute end-0">
+            <div class="position-absolute end-0 top-0 pt-4">
               {{ getDateFromTimestamp(entry!.date) }}
             </div>
           </div>
