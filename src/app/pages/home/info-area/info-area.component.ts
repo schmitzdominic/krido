@@ -4,6 +4,7 @@ import {AccountType} from "../../../../shared/enums/account-type.enum";
 import {Account} from "../../../../shared/interfaces/account.model";
 import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap/modal/modal-ref";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
+import {UserService} from "../../../services/user/user.service";
 
 @Component({
   selector: 'app-info-area',
@@ -21,18 +22,23 @@ export class InfoAreaComponent {
   accounts: Account[] = [];
 
   constructor(private accountService: AccountService,
-              private ngbModal: NgbModal) {
+              private ngbModal: NgbModal,
+              private userService: UserService) {
     this.loadGiroAccounts();
   }
 
   loadGiroAccounts() {
     this.accountService.getAllAccountsFilteredByAccountType(AccountType.giro).subscribe(accounts => {
       this.accounts.length = 0;
-      accounts.forEach(accountsRaw => {
-        const account: Account = accountsRaw.payload.val() as Account;
-        account.key = accountsRaw.key ? accountsRaw.key : '';
-        this.accounts.push(account);
-      });
+      if (this.userService.mainAccount) {
+        accounts.forEach(accountsRaw => {
+          const account: Account = accountsRaw.payload.val() as Account;
+          account.key = accountsRaw.key ? accountsRaw.key : '';
+          if (account.key === this.userService.mainAccount!.key) {
+            this.accounts.push(account);
+          }
+        });
+      }
     });
   }
 
