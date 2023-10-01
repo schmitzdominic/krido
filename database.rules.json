@@ -8,6 +8,9 @@
     },
     "homes": {
       "$home": {
+        "accounts": {
+          ".indexOn": ["accountType"]
+        },
         "budgets": {
           "month": {
             ".indexOn": "validityPeriod"

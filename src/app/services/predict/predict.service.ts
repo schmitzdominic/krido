@@ -75,9 +75,7 @@ export class PredictService {
           this.updateBudget(budget);
         }
       });
-      if (this.budgetSubscription) {
-        this.budgetSubscription.unsubscribe();
-      }
+      this.budgetSubscription?.unsubscribe();
     });
   }
 
@@ -87,11 +85,9 @@ export class PredictService {
     this.cycleSubscription = this.budgetService.getCycle(budget.cycleKey!).subscribe(cycleRaw => {
       const cycle: Cycle = cycleRaw.payload.val() as Cycle;
       this.budgetService.updateMonthBudget(budget, budget.key!).then(() => {
-        this.createNewBudgetFromOldBudget(budget, cycle.isTransfer);
+        this.createNewBudgetFromOldBudget(budget, cycle);
       });
-      if (this.cycleSubscription) {
-        this.cycleSubscription.unsubscribe();
-      }
+      this.cycleSubscription?.unsubscribe();
     });
   }
 
@@ -101,11 +97,11 @@ export class PredictService {
     budget.entries = budget.entries ? budget.entries : [];
   }
 
-  private createNewBudgetFromOldBudget(budget: Budget, isTransfer: boolean) {
+  private createNewBudgetFromOldBudget(budget: Budget, cycle: Cycle) {
     // If Rest Budget should be used
-    if (isTransfer) {
+    if (cycle.isTransfer) {
       const restBudget: number = budget.limit! - budget.usedLimit!
-      budget.limit = budget.limit! + restBudget;
+      budget.limit = cycle.limit! + restBudget;
     }
     delete budget['key'];
     budget.isArchived = false;
@@ -124,9 +120,7 @@ export class PredictService {
         regularly.key = regularlyRaw.key ? regularlyRaw.key : '';
         this.checkRegularMonth(regularly);
       });
-      if (this.regularlyMonthSubscription) {
-        this.regularlyMonthSubscription.unsubscribe();
-      }
+      this.regularlyMonthSubscription?.unsubscribe();
     });
 
     // TODO: Quarter
@@ -138,9 +132,7 @@ export class PredictService {
         regularly.key = regularlyRaw.key ? regularlyRaw.key : '';
         this.checkRegularYear(regularly);
       });
-      if (this.regularlyYearSubscription) {
-        this.regularlyYearSubscription.unsubscribe();
-      }
+      this.regularlyYearSubscription?.unsubscribe();
     });
   }
 
@@ -200,9 +192,7 @@ export class PredictService {
         account.key = accountRaw.key ? accountRaw.key : '';
         this.checkAccountAndCreateEntry(account);
       });
-      if (this.accountsSubscription) {
-        this.accountsSubscription.unsubscribe();
-      }
+      this.accountsSubscription?.unsubscribe();
     });
   }
 
@@ -215,9 +205,5 @@ export class PredictService {
     const date: Date = new Date(year, month, day);
     const entry: Entry = this.createEntryObjectFromAccount(account, this.dateService.getAvailableWeekdayAsTimestampFromTimestamp(date.getTime()), this.nextMonthString);
     this.entryService.addEntry(entry);
-  }
-
-  ngOnDestroy() {
-    console.log('Service destroy')
   }
 }

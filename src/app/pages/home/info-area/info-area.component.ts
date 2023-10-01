@@ -24,6 +24,9 @@ export class InfoAreaComponent {
   constructor(private accountService: AccountService,
               private ngbModal: NgbModal,
               private userService: UserService) {
+  }
+
+  ngOnInit() {
     this.loadGiroAccounts();
   }
 
