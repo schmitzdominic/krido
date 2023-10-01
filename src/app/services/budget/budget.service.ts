@@ -64,6 +64,10 @@ export class BudgetService {
     return this.dbService.readFilteredList(`${this.rootPath}/month`, ref => ref.orderByChild('validityPeriod').equalTo(monthString));
   }
 
+  getAllBudgetsByCycle(cycleKey: string) {
+    return this.dbService.readFilteredList(`${this.rootPath}/month`, ref => ref.orderByChild('cycleKey').equalTo(cycleKey));
+  }
+
   getAllCycles() {
     return this.dbService.readList(`${this.rootPath}/cycle`);
   }

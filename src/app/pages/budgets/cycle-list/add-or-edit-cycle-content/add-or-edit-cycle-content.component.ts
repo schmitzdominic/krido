@@ -33,6 +33,8 @@ export class AddOrEditCycleContentComponent {
 
   chosenCycleType: CycleType = CycleType.monthly;
 
+  budgets: Budget[] = [];
+
   addCycleFormGroup: FormGroup = new FormGroup({
     name: new FormControl(''),
     initialLimit: new FormControl(''),
@@ -49,6 +51,7 @@ export class AddOrEditCycleContentComponent {
   }
 
   ngOnInit() {
+    this.loadBudgets();
     this.createFormGroup();
     this.setValidators();
     this.fillFormIfCycle();
@@ -97,6 +100,19 @@ export class AddOrEditCycleContentComponent {
 
       // Set Generic Error Messages
       this.deleteSuccessMessage = `Cycle ${this.cycle.name} erfolgreich gelöscht`;
+    }
+  }
+
+  loadBudgets(): void {
+    if (this.cycle) {
+      this.budgetService.getAllBudgetsByCycle(this.cycle.key!).subscribe(budgets => {
+        this.budgets.length = 0;
+        budgets.forEach(budgetRaw => {
+          const budget: Budget = budgetRaw.payload.val() as Budget;
+          budget.key = budgetRaw.key ? budgetRaw.key : '';
+          this.budgets.push(budget);
+        });
+      });
     }
   }
 
