@@ -280,7 +280,7 @@ export class AddOrEditRegularlyComponent {
     this.dateService.setNextMonth(nextMonthDate);
     switch(this.selectedCycleType.value) {
       case RegularlyCycleType.month: {
-        const monthDay: number = this.addOrEditRegularlyFormGroup.value.monthDay;
+        const monthDay: number = this.monthDay;
         if (actualDate.getDate() <= monthDay) {
           // This month
           this.createEntry(this.dateForEntry);
@@ -334,6 +334,7 @@ export class AddOrEditRegularlyComponent {
         date.setHours(0);
         if (this.isLastDay) {
           date.setDate(0);
+          date.setMonth(new Date().getMonth());
         } else {
           date.setDate(this.addOrEditRegularlyFormGroup.value.monthDay);
         }
