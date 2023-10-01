@@ -177,7 +177,7 @@ export class PredictService {
     return {
       name: account.name,
       searchName: account.searchName,
-      type: value > 0 ? EntryType.outcome : EntryType.income,
+      type: value < 0 ? EntryType.outcome : EntryType.income,
       value: value,
       account: referenceAccount,
       date: date,
