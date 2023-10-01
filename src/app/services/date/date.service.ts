@@ -48,7 +48,7 @@ export class DateService {
    * @returns {number} last day
    */
   setDateToLastDayOfMonth(date: Date): number {
-    date.setDate(0)
+    date = new Date(date.getFullYear(), date.getMonth()+1, 0);
     return date.getDate();
   }
 
