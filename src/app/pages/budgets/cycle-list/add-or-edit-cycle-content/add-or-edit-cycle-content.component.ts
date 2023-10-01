@@ -177,11 +177,9 @@ export class AddOrEditCycleContentComponent {
           name: name,
           validityPeriod: this.dateService.getActualMonthString(),
           isArchived: false,
+          limit: this.isInitialLimit ? Number(this.addCycleFormGroup.value.limit) : 0,
           cycleKey: cycleKey
         };
-        if (this.addCycleFormGroup.value.initialLimit) {
-          budget.limit = Number(this.addCycleFormGroup.value.limit);
-        }
         return this.budgetService.addMonthBudget(budget);
       }
       default: {
@@ -193,6 +191,10 @@ export class AddOrEditCycleContentComponent {
 
   onCancel() {
     this.onClose.emit();
+  }
+
+  get isInitialLimit() {
+    return this.addCycleFormGroup.value.initialLimit;
   }
 
   protected readonly CycleType = CycleType;
