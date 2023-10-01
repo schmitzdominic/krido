@@ -68,4 +68,5 @@ export class BudgetListEntryComponent {
     }
   }
 
+  protected readonly Math = Math;
 }
