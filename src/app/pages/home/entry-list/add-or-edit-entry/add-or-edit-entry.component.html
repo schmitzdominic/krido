@@ -49,6 +49,7 @@
           formControlName="date"
           ngbDatepicker
           [showWeekNumbers]="true"
+          [startDate]="selectedDate"
           (dateSelect)="onDateSelected($event)"
           #date="ngbDatepicker"
         />
