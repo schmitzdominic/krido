@@ -78,7 +78,7 @@ export class InfoListEntryComponent {
 
   updateValueLeftByBudget(budget: Budget) {
     const restBudget: number = budget.limit! - budget.usedLimit!;
-    if (restBudget > 0) {
+    if (budget.limit! < 0 || restBudget > 0) {
       this.overallValueLeftBudgets += restBudget;
     }
   }

@@ -167,7 +167,9 @@ export class AddOrEditEntryComponent {
   private addBudgetToBudgets(budgetRaw: SnapshotAction<any>) {
     const budget: Budget = budgetRaw.payload.val() as Budget;
     budget.key = budgetRaw.key ? budgetRaw.key : '';
-    this.budgets.push(budget);
+    if (budget.limit! > 0) {
+      this.budgets.push(budget);
+    }
   }
 
   onDateSelected(ngbDate: NgbDate) {

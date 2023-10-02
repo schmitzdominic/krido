@@ -1,8 +1,11 @@
 <div style="height: 2em">
   <span class="name position-absolute start-0 top-0 pt-3 ps-3"> {{budget?.name}} </span>
-  <span class="limit position-absolute top-0 end-0 pt-3 pe-3">{{ budget?.limit ? priceService.convertNumberToEuro(budget?.limit!) : 'Bitte Limit setzen' }}</span>
+  <span class="limit position-absolute top-0 end-0 pt-3 pe-3" [ngClass]="{
+            'text-danger' : budget?.limit! < 0
+         }">{{ budget?.limit ? priceService.convertNumberToEuro(budget?.limit!) : 'Bitte Limit setzen' }}</span>
 </div>
 <ngb-progressbar
+  *ngIf="budget?.limit! >= 0"
   [value]="usedLimit"
   [max]="budget?.limit!"
   type="{{progressBarService.getProgressBarType(usedLimit, budget?.limit!)}}"

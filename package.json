@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "ng serve --ssl",
     "build": "ng build",
     "build:production": "ng build --production --aot --build-optimizer --common-chunk --vendor-chunk --optimization --progress --configuration=production --localize",
     "watch": "ng build --watch --configuration development",
