@@ -18,9 +18,13 @@ export class DbService {
     return home ? home : '';
   }
 
-  create(path: string, object: any): Promise<void> {
+  async create(path: string, object: any): Promise<void> {
     this.loadingService.setLoading = true;
-    return this.db.object(path).set(object).finally(() => {this.loadingService.setLoading = false;});
+    try {
+      return await this.db.object(path).set(object);
+    } finally {
+      this.loadingService.setLoading = false;
+    }
   }
 
   read(path: string) {
@@ -35,41 +39,69 @@ export class DbService {
     return this.db.list(path, queryFn).snapshotChanges();
   }
 
-  update(path: string, object: any, loading: boolean = true): Promise<void> {
+  async update(path: string, object: any, loading: boolean = true): Promise<void> {
     this.loadingService.setLoading = loading;
-    return this.db.object(path).update(object).finally(() => {this.loadingService.setLoading = false;});
+    try {
+      return await this.db.object(path).update(object);
+    } finally {
+      this.loadingService.setLoading = false;
+    }
   }
 
-  updateNoLoading(path: string, object: any) {
-    return this.db.object(path).update(object).finally(() => {this.loadingService.setLoading = false;});
+  async updateNoLoading(path: string, object: any) {
+    try {
+      return await this.db.object(path).update(object);
+    } finally {
+      this.loadingService.setLoading = false;
+    }
   }
 
-  delete(path: string): Promise<void> {
+  async delete(path: string): Promise<void> {
     this.loadingService.setLoading = true;
-    return this.db.object(path).remove().finally(() => {this.loadingService.setLoading = false;});
+    try {
+      return await this.db.object(path).remove();
+    } finally {
+      this.loadingService.setLoading = false;
+    }
   }
 
-  updateList(path: string, key: string, object: any) {
+  async updateList(path: string, key: string, object: any) {
     this.loadingService.setLoading = true;
-    return this.db.list(path).set(key, object).finally(() => {this.loadingService.setLoading = false;});
+    try {
+      return await this.db.list(path).set(key, object);
+    } finally {
+      this.loadingService.setLoading = false;
+    }
   }
 
-  deleteList(path: string) {
+  async deleteList(path: string) {
     this.loadingService.setLoading = true;
-    return this.db.list(path).remove().finally(() => {this.loadingService.setLoading = false;});
+    try {
+      return await this.db.list(path).remove();
+    } finally {
+      this.loadingService.setLoading = false;
+    }
   }
 
   createListValue(path: string, object: any) {
     return this.db.list(path).push(object);
   }
 
-  updateListValue(path: string, key: string, object: any, loading: boolean = true) {
+  async updateListValue(path: string, key: string, object: any, loading: boolean = true) {
     this.loadingService.setLoading = loading;
-    return this.db.list(path).update(key, object).finally(() => {this.loadingService.setLoading = false;});
+    try {
+      return await this.db.list(path).update(key, object);
+    } finally {
+      this.loadingService.setLoading = false;
+    }
   }
 
-  deleteListValue(path: string, key: string) {
+  async deleteListValue(path: string, key: string) {
     this.loadingService.setLoading = true;
-    return this.db.list(path).remove(key).finally(() => {this.loadingService.setLoading = false;});
+    try {
+      return await this.db.list(path).remove(key);
+    } finally {
+      this.loadingService.setLoading = false;
+    }
   }
 }
