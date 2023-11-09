@@ -46,6 +46,10 @@ export class UserService {
     return this.dbService.readList('users');
   }
 
+  getAllUsersFromActualHome() {
+    return this.dbService.readFilteredList(`users`, ref => ref.orderByChild('home').startAt(this.dbService.home));
+  }
+
   get getHomePin() {
     return this.dbService.read(`homes/${this.dbService.home}/pin`);
   }

@@ -5,6 +5,13 @@ import {Entry} from "../../../../shared/interfaces/entry.model";
 import {DateService} from "../../../services/date/date.service";
 import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap/modal/modal-ref";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
+import {Account} from "../../../../shared/interfaces/account.model";
+
+export interface HistorySearchObject {
+  searchValue: string,
+  account: Account | undefined,
+  isLastMonth: boolean
+}
 
 @Component({
   selector: 'app-history-list',
@@ -13,8 +20,7 @@ import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 })
 export class HistoryListComponent {
 
-  @Input() searchValue: string = '';
-  @Input() isLastMonth: boolean = false;
+  @Input() historySearchObject: HistorySearchObject | undefined;
 
   @ViewChild('addOrEditEntryModal') addOrEditEntryModal: NgbModalRef | undefined;
 
@@ -37,23 +43,20 @@ export class HistoryListComponent {
 
   ngOnChanges(changes: SimpleChanges) {
 
-    const searchValue: string | undefined = changes['searchValue']?.currentValue;
-    const isLastMonth: boolean | undefined = changes['isLastMonth']?.currentValue;
+    this.historySearchObject = changes['historySearchObject']?.currentValue;
 
-    if (searchValue) {
-      if (searchValue.length > 3) {
-        this.search(searchValue);
+    if (this.historySearchObject!.searchValue.length > 3) {
+      this.search(this.historySearchObject!.searchValue, this.historySearchObject!.account);
+    } else {
+      if (this.historySearchObject!.isLastMonth) {
+        this.loadLastMonth(this.historySearchObject!.account);
       } else {
         this.entries.length = 0;
       }
     }
-
-    if (isLastMonth) {
-      this.loadLastMonth();
-    }
   }
 
-  search(value: string) {
+  search(value: string, account: Account | undefined = undefined) {
     this.title = 'Ergebnisse'
     this.entryService.searchEntriesByName(this.helperService.createSearchName(value)).subscribe(results => {
       this.entries.length = 0;
@@ -65,6 +68,9 @@ export class HistoryListComponent {
       if (this.entries.length === 0) {
         this.title = 'Nichts gefunden!'
       } else {
+        if (account) {
+          this.filterEntriesByAccount(account);
+        }
         this.sortEntriesByDate(this.entries);
       }
     });
@@ -76,7 +82,7 @@ export class HistoryListComponent {
     });
   }
 
-  loadLastMonth() {
+  loadLastMonth(account: Account | undefined = undefined) {
     const lastMonthString: string = this.dateService.getMonthStringFromMonth(-1);
     this.title = `${this.dateService.getMonthName(lastMonthString)} ${this.dateService.getYear(lastMonthString)}`;
     this.entryService.searchEntriesByMonthString(lastMonthString).subscribe(results => {
@@ -86,7 +92,14 @@ export class HistoryListComponent {
         entry.key = result.key ? result.key : '';
         this.entries.push(entry);
       });
+      if (account) {
+        this.filterEntriesByAccount(account);
+      }
     });
+  }
+
+  filterEntriesByAccount(account: Account) {
+    this.entries = this.entries.filter(entry => entry.account.key == account.key);
   }
 
   openAddOrEditEntryModal(): void {
