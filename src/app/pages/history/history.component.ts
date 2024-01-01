@@ -34,11 +34,6 @@ export class HistoryComponent {
     this.createFormGroup();
     this.createListeners();
     this.loadAccounts();
-
-    this.searchFormGroup.controls['accounts'].valueChanges.subscribe(value => {
-      const account: Account = this.accounts.filter(account => account.key === value)[0];
-      this.historySearchObject = this.getHistorySearchObject('', account, this.historySearchObject.isLastMonth);
-    });
   }
 
   createFormGroup(): void {
@@ -56,6 +51,10 @@ export class HistoryComponent {
         this.historySearchObject = this.getHistorySearchObject();
       }
       this.historySearchObject = this.getHistorySearchObject(searchValue, undefined, false);
+    });
+    this.searchFormGroup.controls['accounts'].valueChanges.subscribe(value => {
+      const account: Account = this.accounts.filter(account => account.key === value)[0];
+      this.historySearchObject = this.getHistorySearchObject('', account, this.historySearchObject.isLastMonth);
     });
   }
 
