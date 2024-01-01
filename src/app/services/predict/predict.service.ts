@@ -15,7 +15,6 @@ import {AccountService} from "../account/account.service";
 import {AccountType} from "../../../shared/enums/account-type.enum";
 import {Account} from "../../../shared/interfaces/account.model";
 import {EntryType} from "../../../shared/enums/entry-type.enum";
-import {Subscription} from "rxjs";
 
 @Injectable({
   providedIn: 'root'
@@ -24,12 +23,6 @@ export class PredictService {
 
   private lastMonthString: string = '';
   private nextMonthString: string = '';
-
-  budgetSubscription: Subscription | undefined;
-  cycleSubscription: Subscription | undefined;
-  regularlyMonthSubscription: Subscription | undefined;
-  regularlyYearSubscription: Subscription | undefined;
-  accountsSubscription: Subscription | undefined;
 
   constructor(private budgetService: BudgetService,
               private userService: UserService,
@@ -67,7 +60,7 @@ export class PredictService {
   }
 
   private createBudgets() {
-    this.budgetSubscription = this.budgetService.getAllMonthBudgetsByMonthString(this.lastMonthString).subscribe(budgets => {
+    this.budgetService.getAllMonthBudgetsByMonthString(this.lastMonthString).subscribe(budgets => {
       budgets.forEach(budgetRaw => {
         const budget: Budget = budgetRaw.payload.val() as Budget;
         budget.key = budgetRaw.key ? budgetRaw.key : '';
@@ -75,19 +68,17 @@ export class PredictService {
           this.updateBudget(budget);
         }
       });
-      this.budgetSubscription?.unsubscribe();
     });
   }
 
   private updateBudget(budget: Budget) {
     this.setBudgetValues(budget);
     budget.isArchived = true;
-    this.cycleSubscription = this.budgetService.getCycle(budget.cycleKey!).subscribe(cycleRaw => {
+    this.budgetService.getCycle(budget.cycleKey!).subscribe(cycleRaw => {
       const cycle: Cycle = cycleRaw.payload.val() as Cycle;
       this.budgetService.updateMonthBudget(budget, budget.key!).then(() => {
         this.createNewBudgetFromOldBudget(budget, cycle);
       });
-      this.cycleSubscription?.unsubscribe();
     });
   }
 
@@ -114,25 +105,23 @@ export class PredictService {
   private createRegularEntries() {
 
     // Month
-    this.regularlyMonthSubscription = this.regularlyService.getAllByCycleType(RegularlyCycleType.month).subscribe(regularities => {
+    this.regularlyService.getAllByCycleType(RegularlyCycleType.month).subscribe(regularities => {
       regularities.forEach(regularlyRaw => {
         const regularly: Regularly = regularlyRaw.payload.val() as Regularly;
         regularly.key = regularlyRaw.key ? regularlyRaw.key : '';
         this.checkRegularMonth(regularly);
       });
-      this.regularlyMonthSubscription?.unsubscribe();
     });
 
     // TODO: Quarter
 
     // Year
-    this.regularlyYearSubscription = this.regularlyService.getAllByCycleType(RegularlyCycleType.year).subscribe(regularities => {
+    this.regularlyService.getAllByCycleType(RegularlyCycleType.year).subscribe(regularities => {
       regularities.forEach(regularlyRaw => {
         const regularly: Regularly = regularlyRaw.payload.val() as Regularly;
         regularly.key = regularlyRaw.key ? regularlyRaw.key : '';
         this.checkRegularYear(regularly);
       });
-      this.regularlyYearSubscription?.unsubscribe();
     });
   }
 
@@ -186,13 +175,12 @@ export class PredictService {
   }
 
   private createCreditCardEntries() {
-    this.accountsSubscription = this.accountService.getAllAccountsFilteredByAccountType(AccountType.creditCard).subscribe(accounts => {
+    this.accountService.getAllAccountsFilteredByAccountType(AccountType.creditCard).subscribe(accounts => {
       accounts.forEach(accountRaw => {
         const account: Account = accountRaw.payload.val() as Account;
         account.key = accountRaw.key ? accountRaw.key : '';
         this.checkAccountAndCreateEntry(account);
       });
-      this.accountsSubscription?.unsubscribe();
     });
   }
 
