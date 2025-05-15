@@ -51,6 +51,8 @@ import { HistoryListComponent } from './pages/history/history-list/history-list.
 import { InfoAreaComponent } from './pages/home/info-area/info-area.component';
 import { InfoListEntryComponent } from './components/info-list-entry/info-list-entry.component';
 import { UpdateAccountValueComponent } from './pages/home/info-area/update-account-value/update-account-value.component';
+import { InvoiceSettingsComponent } from './pages/invoice/invoice-settings/invoice-settings.component';
+import { InvoiceListComponent } from './pages/invoice/invoice-list/invoice-list.component';
 
 @NgModule({
   declarations: [
@@ -89,6 +91,8 @@ import { UpdateAccountValueComponent } from './pages/home/info-area/update-accou
     InfoAreaComponent,
     InfoListEntryComponent,
     UpdateAccountValueComponent,
+    InvoiceSettingsComponent,
+    InvoiceListComponent,
   ],
     imports: [
         BrowserModule,

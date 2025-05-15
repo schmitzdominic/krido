@@ -1,1 +1,24 @@
-<p>invoice works!</p>
+<nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='%236c757d'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li [class]="classSettings">Einstellungen</li>
+    <li *ngIf="classInvoice === breadCrumbActive" [class]="classInvoice">Abrechnung</li>
+  </ol>
+</nav>
+
+<ul ngbNav #nav="ngbNav" [(activeId)]="active" class="nav-tabs">
+  <li [ngbNavItem]="'settings'">
+    <ng-template ngbNavContent>
+      <app-invoice-settings
+        (onNext)="onNextSettings($event)">
+      </app-invoice-settings>
+    </ng-template>
+  </li>
+  <li [ngbNavItem]="'invoice'">
+    <ng-template ngbNavContent>
+      <app-invoice-list>
+      </app-invoice-list>
+    </ng-template>
+  </li>
+</ul>
+
+<div [ngbNavOutlet]="nav" class="mt-2"></div>
