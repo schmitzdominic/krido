@@ -6,9 +6,10 @@ import {HelperService} from "../../../../services/helper/helper.service";
 import {ToastService} from "../../../../services/toast/toast.service";
 
 @Component({
-  selector: 'app-add-or-edit-budget-content',
-  templateUrl: './add-or-edit-budget-content.component.html',
-  styleUrls: ['./add-or-edit-budget-content.component.scss']
+    selector: 'app-add-or-edit-budget-content',
+    templateUrl: './add-or-edit-budget-content.component.html',
+    styleUrls: ['./add-or-edit-budget-content.component.scss'],
+    standalone: false
 })
 export class AddOrEditBudgetContentComponent {
 

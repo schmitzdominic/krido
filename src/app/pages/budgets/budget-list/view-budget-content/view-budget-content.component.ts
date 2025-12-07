@@ -7,9 +7,10 @@ import {Entry} from "../../../../../shared/interfaces/entry.model";
 import {EntryService} from "../../../../services/entry/entry.service";
 
 @Component({
-  selector: 'app-view-budget-content',
-  templateUrl: './view-budget-content.component.html',
-  styleUrls: ['./view-budget-content.component.scss']
+    selector: 'app-view-budget-content',
+    templateUrl: './view-budget-content.component.html',
+    styleUrls: ['./view-budget-content.component.scss'],
+    standalone: false
 })
 export class ViewBudgetContentComponent {
 

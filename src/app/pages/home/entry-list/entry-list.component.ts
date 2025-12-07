@@ -8,9 +8,10 @@ import {Entry} from "../../../../shared/interfaces/entry.model";
 import {LoadingService} from "../../../services/loading/loading.service";
 
 @Component({
-  selector: 'app-entry-list',
-  templateUrl: './entry-list.component.html',
-  styleUrls: ['./entry-list.component.scss']
+    selector: 'app-entry-list',
+    templateUrl: './entry-list.component.html',
+    styleUrls: ['./entry-list.component.scss'],
+    standalone: false
 })
 export class EntryListComponent {
 

@@ -9,9 +9,10 @@ import {HelperService} from "../../../../services/helper/helper.service";
 import {DateService} from "../../../../services/date/date.service";
 
 @Component({
-  selector: 'app-add-or-edit-cycle-content',
-  templateUrl: './add-or-edit-cycle-content.component.html',
-  styleUrls: ['./add-or-edit-cycle-content.component.scss']
+    selector: 'app-add-or-edit-cycle-content',
+    templateUrl: './add-or-edit-cycle-content.component.html',
+    styleUrls: ['./add-or-edit-cycle-content.component.scss'],
+    standalone: false
 })
 export class AddOrEditCycleContentComponent {
 

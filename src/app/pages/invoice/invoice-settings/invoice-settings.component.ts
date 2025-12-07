@@ -8,9 +8,10 @@ import {InvoiceService} from "../../../services/invoice/invoice.service";
 import {LoadingService} from "../../../services/loading/loading.service";
 
 @Component({
-  selector: 'app-invoice-settings',
-  templateUrl: './invoice-settings.component.html',
-  styleUrls: ['./invoice-settings.component.scss']
+    selector: 'app-invoice-settings',
+    templateUrl: './invoice-settings.component.html',
+    styleUrls: ['./invoice-settings.component.scss'],
+    standalone: false
 })
 export class InvoiceSettingsComponent {
 

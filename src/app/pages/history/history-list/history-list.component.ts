@@ -14,9 +14,10 @@ export interface HistorySearchObject {
 }
 
 @Component({
-  selector: 'app-history-list',
-  templateUrl: './history-list.component.html',
-  styleUrls: ['./history-list.component.scss']
+    selector: 'app-history-list',
+    templateUrl: './history-list.component.html',
+    styleUrls: ['./history-list.component.scss'],
+    standalone: false
 })
 export class HistoryListComponent {
 

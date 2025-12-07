@@ -6,9 +6,10 @@ import {DateService} from "../../services/date/date.service";
 import {EntryType} from "../../../shared/enums/entry-type.enum";
 
 @Component({
-  selector: 'app-entry-list-entry',
-  templateUrl: './entry-list-entry.component.html',
-  styleUrls: ['./entry-list-entry.component.scss']
+    selector: 'app-entry-list-entry',
+    templateUrl: './entry-list-entry.component.html',
+    styleUrls: ['./entry-list-entry.component.scss'],
+    standalone: false
 })
 export class EntryListEntryComponent {
 

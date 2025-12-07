@@ -6,9 +6,10 @@ import {Account} from "../../../shared/interfaces/account.model";
 import {HistorySearchObject} from "./history-list/history-list.component";
 
 @Component({
-  selector: 'app-expenditures',
-  templateUrl: './history.component.html',
-  styleUrls: ['./history.component.scss']
+    selector: 'app-expenditures',
+    templateUrl: './history.component.html',
+    styleUrls: ['./history.component.scss'],
+    standalone: false
 })
 export class HistoryComponent {
 

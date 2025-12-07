@@ -4,9 +4,10 @@ import {AccountType} from "../../../../../shared/enums/account-type.enum";
 import {PriceService} from "../../../../services/price/price.service";
 
 @Component({
-  selector: 'app-view-account-content',
-  templateUrl: './view-account-content.component.html',
-  styleUrls: ['./view-account-content.component.scss']
+    selector: 'app-view-account-content',
+    templateUrl: './view-account-content.component.html',
+    styleUrls: ['./view-account-content.component.scss'],
+    standalone: false
 })
 export class ViewAccountContentComponent {
 

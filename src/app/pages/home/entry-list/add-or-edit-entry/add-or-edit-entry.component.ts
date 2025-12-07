@@ -18,9 +18,10 @@ interface EntryTypeInterface {
   label: string,
 }
 @Component({
-  selector: 'app-add-or-edit-entry',
-  templateUrl: './add-or-edit-entry.component.html',
-  styleUrls: ['./add-or-edit-entry.component.scss']
+    selector: 'app-add-or-edit-entry',
+    templateUrl: './add-or-edit-entry.component.html',
+    styleUrls: ['./add-or-edit-entry.component.scss'],
+    standalone: false
 })
 export class AddOrEditEntryComponent {
 

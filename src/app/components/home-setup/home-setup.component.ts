@@ -6,9 +6,10 @@ import {ToastService} from "../../services/toast/toast.service";
 import {HelperService} from "../../services/helper/helper.service";
 
 @Component({
-  selector: 'app-home-setup',
-  templateUrl: './home-setup.component.html',
-  styleUrls: ['./home-setup.component.scss']
+    selector: 'app-home-setup',
+    templateUrl: './home-setup.component.html',
+    styleUrls: ['./home-setup.component.scss'],
+    standalone: false
 })
 export class HomeSetupComponent {
 

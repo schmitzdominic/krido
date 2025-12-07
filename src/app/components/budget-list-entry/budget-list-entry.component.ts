@@ -9,9 +9,10 @@ import {BudgetService} from "../../services/budget/budget.service";
 import {EntryType} from "../../../shared/enums/entry-type.enum";
 
 @Component({
-  selector: 'app-budget-list-entry',
-  templateUrl: './budget-list-entry.component.html',
-  styleUrls: ['./budget-list-entry.component.scss']
+    selector: 'app-budget-list-entry',
+    templateUrl: './budget-list-entry.component.html',
+    styleUrls: ['./budget-list-entry.component.scss'],
+    standalone: false
 })
 export class BudgetListEntryComponent {
 

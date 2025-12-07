@@ -2,9 +2,10 @@ import {Component} from '@angular/core';
 import {MenuTitleService} from "../../../shared/behavior/menu-title/menu-title.service";
 
 @Component({
-  selector: 'app-regularly',
-  templateUrl: './regularly.component.html',
-  styleUrls: ['./regularly.component.scss']
+    selector: 'app-regularly',
+    templateUrl: './regularly.component.html',
+    styleUrls: ['./regularly.component.scss'],
+    standalone: false
 })
 export class RegularlyComponent {
 

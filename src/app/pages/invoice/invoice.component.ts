@@ -3,9 +3,10 @@ import {MenuTitleService} from "../../../shared/behavior/menu-title/menu-title.s
 import {InvoiceSettings} from "../../../shared/interfaces/invoice-settings.model";
 
 @Component({
-  selector: 'app-invoice',
-  templateUrl: './invoice.component.html',
-  styleUrls: ['./invoice.component.scss']
+    selector: 'app-invoice',
+    templateUrl: './invoice.component.html',
+    styleUrls: ['./invoice.component.scss'],
+    standalone: false
 })
 export class InvoiceComponent {
 

@@ -7,9 +7,10 @@ import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap/modal/modal-ref";
 import {LoadingService} from "./services/loading/loading.service";
 
 @Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+    selector: 'app-root',
+    templateUrl: './app.component.html',
+    styleUrls: ['./app.component.scss'],
+    standalone: false
 })
 export class AppComponent {
 

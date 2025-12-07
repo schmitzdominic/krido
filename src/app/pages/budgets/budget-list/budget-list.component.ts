@@ -12,9 +12,10 @@ interface DropdownItem {
 }
 
 @Component({
-  selector: 'app-budget-list',
-  templateUrl: './budget-list.component.html',
-  styleUrls: ['./budget-list.component.scss']
+    selector: 'app-budget-list',
+    templateUrl: './budget-list.component.html',
+    styleUrls: ['./budget-list.component.scss'],
+    standalone: false
 })
 export class BudgetListComponent {
 

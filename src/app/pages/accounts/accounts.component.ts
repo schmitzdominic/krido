@@ -2,9 +2,10 @@ import { Component } from '@angular/core';
 import {MenuTitleService} from "../../../shared/behavior/menu-title/menu-title.service";
 
 @Component({
-  selector: 'app-accounts',
-  templateUrl: './accounts.component.html',
-  styleUrls: ['./accounts.component.scss']
+    selector: 'app-accounts',
+    templateUrl: './accounts.component.html',
+    styleUrls: ['./accounts.component.scss'],
+    standalone: false
 })
 export class AccountsComponent {
 

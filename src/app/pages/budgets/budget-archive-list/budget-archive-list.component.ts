@@ -12,9 +12,10 @@ interface MonthBudget {
 }
 
 @Component({
-  selector: 'app-budget-archive-list',
-  templateUrl: './budget-archive-list.component.html',
-  styleUrls: ['./budget-archive-list.component.scss']
+    selector: 'app-budget-archive-list',
+    templateUrl: './budget-archive-list.component.html',
+    styleUrls: ['./budget-archive-list.component.scss'],
+    standalone: false
 })
 export class BudgetArchiveListComponent {
 

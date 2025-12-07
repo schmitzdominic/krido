@@ -9,9 +9,10 @@ import {AccountType} from "../../../shared/enums/account-type.enum";
 import {PredictService} from "../../services/predict/predict.service";
 
 @Component({
-  selector: 'app-actual-month',
-  templateUrl: './home.component.html',
-  styleUrls: ['./home.component.scss']
+    selector: 'app-actual-month',
+    templateUrl: './home.component.html',
+    styleUrls: ['./home.component.scss'],
+    standalone: false
 })
 export class HomeComponent {
 

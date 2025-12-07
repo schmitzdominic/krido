@@ -7,9 +7,10 @@ import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {UserService} from "../../../services/user/user.service";
 
 @Component({
-  selector: 'app-info-area',
-  templateUrl: './info-area.component.html',
-  styleUrls: ['./info-area.component.scss']
+    selector: 'app-info-area',
+    templateUrl: './info-area.component.html',
+    styleUrls: ['./info-area.component.scss'],
+    standalone: false
 })
 export class InfoAreaComponent {
 

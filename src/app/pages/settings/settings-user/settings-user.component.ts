@@ -6,9 +6,10 @@ import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
 import {AccountType} from "../../../../shared/enums/account-type.enum";
 
 @Component({
-  selector: 'app-settings-user',
-  templateUrl: './settings-user.component.html',
-  styleUrls: ['./settings-user.component.scss']
+    selector: 'app-settings-user',
+    templateUrl: './settings-user.component.html',
+    styleUrls: ['./settings-user.component.scss'],
+    standalone: false
 })
 export class SettingsUserComponent {
 

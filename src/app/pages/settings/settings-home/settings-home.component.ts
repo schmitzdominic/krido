@@ -2,9 +2,10 @@ import { Component } from '@angular/core';
 import {UserService} from "../../../services/user/user.service";
 
 @Component({
-  selector: 'app-settings-home',
-  templateUrl: './settings-home.component.html',
-  styleUrls: ['./settings-home.component.scss']
+    selector: 'app-settings-home',
+    templateUrl: './settings-home.component.html',
+    styleUrls: ['./settings-home.component.scss'],
+    standalone: false
 })
 export class SettingsHomeComponent {
 

@@ -6,9 +6,10 @@ import {DateService} from "../../../../services/date/date.service";
 import {AccountService} from "../../../../services/account/account.service";
 
 @Component({
-  selector: 'app-update-account-value',
-  templateUrl: './update-account-value.component.html',
-  styleUrls: ['./update-account-value.component.scss']
+    selector: 'app-update-account-value',
+    templateUrl: './update-account-value.component.html',
+    styleUrls: ['./update-account-value.component.scss'],
+    standalone: false
 })
 export class UpdateAccountValueComponent {
 

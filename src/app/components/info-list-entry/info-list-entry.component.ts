@@ -10,9 +10,10 @@ import {BudgetService} from "../../services/budget/budget.service";
 import {Budget} from "../../../shared/interfaces/budget.model";
 
 @Component({
-  selector: 'app-info-list-entry',
-  templateUrl: './info-list-entry.component.html',
-  styleUrls: ['./info-list-entry.component.scss']
+    selector: 'app-info-list-entry',
+    templateUrl: './info-list-entry.component.html',
+    styleUrls: ['./info-list-entry.component.scss'],
+    standalone: false
 })
 export class InfoListEntryComponent {
 

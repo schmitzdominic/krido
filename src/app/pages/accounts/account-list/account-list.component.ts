@@ -8,9 +8,10 @@ import {PriceService} from "../../../services/price/price.service";
 import {LoadingService} from "../../../services/loading/loading.service";
 
 @Component({
-  selector: 'app-accounts-list',
-  templateUrl: './account-list.component.html',
-  styleUrls: ['./account-list.component.scss']
+    selector: 'app-accounts-list',
+    templateUrl: './account-list.component.html',
+    styleUrls: ['./account-list.component.scss'],
+    standalone: false
 })
 export class AccountListComponent {
 

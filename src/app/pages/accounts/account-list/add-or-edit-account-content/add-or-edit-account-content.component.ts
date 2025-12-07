@@ -8,9 +8,10 @@ import {Account} from "../../../../../shared/interfaces/account.model";
 import {HelperService} from "../../../../services/helper/helper.service";
 
 @Component({
-  selector: 'app-add-or-edit-account-content',
-  templateUrl: './add-or-edit-account-content.component.html',
-  styleUrls: ['./add-or-edit-account-content.component.scss']
+    selector: 'app-add-or-edit-account-content',
+    templateUrl: './add-or-edit-account-content.component.html',
+    styleUrls: ['./add-or-edit-account-content.component.scss'],
+    standalone: false
 })
 export class AddOrEditAccountContentComponent {
 

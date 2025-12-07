@@ -8,9 +8,10 @@ import {AccountType} from "../../../../shared/enums/account-type.enum";
 import {LoadingService} from "../../../services/loading/loading.service";
 
 @Component({
-  selector: 'app-cycle-list',
-  templateUrl: './cycle-list.component.html',
-  styleUrls: ['./cycle-list.component.scss']
+    selector: 'app-cycle-list',
+    templateUrl: './cycle-list.component.html',
+    styleUrls: ['./cycle-list.component.scss'],
+    standalone: false
 })
 export class CycleListComponent {
 

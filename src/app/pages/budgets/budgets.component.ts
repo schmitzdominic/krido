@@ -4,9 +4,10 @@ import {BudgetService} from "../../services/budget/budget.service";
 import {Budget} from "../../../shared/interfaces/budget.model";
 
 @Component({
-  selector: 'app-budgets',
-  templateUrl: './budgets.component.html',
-  styleUrls: ['./budgets.component.scss']
+    selector: 'app-budgets',
+    templateUrl: './budgets.component.html',
+    styleUrls: ['./budgets.component.scss'],
+    standalone: false
 })
 export class BudgetsComponent {
 

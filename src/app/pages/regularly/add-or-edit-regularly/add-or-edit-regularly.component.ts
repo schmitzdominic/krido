@@ -24,9 +24,10 @@ interface CycleTypeInterface {
 }
 
 @Component({
-  selector: 'app-add-or-edit-regularly',
-  templateUrl: './add-or-edit-regularly.component.html',
-  styleUrls: ['./add-or-edit-regularly.component.scss']
+    selector: 'app-add-or-edit-regularly',
+    templateUrl: './add-or-edit-regularly.component.html',
+    styleUrls: ['./add-or-edit-regularly.component.scss'],
+    standalone: false
 })
 export class AddOrEditRegularlyComponent {
 

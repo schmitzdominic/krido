@@ -7,9 +7,10 @@ import {DateService} from "../../services/date/date.service";
 import {RegularlyCycleType} from "../../../shared/enums/regularly-cycle-type.enum";
 
 @Component({
-  selector: 'app-regularly-list-entry',
-  templateUrl: './regularly-list-entry.component.html',
-  styleUrls: ['./regularly-list-entry.component.scss']
+    selector: 'app-regularly-list-entry',
+    templateUrl: './regularly-list-entry.component.html',
+    styleUrls: ['./regularly-list-entry.component.scss'],
+    standalone: false
 })
 export class RegularlyListEntryComponent {
 

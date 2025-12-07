@@ -10,9 +10,10 @@ import {LoadingService} from "../../../services/loading/loading.service";
 import {DateService} from "../../../services/date/date.service";
 
 @Component({
-  selector: 'app-regularly-list',
-  templateUrl: './regularly-list.component.html',
-  styleUrls: ['./regularly-list.component.scss']
+    selector: 'app-regularly-list',
+    templateUrl: './regularly-list.component.html',
+    styleUrls: ['./regularly-list.component.scss'],
+    standalone: false
 })
 export class RegularlyListComponent {
 
