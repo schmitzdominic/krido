@@ -4,13 +4,17 @@
     (onClose)="onCloseUpdateAccountValueModal()">
   </app-update-account-value>
 </ng-template>
-<div *ngIf="accounts.length > 0">
-  <h1>Konten</h1>
-  <ul class="list-group list-group-flush pb-3">
-    <li class="list-group-item" id="entry-list-actual-month" *ngFor="let account of accounts" (click)="onAccountClick(account)">
-      <app-info-list-entry
-        [account]="account">
-      </app-info-list-entry>
-    </li>
-  </ul>
-</div>
+@if (accounts.length > 0) {
+  <div>
+    <h1>Konten</h1>
+    <ul class="list-group list-group-flush pb-3">
+      @for (account of accounts; track account) {
+        <li class="list-group-item" id="entry-list-actual-month" (click)="onAccountClick(account)">
+          <app-info-list-entry
+            [account]="account">
+          </app-info-list-entry>
+        </li>
+      }
+    </ul>
+  </div>
+}

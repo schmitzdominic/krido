@@ -1,53 +1,73 @@
-<button *ngIf="isEditButtonShown" type="button" class="btn btn-dark position-absolute end-0 top-0 mt-3 me-3" (click)="onButtonEdit()"><i class="bi bi-pencil"></i></button>
+@if (isEditButtonShown) {
+  <button type="button" class="btn btn-dark position-absolute end-0 top-0 mt-3 me-3" (click)="onButtonEdit()"><i class="bi bi-pencil"></i></button>
+}
 <!-- Edit -->
-<div *ngIf="!isContentReadOnly">
-  <app-add-or-edit-account-content
-    [account]="account"
-    (onClose)="onButtonCancel()">
-  </app-add-or-edit-account-content>
-</div>
+@if (!isContentReadOnly) {
+  <div>
+    <app-add-or-edit-account-content
+      [account]="account"
+      (onClose)="onButtonCancel()">
+    </app-add-or-edit-account-content>
+  </div>
+}
 
 <!-- View -->
-<div *ngIf="isContentReadOnly">
-  <h1 class="name-title pt-4 ps-3 pe-3">{{ account?.name }}</h1>
-  <div class="modal-body">
-    <ul class="list-group list-group-flush pb-3">
-      <li class="list-group-item" id="account-value">
-        <div class="custom-list-item">
-          <i class="bi bi-cash-coin"></i>
-          <span class="name ps-2">Kontostand</span>
-          <span class="limit position-absolute top-0 end-0 pe-3 pt-2">{{ priceService.convertNumberToEuro(account!.value) }}</span>
-        </div>
-      </li>
-      <li class="list-group-item" id="credit-day-reference" *ngIf="account?.accountType === AccountType.creditCard">
-        <i class="bi bi-wallet2"></i>
-        <span class="name ps-2">Referenzkonto {{ account?.referenceAccount?.name }}</span>
-      </li>
-      <li class="list-group-item" id="credit-day" *ngIf="account?.accountType === AccountType.creditCard">
-        <i class="bi bi-arrow-right" *ngIf="!account?.creditLastDay"></i>
-        <i class="bi bi-box-arrow-in-right" *ngIf="account?.creditLastDay"></i>
-        <span class="name ps-2" *ngIf="!account?.creditLastDay">Abbuchung am {{ account?.creditDay }}.</span>
-        <span class="name ps-2" *ngIf="account?.creditLastDay">Abbuchung am letzten Tag im Monat</span>
-      </li>
-    </ul>
-    <p>Eigentümer</p>
+@if (isContentReadOnly) {
+  <div>
+    <h1 class="name-title pt-4 ps-3 pe-3">{{ account?.name }}</h1>
+    <div class="modal-body">
+      <ul class="list-group list-group-flush pb-3">
+        <li class="list-group-item" id="account-value">
+          <div class="custom-list-item">
+            <i class="bi bi-cash-coin"></i>
+            <span class="name ps-2">Kontostand</span>
+            <span class="limit position-absolute top-0 end-0 pe-3 pt-2">{{ priceService.convertNumberToEuro(account!.value) }}</span>
+          </div>
+        </li>
+        @if (account?.accountType === AccountType.creditCard) {
+          <li class="list-group-item" id="credit-day-reference">
+            <i class="bi bi-wallet2"></i>
+            <span class="name ps-2">Referenzkonto {{ account?.referenceAccount?.name }}</span>
+          </li>
+        }
+        @if (account?.accountType === AccountType.creditCard) {
+          <li class="list-group-item" id="credit-day">
+            @if (!account?.creditLastDay) {
+              <i class="bi bi-arrow-right"></i>
+            }
+            @if (account?.creditLastDay) {
+              <i class="bi bi-box-arrow-in-right"></i>
+            }
+            @if (!account?.creditLastDay) {
+              <span class="name ps-2">Abbuchung am {{ account?.creditDay }}.</span>
+            }
+            @if (account?.creditLastDay) {
+              <span class="name ps-2">Abbuchung am letzten Tag im Monat</span>
+            }
+          </li>
+        }
+      </ul>
+      <p>Eigentümer</p>
+      <ul class="list-group list-group-flush">
+        @for (owner of account?.owners; track owner) {
+          <li class="list-group-item" id="account-owners">
+            <i class="bi bi-person"></i>
+            <span class="name ps-2">{{ owner.email }}</span>
+          </li>
+        }
+      </ul>
+    </div>
     <ul class="list-group list-group-flush">
-      <li class="list-group-item" id="account-owners" *ngFor="let owner of account?.owners">
-        <i class="bi bi-person"></i>
-        <span class="name ps-2">{{ owner.email }}</span>
+      <li class="list-group-item" id="list-entries">
+        <!-- TODO: Here Entries -->
       </li>
     </ul>
-  </div>
-  <ul class="list-group list-group-flush">
-    <li class="list-group-item" id="list-entries">
-      <!-- TODO: Here Entries -->
-    </li>
-  </ul>
-  <div class="modal-footer">
-    <button
-      type="button"
-      class="btn btn-light"
+    <div class="modal-footer">
+      <button
+        type="button"
+        class="btn btn-light"
       (click)="onButtonCancel()">Schließen</button>
+    </div>
   </div>
-</div>
+}
 

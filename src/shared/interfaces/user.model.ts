@@ -1,4 +1,3 @@
-import firebase from "firebase/compat";
 import {Account} from "./account.model";
 
 export interface User {
@@ -7,5 +6,5 @@ export interface User {
   displayName: string | null;
   home?: string;
   mainAccount?: Account;
-  firebaseUser?: firebase.User;
+  firebaseUser?: any;
 }

@@ -1,5 +1,5 @@
 import {Component, ViewChild} from '@angular/core';
-import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap/modal/modal-ref";
+import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {Account} from "../../../../shared/interfaces/account.model";
 import {AccountService} from "../../../services/account/account.service";

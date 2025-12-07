@@ -2,9 +2,15 @@
   <div class="row">
     <div class="col-1 list-icon">
       <div class="position-absolute start-0 top-0 ps-3 pt-3">
-        <i class="bi bi-calendar4-range" *ngIf="regularly?.cycle === RegularlyCycleType.month"></i>
-        <i class="bi bi-calendar2-week" *ngIf="regularly?.cycle === RegularlyCycleType.quarter"></i>
-        <i class="bi bi-calendar4-event" *ngIf="regularly?.cycle === RegularlyCycleType.year"></i>
+        @if (regularly?.cycle === RegularlyCycleType.month) {
+          <i class="bi bi-calendar4-range"></i>
+        }
+        @if (regularly?.cycle === RegularlyCycleType.quarter) {
+          <i class="bi bi-calendar2-week"></i>
+        }
+        @if (regularly?.cycle === RegularlyCycleType.year) {
+          <i class="bi bi-calendar4-event"></i>
+        }
       </div>
     </div>
     <div class="col-11">

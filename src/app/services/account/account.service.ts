@@ -31,7 +31,7 @@ export class AccountService {
   }
 
   getAllAccountsFilteredByAccountType(accountType: AccountType) {
-    return this.dbService.readFilteredList(`${this.rootPath}`, ref => ref.orderByChild('accountType').equalTo(accountType));
+    return this.dbService.readFilteredList(`${this.rootPath}`, (ref: any) => ref.orderByChild('accountType').equalTo(accountType));
   }
 
   updateAccount(account: Account, key: string) {

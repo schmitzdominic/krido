@@ -10,10 +10,12 @@
       <h1>{{ title }}</h1>
     </div>
   </div>
-  <li class="list-group-item" id="entry-list-actual-month" *ngFor="let entry of entries" (click)="onEntryClick(entry)">
-    <app-entry-list-entry
-      [withMonth]="!historySearchObject!.isLastMonth"
-      [entry]="entry">
-    </app-entry-list-entry>
-  </li>
+  @for (entry of entries; track entry) {
+    <li class="list-group-item" id="entry-list-actual-month" (click)="onEntryClick(entry)">
+      <app-entry-list-entry
+        [withMonth]="!historySearchObject!.isLastMonth"
+        [entry]="entry">
+      </app-entry-list-entry>
+    </li>
+  }
 </ul>

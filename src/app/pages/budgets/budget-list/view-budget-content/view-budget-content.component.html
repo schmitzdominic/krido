@@ -1,55 +1,65 @@
-<button *ngIf="isEditButtonShown" type="button" class="btn btn-dark position-absolute end-0 top-0 mt-3 me-3" (click)="onEdit()"><i class="bi bi-pencil"></i></button>
+@if (isEditButtonShown) {
+  <button type="button" class="btn btn-dark position-absolute end-0 top-0 mt-3 me-3" (click)="onEdit()"><i class="bi bi-pencil"></i></button>
+}
 <!-- Edit -->
-<div *ngIf="!isContentReadOnly">
-  <app-add-or-edit-budget-content
-    [budget]="budget"
-    (onClose)="onCancel()">
-  </app-add-or-edit-budget-content>
-</div>
+@if (!isContentReadOnly) {
+  <div>
+    <app-add-or-edit-budget-content
+      [budget]="budget"
+      (onClose)="onCancel()">
+    </app-add-or-edit-budget-content>
+  </div>
+}
 
 <!-- View -->
-<div *ngIf="isContentReadOnly">
-  <h1 class="name-title pt-4 ps-3 pe-3">{{ budget?.name }}</h1>
-  <div class="modal-body">
-    <div class="text">
-      <ul class="list-group list-group-flush">
-        <li class="list-group-item" id="budget-max">
-          <div class="custom-list-item">
-            <i class="bi bi-cash-coin"></i>
-            <span class="name ps-2">Höhe</span>
-            <span class="limit position-absolute top-0 end-0 pe-3 pt-2">{{ priceService.convertNumberToEuro(budget?.limit) }}</span>
-          </div>
-        </li>
-        <li class="list-group-item pb-4" id="budget-rest">
-          <div class="pt-2 custom-list-item">
-            <i class="bi bi-arrow-bar-right"></i>
-            <span class="name ps-2">Rest</span>
-            <span class="limit position-absolute top-0 end-0 pe-3 pt-3">{{ getRestBudget() }}</span>
-          </div>
-        </li>
-      </ul>
-      <ngb-progressbar
-        [value]="usedLimit"
-        [max]="budget?.limit!"
-        type="{{ progressBarService.getProgressBarType(usedLimit, budget?.limit!) }}"
-      >{{ getProgressBarText() }}</ngb-progressbar>
+@if (isContentReadOnly) {
+  <div>
+    <h1 class="name-title pt-4 ps-3 pe-3">{{ budget?.name }}</h1>
+    <div class="modal-body">
+      <div class="text">
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item" id="budget-max">
+            <div class="custom-list-item">
+              <i class="bi bi-cash-coin"></i>
+              <span class="name ps-2">Höhe</span>
+              <span class="limit position-absolute top-0 end-0 pe-3 pt-2">{{ priceService.convertNumberToEuro(budget?.limit) }}</span>
+            </div>
+          </li>
+          <li class="list-group-item pb-4" id="budget-rest">
+            <div class="pt-2 custom-list-item">
+              <i class="bi bi-arrow-bar-right"></i>
+              <span class="name ps-2">Rest</span>
+              <span class="limit position-absolute top-0 end-0 pe-3 pt-3">{{ getRestBudget() }}</span>
+            </div>
+          </li>
+        </ul>
+        <ngb-progressbar
+          [value]="usedLimit"
+          [max]="budget?.limit!"
+          type="{{ progressBarService.getProgressBarType(usedLimit, budget?.limit!) }}"
+        >{{ getProgressBarText() }}</ngb-progressbar>
+      </div>
+      <div class="pt-4">
+        <ul class="list-group list-group-flush">
+          @if (entries.length > 0) {
+            <h1>Einträge</h1>
+          }
+          @for (entry of entries; track entry) {
+            <li class="list-group-item" id="entry-list-actual-month">
+              <app-entry-list-entry
+                [withMonth]="true"
+                [entry]="entry">
+              </app-entry-list-entry>
+            </li>
+          }
+        </ul>
+      </div>
     </div>
-    <div class="pt-4">
-      <ul class="list-group list-group-flush">
-        <h1 *ngIf="entries.length > 0">Einträge</h1>
-        <li class="list-group-item" id="entry-list-actual-month" *ngFor="let entry of entries">
-          <app-entry-list-entry
-            [withMonth]="true"
-            [entry]="entry">
-          </app-entry-list-entry>
-        </li>
-      </ul>
-    </div>
-  </div>
-  <div class="modal-footer">
-    <button
-      type="button"
-      class="btn btn-light"
+    <div class="modal-footer">
+      <button
+        type="button"
+        class="btn btn-light"
       (click)="onCancel()">Schließen</button>
+    </div>
   </div>
-</div>
+}

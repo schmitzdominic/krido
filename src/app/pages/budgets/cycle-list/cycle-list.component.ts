@@ -1,5 +1,5 @@
 import {Component, ViewChild} from '@angular/core';
-import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap/modal/modal-ref";
+import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {Cycle} from "../../../../shared/interfaces/cycle.model";
 import {BudgetService} from "../../../services/budget/budget.service";

@@ -32,9 +32,15 @@
       </div>
     </div>
   </form>
-  <button *ngIf="budget && !budget?.isArchived" type="button" class="btn btn-secondary" (click)="onArchive()">Archivieren</button>
-  <button *ngIf="budget && budget?.isArchived" type="button" class="btn btn-success" (click)="onDeArchive()">Aktivieren</button>
-  <button *ngIf="isDeleteAvailable" type="button" class="btn btn-danger ms-2" (click)="onDelete()">Löschen</button>
+  @if (budget && !budget.isArchived) {
+    <button type="button" class="btn btn-secondary" (click)="onArchive()">Archivieren</button>
+  }
+  @if (budget && budget.isArchived) {
+    <button type="button" class="btn btn-success" (click)="onDeArchive()">Aktivieren</button>
+  }
+  @if (isDeleteAvailable) {
+    <button type="button" class="btn btn-danger ms-2" (click)="onDelete()">Löschen</button>
+  }
 </div>
 <div class="modal-footer">
   <button type="button" class="btn btn-dark" (click)="onCancel()">Abbrechen</button>
@@ -42,5 +48,5 @@
     type="button"
     class="btn btn-light"
     [disabled]="addBudgetFormGroup.invalid"
-    (click)="onSubmit()">{{ submitButtonText }}</button>
+  (click)="onSubmit()">{{ submitButtonText }}</button>
 </div>

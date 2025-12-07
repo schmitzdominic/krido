@@ -25,22 +25,22 @@ export class EntryService {
   }
 
   getAllEntriesByMonthString(monthString: string) {
-    return this.dbService.readFilteredList(`${this.rootPath}`, ref => ref.orderByChild('monthString').equalTo(monthString));
+    return this.dbService.readFilteredList(`${this.rootPath}`, (ref: any) => ref.orderByChild('monthString').equalTo(monthString));
   }
 
   getAllEntriesByBudgetKey(key: string) {
-    return this.dbService.readFilteredList(`${this.rootPath}`, ref => ref.orderByChild('budgetKey').equalTo(key));
+    return this.dbService.readFilteredList(`${this.rootPath}`, (ref: any) => ref.orderByChild('budgetKey').equalTo(key));
   }
 
   getAllEntriesByAccountKey(key: string) {
-    return this.dbService.readFilteredList(`${this.rootPath}`, ref => ref.orderByChild('account/key').equalTo(key));
+    return this.dbService.readFilteredList(`${this.rootPath}`, (ref: any) => ref.orderByChild('account/key').equalTo(key));
   }
 
   searchEntriesByName(name: string) {
-    return this.dbService.readFilteredList(`${this.rootPath}`, ref => ref.orderByChild('searchName').startAt(name));
+    return this.dbService.readFilteredList(`${this.rootPath}`, (ref: any) => ref.orderByChild('searchName').startAt(name));
   }
 
   searchEntriesByMonthString(monthString: string) {
-    return this.dbService.readFilteredList(`${this.rootPath}`, ref => ref.orderByChild('monthString').startAt(monthString));
+    return this.dbService.readFilteredList(`${this.rootPath}`, (ref: any) => ref.orderByChild('monthString').startAt(monthString));
   }
 }

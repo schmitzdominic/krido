@@ -2,7 +2,8 @@ import { Injectable } from '@angular/core';
 import {AngularFireDatabase} from "@angular/fire/compat/database";
 import {LoadingService} from "./loading/loading.service";
 import {User} from "../../shared/interfaces/user.model";
-import {QueryFn} from "@angular/fire/compat/database/interfaces";
+
+export type QueryFn = any;
 
 @Injectable({
   providedIn: 'root'

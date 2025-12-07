@@ -3,7 +3,6 @@ import {DbService} from "../db.service";
 import {User} from "../../../shared/interfaces/user.model";
 import {AngularFireAuth} from "@angular/fire/compat/auth";
 import {Router} from "@angular/router";
-import firebase from "firebase/compat";
 import {SnapshotAction} from "@angular/fire/compat/database";
 import {Account} from "../../../shared/interfaces/account.model";
 
@@ -47,17 +46,17 @@ export class UserService {
   }
 
   getAllUsersFromActualHome() {
-    return this.dbService.readFilteredList(`users`, ref => ref.orderByChild('home').startAt(this.dbService.home));
+    return this.dbService.readFilteredList(`users`, (ref: any) => ref.orderByChild('home').startAt(this.dbService.home));
   }
 
   get getHomePin() {
     return this.dbService.read(`homes/${this.dbService.home}/pin`);
   }
 
-  getUserObservable(firebaseUser: firebase.User) {
+  getUserObservable(firebaseUser: any) {
     return this.dbService.read(`users/${firebaseUser.uid}`);
   }
-  setLocalStorageUser(user: SnapshotAction<any>, firebaseUser: firebase.User | null) {
+  setLocalStorageUser(user: SnapshotAction<any>, firebaseUser: any) {
     if (firebaseUser) {
       if (user.payload.val()) {
         const home = user.payload.val().home;

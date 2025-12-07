@@ -1,6 +1,6 @@
 import {Component, ViewChild} from '@angular/core';
 import {Regularly} from "../../../../shared/interfaces/regularly.model";
-import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap/modal/modal-ref";
+import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {RegularlyType} from "../../../../shared/enums/regularly-type.enum";
 import {RegularlyService} from "../../../services/regularly/regularly.service";

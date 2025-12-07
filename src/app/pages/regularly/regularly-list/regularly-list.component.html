@@ -7,67 +7,87 @@
   </app-add-or-edit-regularly>
 </ng-template>
 <div class="container pt-3">
-  <div class="row" *ngIf="monthRegularities.length > 0">
-    <ul class="list-group list-group-flush pb-3">
-      <div class="row">
-        <div class="col-8">
-          <h1>Monatlich</h1>
+  @if (monthRegularities.length > 0) {
+    <div class="row">
+      <ul class="list-group list-group-flush pb-3">
+        <div class="row">
+          <div class="col-8">
+            <h1>Monatlich</h1>
+          </div>
         </div>
-      </div>
-      <li class="list-group-item" id="entry-list-month-regularities" *ngFor="let regularly of monthRegularities" (click)="onRegularlyClicked(regularly)">
-        <app-regularly-list-entry [regularly]="regularly"
-          >
-        </app-regularly-list-entry>
-      </li>
-    </ul>
-  </div>
-  <div class="row" *ngIf="quarterRegularities.length > 0">
-    <ul class="list-group list-group-flush pb-3">
-      <div class="row">
-        <div class="col-8">
-          <h1>Quartal</h1>
+        @for (regularly of monthRegularities; track regularly) {
+          <li class="list-group-item" id="entry-list-month-regularities" (click)="onRegularlyClicked(regularly)">
+            <app-regularly-list-entry [regularly]="regularly"
+              >
+            </app-regularly-list-entry>
+          </li>
+        }
+      </ul>
+    </div>
+  }
+  @if (quarterRegularities.length > 0) {
+    <div class="row">
+      <ul class="list-group list-group-flush pb-3">
+        <div class="row">
+          <div class="col-8">
+            <h1>Quartal</h1>
+          </div>
         </div>
-      </div>
-      <li class="list-group-item" id="entry-list-quarter-regularities" *ngFor="let regularly of quarterRegularities" (click)="onRegularlyClicked(regularly)">
-        <app-regularly-list-entry [regularly]="regularly"
-        >
-        </app-regularly-list-entry>
-      </li>
-    </ul>
-  </div>
-  <div class="row" *ngIf="yearRegularities.length > 0">
-    <ul class="list-group list-group-flush pb-3">
-      <div class="row">
-        <div class="col-8">
-          <h1>Jährlich</h1>
+        @for (regularly of quarterRegularities; track regularly) {
+          <li class="list-group-item" id="entry-list-quarter-regularities" (click)="onRegularlyClicked(regularly)">
+            <app-regularly-list-entry [regularly]="regularly"
+              >
+            </app-regularly-list-entry>
+          </li>
+        }
+      </ul>
+    </div>
+  }
+  @if (yearRegularities.length > 0) {
+    <div class="row">
+      <ul class="list-group list-group-flush pb-3">
+        <div class="row">
+          <div class="col-8">
+            <h1>Jährlich</h1>
+          </div>
         </div>
-      </div>
-      <li class="list-group-item" id="entry-list-year-regularities" *ngFor="let regularly of yearRegularities" (click)="onRegularlyClicked(regularly)">
-        <app-regularly-list-entry [regularly]="regularly"
-        >
-        </app-regularly-list-entry>
-      </li>
-    </ul>
-  </div>
-  <div class="row" *ngIf="isNoContentAvailable()">
-    <div class="card">
-      <div class="m-2 mt-3">
-        <img src="assets/img/no-account.gif" class="card-img-top" alt="no regularly" style="border-radius: 6px;">
-      </div>
-      <div class="card-body">
-        <h1 class="card-title">Keine Regelmäßigen Einträge</h1>
-        <div class="no-regularly-card-content">
-          <p class="card-text">Du hast noch keine regelmäßigen Aus- oder Eingaben angelegt. Lege jetzt direkt welche an.</p>
+        @for (regularly of yearRegularities; track regularly) {
+          <li class="list-group-item" id="entry-list-year-regularities" (click)="onRegularlyClicked(regularly)">
+            <app-regularly-list-entry [regularly]="regularly"
+              >
+            </app-regularly-list-entry>
+          </li>
+        }
+      </ul>
+    </div>
+  }
+  @if (isNoContentAvailable()) {
+    <div class="row">
+      <div class="card">
+        <div class="m-2 mt-3">
+          <img src="assets/img/no-account.gif" class="card-img-top" alt="no regularly" style="border-radius: 6px;">
         </div>
-        <div class="position-absolute end-0 bottom-0 me-4 mb-4" *ngIf="isAccountAvailable">
-          <button type="button" class="btn btn-primary" (click)="openAddOrEditRegularlyModal()">Anlegen</button>
+        <div class="card-body">
+          <h1 class="card-title">Keine Regelmäßigen Einträge</h1>
+          <div class="no-regularly-card-content">
+            <p class="card-text">Du hast noch keine regelmäßigen Aus- oder Eingaben angelegt. Lege jetzt direkt welche an.</p>
+          </div>
+          @if (isAccountAvailable) {
+            <div class="position-absolute end-0 bottom-0 me-4 mb-4">
+              <button type="button" class="btn btn-primary" (click)="openAddOrEditRegularlyModal()">Anlegen</button>
+            </div>
+          }
         </div>
       </div>
     </div>
-  </div>
+  }
   <!-- No Account Toast and Add Button -->
-  <ngb-toast class="position-fixed bottom-0 mb-4" *ngIf="isToastNoAccountShown" [autohide]="false"> Um eine regelmäßige Ein- oder Ausgabe anzulegen, benötigst du ein Konto. <a [routerLink]="['/accounts']">Hier</a> kannst du ein Konto anlegen. </ngb-toast>
-  <div class="position-fixed end-0 bottom-0 me-4 mb-4" *ngIf="isAccountAvailable && !isNoContentAvailable()">
-    <button type="button" class="btn btn-primary" (click)="openAddOrEditRegularlyModal()"><i class="bi bi-plus-lg"></i></button>
-  </div>
+  @if (isToastNoAccountShown) {
+    <ngb-toast class="position-fixed bottom-0 mb-4" [autohide]="false"> Um eine regelmäßige Ein- oder Ausgabe anzulegen, benötigst du ein Konto. <a [routerLink]="['/accounts']">Hier</a> kannst du ein Konto anlegen. </ngb-toast>
+  }
+  @if (isAccountAvailable && !isNoContentAvailable()) {
+    <div class="position-fixed end-0 bottom-0 me-4 mb-4">
+      <button type="button" class="btn btn-primary" (click)="openAddOrEditRegularlyModal()"><i class="bi bi-plus-lg"></i></button>
+    </div>
+  }
 </div>

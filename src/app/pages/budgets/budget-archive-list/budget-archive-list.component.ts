@@ -2,7 +2,7 @@ import {Component, ViewChild} from '@angular/core';
 import {Budget} from "../../../../shared/interfaces/budget.model";
 import {BudgetService} from "../../../services/budget/budget.service";
 import {DateService} from "../../../services/date/date.service";
-import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap/modal/modal-ref";
+import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 
 interface MonthBudget {

@@ -8,7 +8,9 @@
   <form class="needs-validation" [formGroup]="addOrEditEntryFormGroup" (ngSubmit)="onSubmit()" novalidate>
     <div class="mb-4">
       <select class="form-select" id="add-entry-type" aria-label="Select entry type" formControlName="entryType">
-        <option *ngFor="let entryType of entryTypes" value="{{ entryType.value }}">{{ entryType.label }}</option>
+        @for (entryType of entryTypes; track entryType) {
+          <option value="{{ entryType.value }}">{{ entryType.label }}</option>
+        }
       </select>
     </div>
     <div class="col-md-12 mb-3">
@@ -52,25 +54,31 @@
           [startDate]="selectedDate"
           (dateSelect)="onDateSelected($event)"
           #date="ngbDatepicker"
-        />
+          />
         <button class="btn btn-outline-secondary bi bi-calendar3" (click)="date.toggle()" type="button"></button>
       </div>
     </div>
     <div class="col-md-12 mb-3">
       <label for="add-entry-account" class="form-label">Konto</label>
       <select class="form-select" id="add-entry-account" aria-label="Select entry type" formControlName="account">
-        <option *ngFor="let account of accounts" value="{{ account.key }}">{{ account.name }}</option>
+        @for (account of accounts; track account) {
+          <option value="{{ account.key }}">{{ account.name }}</option>
+        }
       </select>
     </div>
     <div class="col-md-12 mb-3">
       <label for="add-entry-budget" class="form-label">Budget</label>
       <select class="form-select" id="add-entry-budget" aria-label="Select entry type" formControlName="budget">
-        <option *ngFor="let budget of budgets" value="{{ budget.key }}">{{ budget.name }}</option>
+        @for (budget of budgets; track budget) {
+          <option value="{{ budget.key }}">{{ budget.name }}</option>
+        }
       </select>
     </div>
   </form>
   <div class="pt-2">
-    <button type="button" class="btn btn-danger" *ngIf="entry" (click)="onButtonDelete()"><i class="bi bi-trash pe-2"></i>Löschen</button>
+    @if (entry) {
+      <button type="button" class="btn btn-danger" (click)="onButtonDelete()"><i class="bi bi-trash pe-2"></i>Löschen</button>
+    }
   </div>
 </div>
 <div class="modal-footer">
@@ -79,7 +87,7 @@
     type="button"
     class="btn btn-light"
     [disabled]="isNameInvalid || isValueInvalid"
-    (click)="onSubmit()">{{ submitButtonText }}</button>
+  (click)="onSubmit()">{{ submitButtonText }}</button>
 </div>
 
 

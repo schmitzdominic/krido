@@ -27,21 +27,23 @@
         </label>
       </div>
     </div>
-    <div *ngIf="isLimitVisible" class="col-md-12 mb-3">
-      <label for="add-cycle-limit" class="form-label">Limit</label>
-      <div class="input-group has-validation">
-        <input
-          currencyMask
-          class="form-control"
-          id="add-cycle-limit"
-          formControlName="limit"
-          aria-describedby="inputGroupPrepend"
-          [options]="{ prefix: '', thousands: '', decimal: ',' }"
-          inputmode="numeric"
-          pattern="^\d+(\,\d{1,2})?$">
-        <span class="input-group-text" id="inputGroupPrepend">€</span>
+    @if (isLimitVisible) {
+      <div class="col-md-12 mb-3">
+        <label for="add-cycle-limit" class="form-label">Limit</label>
+        <div class="input-group has-validation">
+          <input
+            currencyMask
+            class="form-control"
+            id="add-cycle-limit"
+            formControlName="limit"
+            aria-describedby="inputGroupPrepend"
+            [options]="{ prefix: '', thousands: '', decimal: ',' }"
+            inputmode="numeric"
+            pattern="^\d+(\,\d{1,2})?$">
+          <span class="input-group-text" id="inputGroupPrepend">€</span>
+        </div>
       </div>
-    </div>
+    }
     <div class="col-12 mb-3">
       <div class="form-check">
         <input formControlName="transfer" class="form-check-input" type="checkbox" value="" id="add-cycle-transfer">
@@ -50,16 +52,20 @@
         </label>
       </div>
     </div>
-    <div *ngIf="isCreateNowVisible" class="col-12 mb-3">
-      <div class="form-check">
-        <input formControlName="createNow" class="form-check-input" type="checkbox" value="" id="add-cycle-create-now">
-        <label class="form-check-label ps-1" for="add-cycle-create-now">
-          Budget für diesen Zyklus erstellen?
-        </label>
+    @if (isCreateNowVisible) {
+      <div class="col-12 mb-3">
+        <div class="form-check">
+          <input formControlName="createNow" class="form-check-input" type="checkbox" value="" id="add-cycle-create-now">
+          <label class="form-check-label ps-1" for="add-cycle-create-now">
+            Budget für diesen Zyklus erstellen?
+          </label>
+        </div>
       </div>
-    </div>
+    }
   </form>
-  <button *ngIf="cycle && budgets.length === 0" type="button" class="btn btn-danger ms-2" (click)="onDelete()">Löschen</button>
+  @if (cycle && budgets.length === 0) {
+    <button type="button" class="btn btn-danger ms-2" (click)="onDelete()">Löschen</button>
+  }
 </div>
 <div class="modal-footer">
   <button type="button" class="btn btn-dark" (click)="onCancel()">Abbrechen</button>
@@ -67,5 +73,5 @@
     type="button"
     class="btn btn-light"
     [disabled]="isNameInvalid || isLimitInvalid"
-    (click)="onSubmit()">{{ submitButtonText }}</button>
+  (click)="onSubmit()">{{ submitButtonText }}</button>
 </div>

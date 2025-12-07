@@ -13,34 +13,44 @@
 <div class="container">
   <div class="row">
     <ul class="list-group list-group-flush">
-      <li class="list-group-item" id="list-accounts" *ngFor="let account of accounts" (click)="onClickAccount(account)">
-        <div class="custom-list-item">
-          <i class="bi bi-bank icon" *ngIf="account.accountType === AccountType.giro"></i>
-          <i class="bi bi-credit-card-2-front icon" *ngIf="account.accountType === AccountType.creditCard"></i>
-          <span class="name ps-2 pt-1"> {{ account.name }} </span>
-          <span class="limit position-absolute top-0 end-0 pt-3 pe-3 value">{{ priceService.convertNumberToEuro(account.value) }}</span>
-        </div>
-      </li>
+      @for (account of accounts; track account) {
+        <li class="list-group-item" id="list-accounts" (click)="onClickAccount(account)">
+          <div class="custom-list-item">
+            @if (account.accountType === AccountType.giro) {
+              <i class="bi bi-bank icon"></i>
+            }
+            @if (account.accountType === AccountType.creditCard) {
+              <i class="bi bi-credit-card-2-front icon"></i>
+            }
+            <span class="name ps-2 pt-1"> {{ account.name }} </span>
+            <span class="limit position-absolute top-0 end-0 pt-3 pe-3 value">{{ priceService.convertNumberToEuro(account.value) }}</span>
+          </div>
+        </li>
+      }
     </ul>
   </div>
   <!-- Add Button -->
-  <div class="position-fixed end-0 bottom-0 me-4 mb-4" *ngIf="accounts.length > 0">
-    <button type="button" class="btn btn-primary" (click)="onButtonAddClick()"><i class="bi bi-plus-lg"></i></button>
-  </div>
-</div>
-<div class="row" *ngIf="accounts.length == 0 && isInitialized">
-  <div class="card">
-    <div class="m-2 mt-3">
-      <img src="assets/img/no-credit-card.gif" class="card-img-top" alt="welcome" style="border-radius: 6px;">
+  @if (accounts.length > 0) {
+    <div class="position-fixed end-0 bottom-0 me-4 mb-4">
+      <button type="button" class="btn btn-primary" (click)="onButtonAddClick()"><i class="bi bi-plus-lg"></i></button>
     </div>
-    <div class="card-body">
-      <h1 class="card-title">Keine Konten</h1>
-      <div class="welcome-card-content">
-        <p class="card-text">Du hast noch keine Konten. Um Abrechnungen erstellen zu können, wird ein Konto benötigt.</p>
+  }
+</div>
+@if (accounts.length == 0 && isInitialized) {
+  <div class="row">
+    <div class="card">
+      <div class="m-2 mt-3">
+        <img src="assets/img/no-credit-card.gif" class="card-img-top" alt="welcome" style="border-radius: 6px;">
       </div>
-      <div class="position-absolute end-0 bottom-0 me-4 mb-4">
-        <button type="button" class="btn btn-primary" (click)="onButtonAddClick()">Anlegen</button>
+      <div class="card-body">
+        <h1 class="card-title">Keine Konten</h1>
+        <div class="welcome-card-content">
+          <p class="card-text">Du hast noch keine Konten. Um Abrechnungen erstellen zu können, wird ein Konto benötigt.</p>
+        </div>
+        <div class="position-absolute end-0 bottom-0 me-4 mb-4">
+          <button type="button" class="btn btn-primary" (click)="onButtonAddClick()">Anlegen</button>
+        </div>
       </div>
     </div>
   </div>
-</div>
+}

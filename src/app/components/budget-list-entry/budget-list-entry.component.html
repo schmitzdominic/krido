@@ -4,9 +4,10 @@
             'text-danger' : budget?.limit! < 0
          }">{{ budget?.limit ? priceService.convertNumberToEuro(budget?.limit!) : 'Bitte Limit setzen' }}</span>
 </div>
-<ngb-progressbar
-  *ngIf="budget?.limit! >= 0"
-  [value]="usedLimit"
-  [max]="budget?.limit!"
-  type="{{progressBarService.getProgressBarType(usedLimit, budget?.limit!)}}"
->{{ getProgressBarText() }}</ngb-progressbar>
+@if (budget?.limit! >= 0) {
+  <ngb-progressbar
+    [value]="usedLimit"
+    [max]="budget?.limit!"
+    type="{{progressBarService.getProgressBarType(usedLimit, budget?.limit!)}}"
+  >{{ getProgressBarText() }}</ngb-progressbar>
+}

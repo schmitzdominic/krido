@@ -3,7 +3,7 @@ import {UserService} from "./services/user/user.service";
 import {Router} from "@angular/router";
 import {AngularFireAuth} from "@angular/fire/compat/auth";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
-import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap/modal/modal-ref";
+import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap";
 import {LoadingService} from "./services/loading/loading.service";
 
 @Component({

@@ -11,15 +11,21 @@
 </ng-template>
 
 <!-- Content -->
-<div *ngIf="showLogin">
-  <app-login></app-login>
-</div>
-<div *ngIf="showHomeSetup">
-  <app-home-setup></app-home-setup>
-</div>
-<div *ngIf="showMain">
-  <app-main-menu></app-main-menu>
-</div>
+@if (showLogin) {
+  <div>
+    <app-login></app-login>
+  </div>
+}
+@if (showHomeSetup) {
+  <div>
+    <app-home-setup></app-home-setup>
+  </div>
+}
+@if (showMain) {
+  <div>
+    <app-main-menu></app-main-menu>
+  </div>
+}
 
 <!-- Toasts -->
 <app-toasts aria-live="polite" aria-atomic="true"></app-toasts>

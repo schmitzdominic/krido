@@ -2,7 +2,7 @@ import {Component, ViewChild} from '@angular/core';
 import {AccountService} from "../../../services/account/account.service";
 import {AccountType} from "../../../../shared/enums/account-type.enum";
 import {Account} from "../../../../shared/interfaces/account.model";
-import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap/modal/modal-ref";
+import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {UserService} from "../../../services/user/user.service";
 

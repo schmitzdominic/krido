@@ -3,7 +3,7 @@ import {EntryService} from "../../../services/entry/entry.service";
 import {HelperService} from "../../../services/helper/helper.service";
 import {Entry} from "../../../../shared/interfaces/entry.model";
 import {DateService} from "../../../services/date/date.service";
-import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap/modal/modal-ref";
+import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {Account} from "../../../../shared/interfaces/account.model";
 

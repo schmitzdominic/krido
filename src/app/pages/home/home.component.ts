@@ -3,7 +3,7 @@ import {DateService} from "../../services/date/date.service";
 import {MenuTitleService} from "../../../shared/behavior/menu-title/menu-title.service";
 import {BudgetService} from "../../services/budget/budget.service";
 import {Budget} from "../../../shared/interfaces/budget.model";
-import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap/modal/modal-ref";
+import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {AccountType} from "../../../shared/enums/account-type.enum";
 import {PredictService} from "../../services/predict/predict.service";

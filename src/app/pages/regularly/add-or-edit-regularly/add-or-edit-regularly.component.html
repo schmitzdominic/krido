@@ -8,12 +8,16 @@
   <form class="needs-validation" [formGroup]="addOrEditRegularlyFormGroup" (ngSubmit)="onSubmit()" novalidate>
     <div class="mb-4">
       <select class="form-select" id="add-regularly-entry-type" aria-label="Select entry type" formControlName="entryType">
-        <option *ngFor="let entryType of entryTypes" value="{{ entryType.value }}">{{ entryType.label }}</option>
+        @for (entryType of entryTypes; track entryType) {
+          <option value="{{ entryType.value }}">{{ entryType.label }}</option>
+        }
       </select>
     </div>
     <div class="mb-4">
       <select class="form-select" id="add-regularly-cycle-type" aria-label="Select cycle type" formControlName="cycleType">
-        <option *ngFor="let cycleType of cycleTypes" value="{{ cycleType.value }}">{{ cycleType.label }}</option>
+        @for (cycleType of cycleTypes; track cycleType) {
+          <option value="{{ cycleType.value }}">{{ cycleType.label }}</option>
+        }
       </select>
     </div>
     <div class="col-md-12 mb-3">
@@ -46,54 +50,64 @@
     <div class="col-md-12 mb-3">
       <label for="add-entry-account" class="form-label">Konto</label>
       <select class="form-select" id="add-entry-account" aria-label="Select entry type" formControlName="account">
-        <option *ngFor="let account of accounts" value="{{ account.key }}">{{ account.name }}</option>
+        @for (account of accounts; track account) {
+          <option value="{{ account.key }}">{{ account.name }}</option>
+        }
       </select>
     </div>
-    <div class="col-md-12 mb-3" *ngIf="selectedCycleType === yearCycleType">
-      <label for="add-entry-date" class="form-label">Datum</label>
-      <div class="input-group">
-        <input
-          id="add-entry-date"
-          class="form-control"
-          placeholder="{{ selectedDateTimestamp | date: 'dd.MM'}}"
-          name="date"
-          formControlName="date"
-          ngbDatepicker
-          value="{{ selectedDateTimestamp | date: 'dd.MM'}}"
-          [showWeekNumbers]="true"
-          (dateSelect)="onDateSelected($event)"
-          #date="ngbDatepicker"
-        />
-        <button class="btn btn-outline-secondary bi bi-calendar3" (click)="date.toggle()" type="button"></button>
+    @if (selectedCycleType === yearCycleType) {
+      <div class="col-md-12 mb-3">
+        <label for="add-entry-date" class="form-label">Datum</label>
+        <div class="input-group">
+          <input
+            id="add-entry-date"
+            class="form-control"
+            placeholder="{{ selectedDateTimestamp | date: 'dd.MM'}}"
+            name="date"
+            formControlName="date"
+            ngbDatepicker
+            value="{{ selectedDateTimestamp | date: 'dd.MM'}}"
+            [showWeekNumbers]="true"
+            (dateSelect)="onDateSelected($event)"
+            #date="ngbDatepicker"
+            />
+          <button class="btn btn-outline-secondary bi bi-calendar3" (click)="date.toggle()" type="button"></button>
+        </div>
       </div>
-    </div>
-    <div class="col-md-12 mb-3" *ngIf="!isLastDay && isMonthDayNeeded">
-      <label for="add-regularly-month-day-number" class="form-label">Tag im Monat</label>
-      <div class="input-group has-validation">
-        <input
-          currencyMask
-          class="form-control"
-          id="add-regularly-month-day-number"
-          formControlName="monthDay"
-          aria-describedby="inputGroupPrepend"
-          [max]="28"
-          maxlength="2"
-          [options]="{ prefix: '', allowNegative: false, precision: 0 }"
-          inputmode="numeric"
-          pattern="">
+    }
+    @if (!isLastDay && isMonthDayNeeded) {
+      <div class="col-md-12 mb-3">
+        <label for="add-regularly-month-day-number" class="form-label">Tag im Monat</label>
+        <div class="input-group has-validation">
+          <input
+            currencyMask
+            class="form-control"
+            id="add-regularly-month-day-number"
+            formControlName="monthDay"
+            aria-describedby="inputGroupPrepend"
+            [max]="28"
+            maxlength="2"
+            [options]="{ prefix: '', allowNegative: false, precision: 0 }"
+            inputmode="numeric"
+            pattern="">
+        </div>
       </div>
-    </div>
-    <div class="col-12 mb-3" *ngIf="isMonthDayNeeded">
-      <div class="form-check">
-        <input formControlName="lastDay" class="form-check-input" type="checkbox" value="" id="add-regularly-month-last-day">
-        <label class="form-check-label ps-1" for="add-regularly-month-last-day">
-          Letzter Tag im Monat
-        </label>
+    }
+    @if (isMonthDayNeeded) {
+      <div class="col-12 mb-3">
+        <div class="form-check">
+          <input formControlName="lastDay" class="form-check-input" type="checkbox" value="" id="add-regularly-month-last-day">
+          <label class="form-check-label ps-1" for="add-regularly-month-last-day">
+            Letzter Tag im Monat
+          </label>
+        </div>
       </div>
-    </div>
+    }
   </form>
   <div class="pt-2">
-    <button type="button" class="btn btn-danger" *ngIf="regularly" (click)="onButtonDelete()"><i class="bi bi-trash pe-2"></i>Löschen</button>
+    @if (regularly) {
+      <button type="button" class="btn btn-danger" (click)="onButtonDelete()"><i class="bi bi-trash pe-2"></i>Löschen</button>
+    }
   </div>
 </div>
 <div class="modal-footer">
@@ -102,7 +116,7 @@
     type="button"
     class="btn btn-light"
     [disabled]="isNameInvalid || isValueInvalid || isMonthDayInvalid"
-    (click)="onSubmit()">{{ submitButtonText }}</button>
+  (click)="onSubmit()">{{ submitButtonText }}</button>
 </div>
 
 
