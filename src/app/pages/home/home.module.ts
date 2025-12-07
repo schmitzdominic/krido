@@ -1,0 +1,49 @@
+import { NgModule, NO_ERRORS_SCHEMA } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { CurrencyMaskModule } from 'ng2-currency-mask';
+
+import { HomeComponent } from './home.component';
+import { EntryListComponent } from './entry-list/entry-list.component';
+import { AddOrEditEntryComponent } from './entry-list/add-or-edit-entry/add-or-edit-entry.component';
+import { InfoAreaComponent } from './info-area/info-area.component';
+import { UpdateAccountValueComponent } from './info-area/update-account-value/update-account-value.component';
+import { EntryListEntryComponent } from '../../components/entry-list-entry/entry-list-entry.component';
+import { InfoListEntryComponent } from '../../components/info-list-entry/info-list-entry.component';
+
+@NgModule({
+  declarations: [
+    HomeComponent,
+    EntryListComponent,
+    AddOrEditEntryComponent,
+    InfoAreaComponent,
+    UpdateAccountValueComponent,
+    EntryListEntryComponent,
+    InfoListEntryComponent,
+  ],
+  imports: [
+    CommonModule,
+    RouterModule,
+    ReactiveFormsModule,
+    FormsModule,
+    NgbModule,
+    MatIconModule,
+    MatButtonModule,
+    CurrencyMaskModule,
+  ],
+  exports: [
+    HomeComponent,
+    EntryListComponent,
+    AddOrEditEntryComponent,
+    InfoAreaComponent,
+    UpdateAccountValueComponent,
+    EntryListEntryComponent,
+    InfoListEntryComponent,
+  ],
+  schemas: [NO_ERRORS_SCHEMA],
+})
+export class HomeModule { }
