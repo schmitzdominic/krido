@@ -6,11 +6,8 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import {NgbDateParserFormatter, NgbModule} from "@ng-bootstrap/ng-bootstrap";
 import { MainMenuComponent } from './components/main-menu/main-menu.component';
-import { initializeApp,provideFirebaseApp } from '@angular/fire/app';
 import { environment } from '../environments/environment';
-import { provideAnalytics,getAnalytics,ScreenTrackingService,UserTrackingService } from '@angular/fire/analytics';
-import { provideAuth,getAuth } from '@angular/fire/auth';
-import { provideDatabase,getDatabase } from '@angular/fire/database';
+import {ScreenTrackingService, UserTrackingService} from '@angular/fire/analytics';
 import {AngularFireModule} from "@angular/fire/compat";
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {MatIconModule} from "@angular/material/icon";
@@ -30,6 +27,9 @@ import { BudgetsModule } from './pages/budgets/budgets.module';
 import { AccountsModule } from './pages/accounts/accounts.module';
 import { HistoryModule } from './pages/history/history.module';
 import { InvoiceModule } from './pages/invoice/invoice.module';
+import {AngularFireAnalyticsModule} from "@angular/fire/compat/analytics";
+import {AngularFireAuthModule} from "@angular/fire/compat/auth";
+import {AngularFireDatabaseModule} from "@angular/fire/compat/database";
 
 @NgModule({
   declarations: [
@@ -50,6 +50,9 @@ import { InvoiceModule } from './pages/invoice/invoice.module';
     HistoryModule,
     InvoiceModule,
     AngularFireModule.initializeApp(environment.firebase),
+    AngularFireAnalyticsModule,
+    AngularFireAuthModule,
+    AngularFireDatabaseModule,
     NgbModule,
     AppRoutingModule,
     BrowserAnimationsModule,
@@ -66,10 +69,6 @@ import { InvoiceModule } from './pages/invoice/invoice.module';
     ScreenTrackingService,
     UserTrackingService,
     { provide: NgbDateParserFormatter, useClass: NgbDateCustomParserFormatter },
-    provideFirebaseApp(() => initializeApp(environment.firebase)),
-    provideAnalytics(() => getAnalytics()),
-    provideAuth(() => getAuth()),
-    provideDatabase(() => getDatabase()),
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA],
   bootstrap: [AppComponent]
