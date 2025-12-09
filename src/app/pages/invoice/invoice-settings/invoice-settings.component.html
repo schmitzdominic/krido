@@ -5,7 +5,7 @@
       <div class="mb-3">
         <select class="form-select" id="invoice-settings-invoice-accounts" aria-label="Select Invoice Account" formControlName="invoiceAccounts">
           @for (invoiceAccount of invoiceAccounts; track invoiceAccount) {
-            <option value="{{ invoiceAccount.key }}">{{ invoiceAccount.name }}</option>
+            <option value="{{ invoiceAccount.id }}">{{ invoiceAccount.name }}</option>
           }
         </select>
       </div>
@@ -20,7 +20,7 @@
             <div class="col-10">
               <select class="form-select" id="invoice-settings-beneficiary-accounts-select" aria-label="Select Beneficiary Account" formControlName="beneficiaryAccounts">
                 @for (beneficiaryAccount of beneficiaryAccounts; track beneficiaryAccount) {
-                  <option value="{{ beneficiaryAccount.key }}">{{ beneficiaryAccount.name }}</option>
+                  <option value="{{ beneficiaryAccount.id }}">{{ beneficiaryAccount.name }}</option>
                 }
               </select>
             </div>

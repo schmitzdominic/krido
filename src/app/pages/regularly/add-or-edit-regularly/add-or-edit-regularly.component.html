@@ -51,7 +51,7 @@
       <label for="add-entry-account" class="form-label">Konto</label>
       <select class="form-select" id="add-entry-account" aria-label="Select entry type" formControlName="account">
         @for (account of accounts; track account) {
-          <option value="{{ account.key }}">{{ account.name }}</option>
+          <option value="{{ account.id }}">{{ account.name }}</option>
         }
       </select>
     </div>

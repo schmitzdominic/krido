@@ -14,6 +14,7 @@ import { InfoAreaComponent } from './info-area/info-area.component';
 import { UpdateAccountValueComponent } from './info-area/update-account-value/update-account-value.component';
 import { EntryListEntryComponent } from '../../components/entry-list-entry/entry-list-entry.component';
 import { InfoListEntryComponent } from '../../components/info-list-entry/info-list-entry.component';
+import { BudgetsModule } from "../budgets/budgets.module";
 
 @NgModule({
   declarations: [
@@ -34,7 +35,8 @@ import { InfoListEntryComponent } from '../../components/info-list-entry/info-li
     MatIconModule,
     MatButtonModule,
     CurrencyMaskModule,
-  ],
+    BudgetsModule
+],
   exports: [
     HomeComponent,
     EntryListComponent,

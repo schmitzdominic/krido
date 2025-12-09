@@ -6,7 +6,7 @@ import {EntryService} from "../../../services/entry/entry.service";
 import {DateService} from "../../../services/date/date.service";
 import {Entry} from "../../../../shared/interfaces/entry.model";
 import {LoadingService} from "../../../services/loading/loading.service";
-import { forkJoin, map, Subject, take, takeUntil } from 'rxjs';
+import { combineLatest, forkJoin, map, Subject, take, takeUntil } from 'rxjs';
 import { Account } from '../../../../shared/interfaces/account.model';
 
 @Component({
@@ -51,19 +51,14 @@ export class EntryListComponent implements OnInit, OnDestroy {
 
   loadEntries() {
     this.loadingService.setLoading = true;
-    const actualMonth$ = this.entryService.getAllEntriesByMonthString(this.dateService.getActualMonthString()).pipe(take(1), map(e => e as (Entry & { id: string })[]));
-    const nextMonth$ = this.entryService.getAllEntriesByMonthString(this.dateService.getMonthStringFromMonth(1)).pipe(take(1), map(e => e as (Entry & { id: string })[]));
+    const actualMonth$ = this.entryService.getAllEntriesByMonthString(this.dateService.getActualMonthString());
+    const nextMonth$ = this.entryService.getAllEntriesByMonthString(this.dateService.getMonthStringFromMonth(1));
 
-    const test = this.entryService.getAllEntriesByMonthString(this.dateService.getMonthStringFromMonth(1)).subscribe(values => {
-      console.log(values);
-  
-    });
-
-    forkJoin([actualMonth$, nextMonth$]).pipe(
-      takeUntil(this.destroy$)
-    ).subscribe(([actualEntries, nextEntries]) => {
-
-      // Process actual month entries
+    combineLatest([actualMonth$, nextMonth$]).pipe(
+      takeUntil(this.destroy$)).
+      subscribe(([actualEntries, nextEntries]) => {
+      
+        // Process actual month entries
       this.totalActualMonthEntries = actualEntries.length;
       const filteredActual = this.isShowAll ? actualEntries : actualEntries.filter(entry => entry.date >= this.dateService.getActualDayTimestamp());
       this.actualMonthEntries = this.sortEntriesByDate(filteredActual);
@@ -74,7 +69,7 @@ export class EntryListComponent implements OnInit, OnDestroy {
       this.nextMonthEntries = this.sortEntriesByDate(filteredNext);
 
       this.loadingService.setLoading = false;
-    });
+      });
   }
 
   private sortEntriesByDate(entries: (Entry & { id: string })[]) {
@@ -86,10 +81,8 @@ export class EntryListComponent implements OnInit, OnDestroy {
 
   checkForAccounts() {
     this.accountService.getAllAccounts().pipe(
-      take(1), // Es ist auch eine gute Praxis, dies hier hinzuzufügen
-      map(accounts => accounts as Account[]), // Die Typ-Zuweisung ist hier wahrscheinlich nicht nötig, wenn der Service schon den richtigen Typ zurückgibt
-      takeUntil(this.destroy$)
-    ).subscribe(accounts => {
+      takeUntil(this.destroy$)).
+      subscribe(accounts => {
       this.isAccountAvailable = accounts.length > 0;
       this.isToastNoAccountShown = !this.isAccountAvailable;
     });

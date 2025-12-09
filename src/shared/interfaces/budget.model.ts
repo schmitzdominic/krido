@@ -1,7 +1,7 @@
 import {Entry} from "./entry.model";
 
 export interface Budget {
-  key?: string;
+  id?: string;
   cycleKey?: string;
   searchName: string;
   name: string;

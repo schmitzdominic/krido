@@ -53,11 +53,8 @@ export class AppComponent {
   private subscribeLoadingService() {
     this.loadingService.isLoading.subscribe(isLoading => {
       if (isLoading) {
-        // this.openLoading();
-        console.log('loading');
+        this.openLoading();
       } else {
-        // this.closeLoading();
-        console.log('not loading');
         this.closeLoading();
       }
     });

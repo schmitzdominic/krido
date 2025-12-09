@@ -21,7 +21,7 @@ export class ViewBudgetContentComponent {
   priceService = inject(PriceService);
 
 
-  @Input() budget: (Budget & { id: string }) | undefined;
+  @Input() budget: Budget | undefined;
 
   @Output() onClose: EventEmitter<any> = new EventEmitter<any>();
 
@@ -59,7 +59,7 @@ export class ViewBudgetContentComponent {
   }
 
   loadEntries() {
-    if (this.budget?.id) {
+    if (this.budget && this.budget.id) {
       this.entryService.getAllEntriesByBudgetKey(this.budget.id).pipe(
         map(entries => entries as (Entry & { id: string })[])
       ).subscribe(entries => runInInjectionContext(this.injector, () => {

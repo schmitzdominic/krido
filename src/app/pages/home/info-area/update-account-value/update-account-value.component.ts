@@ -67,7 +67,7 @@ export class UpdateAccountValueComponent {
   }
 
   onSubmit() {
-    this.accountService.setValue(this.selectedDateTimestamp, this.value, this.account!.key!).then(() => this.onClose.emit());
+    this.accountService.setValue(this.selectedDateTimestamp, this.value, this.account!.id!).then(() => this.onClose.emit());
   }
 
   onButtonCancel() {

@@ -15,7 +15,7 @@ export class AccountService {
   private rootPath: string =  `homes/${this.dbService.home}/accounts`;
 
   noAccountValue: Account = {
-    key: 'key',
+    id: 'id',
     name: 'Kein Konto angelegt',
     searchName: 'keinKontoAngelegt',
     owners: [this.userService.user],

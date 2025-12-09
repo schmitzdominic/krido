@@ -10,7 +10,7 @@
   <div class="col-md-12 mb-3">
     <select class="form-select" id="user" aria-label="Select user" formControlName="accounts">
       @for (account of accounts; track account) {
-        <option value="{{ account.key }}">{{ account.name }}</option>
+        <option value="{{ account.id }}">{{ account.name }}</option>
       }
     </select>
   </div>

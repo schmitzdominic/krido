@@ -38,12 +38,6 @@ export class AddOrEditBudgetContentComponent {
     limit: new FormControl('')
   });
 
-  /** Inserted by Angular inject() migration for backwards compatibility */
-  constructor(...args: unknown[]);
-
-  constructor() {
-  }
-
   ngOnInit() {
     this.createFormGroup();
     this.setLimitValidator();
@@ -90,14 +84,14 @@ export class AddOrEditBudgetContentComponent {
 
   onDelete(): void {
     if (!this.budget?.entries) {
-      if (this.budget && this.budget.key && this.budget?.validityPeriod) {
-        this.budgetService.deleteMonthBudget(this.budget.key).then(() => {
+      if (this.budget && this.budget.id && this.budget?.validityPeriod) {
+        this.budgetService.deleteMonthBudget(this.budget.id).then(() => {
           this.toastService.showSuccess(this.deleteSuccessMessage);
           this.onClose.emit();
         });
       }
-      if (this.budget && this.budget.key && !this.budget.validityPeriod) {
-        this.budgetService.deleteBudget(this.budget.key).then(() => {
+      if (this.budget && this.budget.id && !this.budget.validityPeriod) {
+        this.budgetService.deleteBudget(this.budget.id).then(() => {
           this.toastService.showSuccess(this.deleteSuccessMessage);
           this.onClose.emit();
         });
@@ -128,9 +122,9 @@ export class AddOrEditBudgetContentComponent {
     const budget = this.createBudgetObject();
     if (this.budget) {
       // Edit existing budget
-      if (this.budget.key) {
-        const key: string = this.budget.key;
-        delete budget['key'];
+      if (this.budget.id) {
+        const key: string = this.budget.id;
+        delete budget['id'];
         if (this.budget.validityPeriod) {
           this.budgetService.updateMonthBudget(budget, key).then(() => {
             this.onClose.emit();
@@ -155,9 +149,9 @@ export class AddOrEditBudgetContentComponent {
   setArchiveState(state: boolean) {
     let budget: Budget = this.createBudgetObject();
     budget.isArchived = state;
-    if (this.budget?.key) {
-      const key: string = this.budget.key;
-      delete budget['key'];
+    if (this.budget && this.budget.id) {
+      const key: string = this.budget.id;
+      delete budget['id'];
       if (this.budget?.validityPeriod) {
         this.budgetService.updateMonthBudget(budget, key).then(() => {
           this.toastService.showSuccess(state ? this.archiveSuccessArchivedMessage : this.archiveSuccessDeArchivedMessage);
