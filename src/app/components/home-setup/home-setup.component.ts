@@ -1,9 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, inject, Injector, runInInjectionContext } from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {HomeService} from "../../services/home/home.service";
 import {Home} from "../../../shared/interfaces/home.model";
 import {ToastService} from "../../services/toast/toast.service";
 import {HelperService} from "../../services/helper/helper.service";
+import { map } from 'rxjs/operators';
 
 @Component({
     selector: 'app-home-setup',
@@ -12,6 +13,12 @@ import {HelperService} from "../../services/helper/helper.service";
     standalone: false
 })
 export class HomeSetupComponent {
+  private formBuilder = inject(FormBuilder);
+  private homeService = inject(HomeService);
+  private helperService = inject(HelperService);
+  private toastService = inject(ToastService);
+  private injector = inject(Injector);
+
 
   joinFormGroup: FormGroup = new FormGroup({
     joinHomeName: new FormControl(''),
@@ -28,12 +35,6 @@ export class HomeSetupComponent {
   isButtonDisabled: boolean = true;
 
   homes: Home[] = [];
-
-  constructor(private formBuilder: FormBuilder,
-              private homeService: HomeService,
-              private helperService: HelperService,
-              private toastService: ToastService) {
-  }
 
   ngOnInit(): void {
     this.createFormGroups();
@@ -57,12 +58,10 @@ export class HomeSetupComponent {
   }
 
   subscribeAllHomes(): void {
-    this.homeService.getAllHomes.subscribe(homes => {
-      this.homes = [];
-      homes.forEach(home => {
-        this.homes.push(home.payload.val() as Home);
-      })
-    });
+    // With the new API, we get the array of homes directly.
+    this.homeService.getAllHomes.pipe(
+      map(homes => homes as Home[])
+    ).subscribe(homes => this.homes = homes);
   }
 
   onShow(event: string): void {
@@ -105,7 +104,7 @@ export class HomeSetupComponent {
     const isHomeExisting: Home | undefined = this.homes.find(home => home.searchName === searchName);
 
     if (isHomeExisting) {
-      if (isHomeExisting.pin == pin) {
+      if (isHomeExisting.pin === Number(pin)) {
         // if exist and pin is equal, join!
         const home: Home = {
           searchName: searchName,
@@ -138,10 +137,12 @@ export class HomeSetupComponent {
         pin: this.homeService.generatePin
       };
       this.homeService.createHome(home).then(() => {
-        this.homeService.joinHome(home).then(() => {
-          window.location.reload();
-          this.toastService.showSuccess(`${this.createFormGroup.value.createHomeName} erfolgreich erstellt`, 5000);
-        });
+        runInInjectionContext(this.injector, () => {
+          this.homeService.joinHome(home).then(() => {
+            window.location.reload();
+            this.toastService.showSuccess(`${this.createFormGroup.value.createHomeName} erfolgreich erstellt`, 5000);
+          });
+        })
       });
     }
   }

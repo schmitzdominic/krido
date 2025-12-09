@@ -1,4 +1,4 @@
-import {Component, ViewChild} from '@angular/core';
+import { Component, inject, Injector, runInInjectionContext, ViewChild } from '@angular/core';
 import {DateService} from "../../services/date/date.service";
 import {MenuTitleService} from "../../../shared/behavior/menu-title/menu-title.service";
 import {BudgetService} from "../../services/budget/budget.service";
@@ -7,6 +7,7 @@ import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {AccountType} from "../../../shared/enums/account-type.enum";
 import {PredictService} from "../../services/predict/predict.service";
+import { map } from 'rxjs/operators';
 
 @Component({
     selector: 'app-actual-month',
@@ -15,6 +16,13 @@ import {PredictService} from "../../services/predict/predict.service";
     standalone: false
 })
 export class HomeComponent {
+  private menuTitleService = inject(MenuTitleService);
+  private dateService = inject(DateService);
+  private budgetService = inject(BudgetService);
+  private ngbModal = inject(NgbModal);
+  private predictService = inject(PredictService);
+  private injector = inject(Injector);
+
 
   @ViewChild('viewBudgetModal') viewBudgetModal: NgbModalRef | undefined;
 
@@ -29,15 +37,8 @@ export class HomeComponent {
 
   clickedBudget: Budget | undefined;
 
-  allTimeBudgets: Budget[] = [];
-  monthlyBudgets: Budget[] = [];
-
-  constructor(private menuTitleService: MenuTitleService,
-              private dateService: DateService,
-              private budgetService: BudgetService,
-              private ngbModal: NgbModal,
-              private predictService: PredictService) {
-  }
+  allTimeBudgets: (Budget & { id: string })[] = [];
+  monthlyBudgets: (Budget & { id: string })[] = [];
 
   ngOnInit(): void {
     this.predictService.createEntries();
@@ -60,25 +61,19 @@ export class HomeComponent {
   }
 
   private loadAllTimeBudgets() {
-    this.budgetService.getAllNoTimeLimitBudgets().subscribe(budgets => {
-      this.allTimeBudgets = [];
-      budgets.filter(budgetRaw => !(budgetRaw.payload.val() as Budget).isArchived).forEach(budgetRaw => {
-        const budget: Budget = budgetRaw.payload.val() as Budget;
-        budget.key = budgetRaw.key ? budgetRaw.key : '';
-        this.allTimeBudgets.push(budget);
-      });
-    });
+    this.budgetService.getAllNoTimeLimitBudgets().pipe(
+      map(budgets => budgets as (Budget & { id: string })[])
+    ).subscribe(budgets => runInInjectionContext(this.injector, () => {
+      this.allTimeBudgets = budgets.filter(budget => !budget.isArchived);
+    }));
   }
 
   private loadMonthlyBudgets() {
-    this.budgetService.getAllMonthBudgetsByMonthString(this.dateService.getActualMonthString()).subscribe(budgets => {
-      this.monthlyBudgets = [];
-      budgets.filter(budgetRaw => !(budgetRaw.payload.val() as Budget).isArchived).forEach(budgetRaw => {
-        const budget: Budget = budgetRaw.payload.val() as Budget;
-        budget.key = budgetRaw.key ? budgetRaw.key : '';
-        this.monthlyBudgets.push(budget);
-      });
-    });
+    this.budgetService.getAllMonthBudgetsByMonthString(this.dateService.getActualMonthString()).pipe(
+      map(budgets => budgets as (Budget & { id: string })[])
+    ).subscribe(budgets => runInInjectionContext(this.injector, () => {
+      this.monthlyBudgets = budgets.filter(budget => !budget.isArchived);
+    }));
   }
 
   openViewBudgetModal(budget: Budget): void {

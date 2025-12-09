@@ -7,8 +7,6 @@ import { AppComponent } from './app.component';
 import {NgbDateParserFormatter, NgbModule} from "@ng-bootstrap/ng-bootstrap";
 import { MainMenuComponent } from './components/main-menu/main-menu.component';
 import { environment } from '../environments/environment';
-import {ScreenTrackingService, UserTrackingService} from '@angular/fire/analytics';
-import {AngularFireModule} from "@angular/fire/compat";
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {MatIconModule} from "@angular/material/icon";
 import {MatButtonModule} from '@angular/material/button';
@@ -27,9 +25,11 @@ import { BudgetsModule } from './pages/budgets/budgets.module';
 import { AccountsModule } from './pages/accounts/accounts.module';
 import { HistoryModule } from './pages/history/history.module';
 import { InvoiceModule } from './pages/invoice/invoice.module';
-import {AngularFireAnalyticsModule} from "@angular/fire/compat/analytics";
-import {AngularFireAuthModule} from "@angular/fire/compat/auth";
-import {AngularFireDatabaseModule} from "@angular/fire/compat/database";
+
+// AngularFire Modular Imports
+import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
+import { getDatabase, provideDatabase } from '@angular/fire/database';
+import { getAuth, provideAuth } from '@angular/fire/auth';
 
 @NgModule({
   declarations: [
@@ -49,10 +49,6 @@ import {AngularFireDatabaseModule} from "@angular/fire/compat/database";
     AccountsModule,
     HistoryModule,
     InvoiceModule,
-    AngularFireModule.initializeApp(environment.firebase),
-    AngularFireAnalyticsModule,
-    AngularFireAuthModule,
-    AngularFireDatabaseModule,
     NgbModule,
     AppRoutingModule,
     BrowserAnimationsModule,
@@ -66,8 +62,9 @@ import {AngularFireDatabaseModule} from "@angular/fire/compat/database";
     }),
   ],
   providers: [
-    ScreenTrackingService,
-    UserTrackingService,
+    provideFirebaseApp(() => initializeApp(environment.firebase)),
+    provideAuth(() => getAuth()),
+    provideDatabase(() => getDatabase()),
     { provide: NgbDateParserFormatter, useClass: NgbDateCustomParserFormatter },
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA],

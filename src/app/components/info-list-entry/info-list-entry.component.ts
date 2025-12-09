@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import { Component, inject, Injector, Input, OnChanges, runInInjectionContext, SimpleChanges } from '@angular/core';
 import {Account} from "../../../shared/interfaces/account.model";
 import {AccountType} from "../../../shared/enums/account-type.enum";
 import {PriceService} from "../../services/price/price.service";
@@ -8,6 +8,7 @@ import {Entry} from "../../../shared/interfaces/entry.model";
 import {EntryType} from "../../../shared/enums/entry-type.enum";
 import {BudgetService} from "../../services/budget/budget.service";
 import {Budget} from "../../../shared/interfaces/budget.model";
+import {forkJoin, map} from "rxjs";
 
 @Component({
     selector: 'app-info-list-entry',
@@ -15,7 +16,13 @@ import {Budget} from "../../../shared/interfaces/budget.model";
     styleUrls: ['./info-list-entry.component.scss'],
     standalone: false
 })
-export class InfoListEntryComponent {
+export class InfoListEntryComponent implements OnChanges {
+  priceService = inject(PriceService);
+  private dateService = inject(DateService);
+  private entryService = inject(EntryService);
+  private budgetService = inject(BudgetService);
+  private injector = inject(Injector);
+
 
   @Input() account: Account | undefined;
 
@@ -24,14 +31,10 @@ export class InfoListEntryComponent {
   overallValueLeftBudgets: number = 0;
   overallValueEntries: number = 0;
 
-  constructor(public priceService: PriceService,
-              private dateService: DateService,
-              private entryService: EntryService,
-              private budgetService: BudgetService) {
-  }
-
-  ngOnInit() {
-    this.calculateRest();
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['account'] && changes['account'].currentValue) {
+      this.calculateRest();
+    }
   }
 
   getPrice(account: Account) {
@@ -44,44 +47,43 @@ export class InfoListEntryComponent {
   }
 
   calculateRest() {
-    if (this.account!.updatedDate) {
+    if (this.account?.updatedDate) {
+      const monthString = this.dateService.getActualMonthString();
 
       // Budgets
-      this.budgetService.getAllMonthBudgetsByMonthString(this.dateService.getActualMonthString()).subscribe(budgets => {
-        this.overallValueLeftBudgets = 0;
-        budgets.filter(budget => !(budget.payload.val() as Budget).isArchived).forEach(budgetRaw => {
-          const budget: Budget = budgetRaw.payload.val() as Budget;
-          budget.key = budgetRaw.key ? budgetRaw.key : '';
-          this.updateValueLeftByBudget(budget);
-        });
-      });
+      const budgets$ = this.budgetService.getAllMonthBudgetsByMonthString(monthString).pipe(
+        map(budgets => budgets as Budget[])
+      );
 
       // Entries
-      this.entryService.getAllEntriesByMonthString(this.dateService.getActualMonthString()).subscribe(entries => {
-        this.overallValueEntries = 0;
-        entries.filter(entry => {
-          return (entry.payload.val() as Entry).account.key === this.account!.key! && (entry.payload.val() as Entry).date >= this.account?.updatedDate!;
-        }).forEach(entryRaw => {
-          const entry: Entry = entryRaw.payload.val() as Entry;
-          entry.key = entryRaw.key ? entryRaw.key : '';
-          this.updateValueLeftByEntry(entry);
-        });
-      });
+      const entries$ = this.entryService.getAllEntriesByMonthString(monthString).pipe(
+        map(entries => entries as Entry[])
+      );
+
+      forkJoin([budgets$, entries$]).subscribe(([budgets, entries]) => runInInjectionContext(this.injector, () => {
+        // Process Budgets
+        this.overallValueLeftBudgets = budgets
+          .filter(budget => !budget.isArchived)
+          .reduce((acc, budget) => acc + this.getValueLeftByBudget(budget), 0);
+
+        // Process Entries
+        this.overallValueEntries = entries
+          .filter(entry => (entry.account as any)?.id === (this.account as any)?.id && entry.date >= this.account!.updatedDate!)
+          .reduce((acc, entry) => acc + this.getValueLeftByEntry(entry), 0);
+      }));
     }
   }
 
-  updateValueLeftByEntry(entry: Entry) {
-    switch (entry.type) {
-      case EntryType.income: this.overallValueEntries -= entry.value; break;
-      case EntryType.outcome: this.overallValueEntries += entry.value; break;
-    }
+  getValueLeftByEntry(entry: Entry): number {
+    return entry.type === EntryType.income ? -entry.value : entry.value;
   }
 
-  updateValueLeftByBudget(budget: Budget) {
+  getValueLeftByBudget(budget: Budget): number {
     const restBudget: number = budget.limit! - budget.usedLimit!;
     if (budget.limit! < 0 || restBudget > 0) {
-      this.overallValueLeftBudgets += restBudget;
+      return restBudget;
     }
+    return 0;
   }
 
   calculateOverallRest(): number {

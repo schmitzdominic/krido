@@ -1,13 +1,16 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {DbService} from "../db.service";
 import {Account} from "../../../shared/interfaces/account.model";
 import {AccountType} from "../../../shared/enums/account-type.enum";
 import {UserService} from "../user/user.service";
+import {equalTo, orderByChild} from "@angular/fire/database";
 
 @Injectable({
   providedIn: 'root'
 })
 export class AccountService {
+  private dbService = inject(DbService);
+  private userService = inject(UserService);
 
   private rootPath: string =  `homes/${this.dbService.home}/accounts`;
 
@@ -19,8 +22,7 @@ export class AccountService {
     accountType: AccountType.giro
   }
 
-  constructor(private dbService: DbService,
-              private userService: UserService) { }
+  constructor() { }
 
   addAccount(account: Account) {
     return this.dbService.createListValue(`${this.rootPath}`, account);
@@ -31,7 +33,7 @@ export class AccountService {
   }
 
   getAllAccountsFilteredByAccountType(accountType: AccountType) {
-    return this.dbService.readFilteredList(`${this.rootPath}`, (ref: any) => ref.orderByChild('accountType').equalTo(accountType));
+    return this.dbService.readFilteredList(`${this.rootPath}`, orderByChild('accountType'), equalTo(accountType));
   }
 
   updateAccount(account: Account, key: string) {

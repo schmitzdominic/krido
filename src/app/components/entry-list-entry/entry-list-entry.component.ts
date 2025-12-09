@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import {Entry} from "../../../shared/interfaces/entry.model";
 import {AccountType} from "../../../shared/enums/account-type.enum";
 import {PriceService} from "../../services/price/price.service";
@@ -12,14 +12,19 @@ import {EntryType} from "../../../shared/enums/entry-type.enum";
     standalone: false
 })
 export class EntryListEntryComponent {
+  priceService = inject(PriceService);
+  dateService = inject(DateService);
+
 
   @Input() entry: Entry | undefined;
   @Input() withMonth: boolean = false;
 
   protected readonly AccountType = AccountType;
 
-  constructor(public priceService: PriceService,
-              public dateService: DateService) {
+  /** Inserted by Angular inject() migration for backwards compatibility */
+  constructor(...args: unknown[]);
+
+  constructor() {
   }
 
   ngOnInit() {

@@ -1,4 +1,4 @@
-import {Component, Input, SimpleChanges, ViewChild} from '@angular/core';
+import { Component, inject, Injector, Input, runInInjectionContext, SimpleChanges, ViewChild } from '@angular/core';
 import {EntryService} from "../../../services/entry/entry.service";
 import {HelperService} from "../../../services/helper/helper.service";
 import {Entry} from "../../../../shared/interfaces/entry.model";
@@ -6,6 +6,7 @@ import {DateService} from "../../../services/date/date.service";
 import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {Account} from "../../../../shared/interfaces/account.model";
+import { map } from 'rxjs/operators';
 
 export interface HistorySearchObject {
   searchValue: string,
@@ -20,6 +21,12 @@ export interface HistorySearchObject {
     standalone: false
 })
 export class HistoryListComponent {
+  private entryService = inject(EntryService);
+  private helperService = inject(HelperService);
+  private dateService = inject(DateService);
+  private ngbModal = inject(NgbModal);
+  private injector = inject(Injector);
+
 
   @Input() historySearchObject: HistorySearchObject | undefined;
 
@@ -29,15 +36,9 @@ export class HistoryListComponent {
 
   addOrEditEntryModalRef: NgbModalRef | undefined;
 
-  entries: Entry[] = [];
+  entries: (Entry & { id: string })[] = [];
 
-  selectedEntry: Entry | undefined;
-
-  constructor(private entryService: EntryService,
-              private helperService: HelperService,
-              private dateService: DateService,
-              private ngbModal: NgbModal) {
-  }
+  selectedEntry: (Entry & { id: string }) | undefined;
 
   ngOnInit() {
   }
@@ -59,13 +60,11 @@ export class HistoryListComponent {
 
   search(value: string, account: Account | undefined = undefined) {
     this.title = 'Ergebnisse'
-    this.entryService.searchEntriesByName(this.helperService.createSearchName(value)).subscribe(results => {
-      this.entries.length = 0;
-      results.filter(entry => (entry.payload.val() as Entry).searchName.includes(this.helperService.createSearchName(value))).forEach(result => {
-        const entry: Entry = result.payload.val() as Entry;
-        entry.key = result.key ? result.key : '';
-        this.entries.push(entry);
-      });
+    this.entryService.searchEntriesByName(this.helperService.createSearchName(value)).pipe(
+      map(results => results as (Entry & { id: string })[])
+    ).subscribe(results => runInInjectionContext(this.injector, () => {
+      this.entries = results.filter(entry => entry.searchName.includes(this.helperService.createSearchName(value)));
+
       if (this.entries.length === 0) {
         this.title = 'Nichts gefunden!'
       } else {
@@ -74,7 +73,7 @@ export class HistoryListComponent {
         }
         this.sortEntriesByDate(this.entries);
       }
-    });
+    }));
   }
 
   private sortEntriesByDate(entries: Entry[]) {
@@ -86,21 +85,19 @@ export class HistoryListComponent {
   loadLastMonth(account: Account | undefined = undefined) {
     const lastMonthString: string = this.dateService.getMonthStringFromMonth(-1);
     this.title = `${this.dateService.getMonthName(lastMonthString)} ${this.dateService.getYear(lastMonthString)}`;
-    this.entryService.searchEntriesByMonthString(lastMonthString).subscribe(results => {
-      this.entries.length = 0;
-      results.filter(entry => (entry.payload.val() as Entry).monthString.includes(lastMonthString)).forEach(result => {
-        const entry: Entry = result.payload.val() as Entry;
-        entry.key = result.key ? result.key : '';
-        this.entries.push(entry);
-      });
+    this.entryService.searchEntriesByMonthString(lastMonthString).pipe(
+      map(results => results as (Entry & { id: string })[])
+    ).subscribe(results => runInInjectionContext(this.injector, () => {
+      this.entries = results.filter(entry => entry.monthString.includes(lastMonthString));
+
       if (account) {
         this.filterEntriesByAccount(account);
       }
-    });
+    }));
   }
 
   filterEntriesByAccount(account: Account) {
-    this.entries = this.entries.filter(entry => entry.account.key == account.key);
+    this.entries = this.entries.filter(entry => (entry.account as any)?.id === (account as any)?.id);
   }
 
   openAddOrEditEntryModal(): void {
@@ -118,7 +115,7 @@ export class HistoryListComponent {
     }
   }
 
-  onEntryClick(entry: Entry) {
+  onEntryClick(entry: Entry & { id: string }) {
     this.selectedEntry = entry;
     this.openAddOrEditEntryModal();
   }

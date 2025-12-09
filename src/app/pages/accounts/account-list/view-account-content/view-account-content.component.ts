@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import {Account} from "../../../../../shared/interfaces/account.model";
 import {AccountType} from "../../../../../shared/enums/account-type.enum";
 import {PriceService} from "../../../../services/price/price.service";
@@ -10,16 +10,15 @@ import {PriceService} from "../../../../services/price/price.service";
     standalone: false
 })
 export class ViewAccountContentComponent {
+  priceService = inject(PriceService);
 
-  @Input() account: Account | undefined;
+
+  @Input() account: (Account & { id: string }) | undefined;
 
   @Output() onClose: EventEmitter<any> = new EventEmitter<any>();
 
   isContentReadOnly: boolean = true;
   isEditButtonShown: boolean = true;
-
-  constructor(public priceService: PriceService) {
-  }
 
   onButtonEdit() {
     this.isContentReadOnly = !this.isContentReadOnly;

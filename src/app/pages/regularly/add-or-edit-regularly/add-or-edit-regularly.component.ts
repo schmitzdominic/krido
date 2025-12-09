@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import { Component, EventEmitter, inject, Injector, Input, Output, runInInjectionContext } from '@angular/core';
 import {EntryType} from "../../../../shared/enums/entry-type.enum";
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {RegularlyCycleType} from "../../../../shared/enums/regularly-cycle-type.enum";
@@ -12,6 +12,7 @@ import {NgbCalendar, NgbDate} from "@ng-bootstrap/ng-bootstrap";
 import {DateService} from "../../../services/date/date.service";
 import {Entry} from "../../../../shared/interfaces/entry.model";
 import {EntryService} from "../../../services/entry/entry.service";
+import { map } from 'rxjs/operators';
 
 interface EntryTypeInterface {
   value: EntryType,
@@ -30,6 +31,15 @@ interface CycleTypeInterface {
     standalone: false
 })
 export class AddOrEditRegularlyComponent {
+  private formBuilder = inject(FormBuilder);
+  private accountService = inject(AccountService);
+  private helperService = inject(HelperService);
+  private regularlyService = inject(RegularlyService);
+  private dateService = inject(DateService);
+  private ngbCalendar = inject(NgbCalendar);
+  private entryService = inject(EntryService);
+  private injector = inject(Injector);
+
 
   @Input() regularly: Regularly | undefined;
   @Input() type: RegularlyType | undefined;
@@ -51,7 +61,7 @@ export class AddOrEditRegularlyComponent {
   selectedDateTimestamp: number = this.dateService.getTimestampFromNgbDate(this.selectedDate);
 
 
-  accounts: Account[] = [];
+  accounts: (Account & { id?: string })[] = [];
 
   title: string = this.selectedEntryType.label;
   submitButtonText: string = 'Eintragen';
@@ -72,15 +82,6 @@ export class AddOrEditRegularlyComponent {
     date: new FormControl(''),
   });
 
-  constructor(private formBuilder: FormBuilder,
-              private accountService: AccountService,
-              private helperService: HelperService,
-              private regularlyService: RegularlyService,
-              private dateService: DateService,
-              private ngbCalendar: NgbCalendar,
-              private entryService: EntryService) {
-  }
-
   ngOnInit() {
     this.createFormGroup();
     this.createListeners();
@@ -98,7 +99,7 @@ export class AddOrEditRegularlyComponent {
         value: [this.regularly ? this.regularly.value : ''],
         monthDay: [1],
         lastDay: [this.regularly?.isEndOfMonth],
-        account: [this.regularly ? this.regularly.account.key : ''],
+        account: [this.regularly ? (this.regularly.account as any)?.id : ''],
         date: [''],
       }
     );
@@ -203,18 +204,16 @@ export class AddOrEditRegularlyComponent {
   }
 
   private loadAccounts() {
-    this.accountService.getAllAccounts().subscribe(accounts => {
-      accounts.forEach(accountRaw => {
-        const account: Account = accountRaw.payload.val() as Account;
-        account.key = accountRaw.key ? accountRaw.key : '';
-        this.accounts.push(account);
-      });
+    this.accountService.getAllAccounts().pipe(
+      map(accounts => accounts as (Account & { id: string })[])
+    ).subscribe(accounts => runInInjectionContext(this.injector, () => {
+      this.accounts = accounts;
       if (!this.regularly) {
         if (accounts.length > 0) {
-          this.addOrEditRegularlyFormGroup.controls['account'].setValue(this.accounts[0].key);
+          this.addOrEditRegularlyFormGroup.controls['account'].setValue(this.accounts[0].id);
         }
       }
-    });
+    }));
   }
 
   get isMonthDayNeeded() {
@@ -240,7 +239,7 @@ export class AddOrEditRegularlyComponent {
   }
 
   onEdit() {
-    this.regularlyService.updateRegularly(this.regularlyObject, this.regularly!.key!).then(() => {
+    this.regularlyService.updateRegularly(this.regularlyObject, (this.regularly as any).id).then(() => {
       this.onClose.emit();
     });
   }
@@ -349,12 +348,12 @@ export class AddOrEditRegularlyComponent {
   }
 
   get selectedAccount(): Account {
-    const account = this.accounts.find((account: Account) => account.key === this.addOrEditRegularlyFormGroup.value.account);
+    const account = this.accounts.find((account: Account) => (account as any).id === this.addOrEditRegularlyFormGroup.value.account);
     return account ? account : this.accountService.noAccountValue;
   }
 
   onButtonDelete() {
-    this.regularlyService.deleteRegularly(this.regularly!.key!).then(() => this.onClose.emit());
+    this.regularlyService.deleteRegularly((this.regularly as any).id).then(() => this.onClose.emit());
   }
 
   onButtonCancel() {

@@ -1,16 +1,18 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {Budget} from "../../../shared/interfaces/budget.model";
 import {DbService} from "../db.service";
 import {Cycle} from "../../../shared/interfaces/cycle.model";
+import {equalTo, orderByChild} from "@angular/fire/database";
 
 @Injectable({
   providedIn: 'root'
 })
 export class BudgetService {
+  private dbService = inject(DbService);
 
   private rootPath: string =  `homes/${this.dbService.home}/budgets`;
 
-  constructor(private dbService: DbService) { }
+  constructor() { }
 
   addBudget(budget: Budget) {
     return this.dbService.createListValue(`${this.rootPath}/general`, budget);
@@ -61,11 +63,11 @@ export class BudgetService {
   }
 
   getAllMonthBudgetsByMonthString(monthString: string) {
-    return this.dbService.readFilteredList(`${this.rootPath}/month`, (ref: any) => ref.orderByChild('validityPeriod').equalTo(monthString));
+    return this.dbService.readFilteredList(`${this.rootPath}/month`, orderByChild('validityPeriod'), equalTo(monthString));
   }
 
   getAllBudgetsByCycle(cycleKey: string) {
-    return this.dbService.readFilteredList(`${this.rootPath}/month`, (ref: any) => ref.orderByChild('cycleKey').equalTo(cycleKey));
+    return this.dbService.readFilteredList(`${this.rootPath}/month`, orderByChild('cycleKey'), equalTo(cycleKey));
   }
 
   getAllCycles() {

@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Component} from '@angular/core';
+import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import {MenuTitleService} from "../../../shared/behavior/menu-title/menu-title.service";
 import {Router} from "@angular/router";
 
@@ -9,13 +9,18 @@ import {Router} from "@angular/router";
     standalone: false
 })
 export class MainMenuComponent {
+  private changeDetectorRef = inject(ChangeDetectorRef);
+  private router = inject(Router);
+  private menuTitleService = inject(MenuTitleService);
+
 
   title?: string;
   activeId: number = 1;
 
-  constructor(private changeDetectorRef: ChangeDetectorRef,
-              private router: Router,
-              private menuTitleService: MenuTitleService) {
+  /** Inserted by Angular inject() migration for backwards compatibility */
+  constructor(...args: unknown[]);
+
+  constructor() {
   }
 
   ngOnInit(): void {

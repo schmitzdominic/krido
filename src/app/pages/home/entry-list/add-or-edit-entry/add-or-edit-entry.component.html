@@ -62,7 +62,7 @@
       <label for="add-entry-account" class="form-label">Konto</label>
       <select class="form-select" id="add-entry-account" aria-label="Select entry type" formControlName="account">
         @for (account of accounts; track account) {
-          <option value="{{ account.key }}">{{ account.name }}</option>
+          <option value="{{ account.id }}">{{ account.name }}</option>
         }
       </select>
     </div>
@@ -70,7 +70,7 @@
       <label for="add-entry-budget" class="form-label">Budget</label>
       <select class="form-select" id="add-entry-budget" aria-label="Select entry type" formControlName="budget">
         @for (budget of budgets; track budget) {
-          <option value="{{ budget.key }}">{{ budget.name }}</option>
+          <option value="{{ budget.id }}">{{ budget.name }}</option>
         }
       </select>
     </div>
@@ -89,5 +89,3 @@
     [disabled]="isNameInvalid || isValueInvalid"
   (click)="onSubmit()">{{ submitButtonText }}</button>
 </div>
-
-

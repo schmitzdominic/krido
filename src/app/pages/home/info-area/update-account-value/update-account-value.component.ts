@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import {Account} from "../../../../../shared/interfaces/account.model";
 import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
 import {NgbCalendar, NgbDate} from "@ng-bootstrap/ng-bootstrap";
@@ -12,6 +12,11 @@ import {AccountService} from "../../../../services/account/account.service";
     standalone: false
 })
 export class UpdateAccountValueComponent {
+  private formBuilder = inject(FormBuilder);
+  private dateService = inject(DateService);
+  private ngbCalendar = inject(NgbCalendar);
+  private accountService = inject(AccountService);
+
 
   @Input() account: Account | undefined;
 
@@ -27,10 +32,10 @@ export class UpdateAccountValueComponent {
     value: new FormControl(''),
   });
 
-  constructor(private formBuilder: FormBuilder,
-              private dateService: DateService,
-              private ngbCalendar: NgbCalendar,
-              private accountService: AccountService) {
+  /** Inserted by Angular inject() migration for backwards compatibility */
+  constructor(...args: unknown[]);
+
+  constructor() {
   }
 
   ngOnInit() {

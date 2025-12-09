@@ -1,4 +1,4 @@
-import {Component, ViewChild} from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
 import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {AccountService} from "../../../services/account/account.service";
@@ -6,6 +6,8 @@ import {EntryService} from "../../../services/entry/entry.service";
 import {DateService} from "../../../services/date/date.service";
 import {Entry} from "../../../../shared/interfaces/entry.model";
 import {LoadingService} from "../../../services/loading/loading.service";
+import { forkJoin, map, Subject, take, takeUntil } from 'rxjs';
+import { Account } from '../../../../shared/interfaces/account.model';
 
 @Component({
     selector: 'app-entry-list',
@@ -13,19 +15,25 @@ import {LoadingService} from "../../../services/loading/loading.service";
     styleUrls: ['./entry-list.component.scss'],
     standalone: false
 })
-export class EntryListComponent {
+export class EntryListComponent implements OnInit, OnDestroy {
+  private ngbModal = inject(NgbModal);
+  private accountService = inject(AccountService);
+  private entryService = inject(EntryService);
+  private dateService = inject(DateService);
+  private loadingService = inject(LoadingService);
+
 
   @ViewChild('addOrEditEntryModal') addOrEditEntryModal: NgbModalRef | undefined;
 
-  selectedEntry: Entry | undefined;
+  selectedEntry: (Entry & { id: string }) | undefined;
 
   addOrEditEntryModalRef: NgbModalRef | undefined;
 
   actualMonthName: string = this.dateService.getActualMonthName();
   nextMonthName: string = this.dateService.getMonthName(this.dateService.getMonthStringFromMonth(1));
 
-  actualMonthEntries: Entry[] = [];
-  nextMonthEntries: Entry[] = [];
+  actualMonthEntries: (Entry & { id: string })[] = [];
+  nextMonthEntries: (Entry & { id: string })[] = [];
 
   totalActualMonthEntries: number = -1;
   totalNextMonthEntries: number = -1;
@@ -34,15 +42,7 @@ export class EntryListComponent {
   isToastNoAccountShown: boolean = false;
   isShowAll: boolean = false;
 
-  loadedLists: number = 0;
-  endLoadingOnList: number = 2;
-
-  constructor(private ngbModal: NgbModal,
-              private accountService: AccountService,
-              private entryService: EntryService,
-              private dateService: DateService,
-              private loadingService: LoadingService) {
-  }
+  private destroy$ = new Subject<void>();
 
   ngOnInit() {
     this.checkForAccounts();
@@ -50,58 +50,46 @@ export class EntryListComponent {
   }
 
   loadEntries() {
-    // this.loadingService.setLoading = true;
-    this.loadedLists = 0;
-    this.loadActualMonthEntries();
-    this.loadNextMonthEntries();
-  }
+    this.loadingService.setLoading = true;
+    const actualMonth$ = this.entryService.getAllEntriesByMonthString(this.dateService.getActualMonthString()).pipe(take(1), map(e => e as (Entry & { id: string })[]));
+    const nextMonth$ = this.entryService.getAllEntriesByMonthString(this.dateService.getMonthStringFromMonth(1)).pipe(take(1), map(e => e as (Entry & { id: string })[]));
 
-  loadActualMonthEntries() {
-    this.entryService.getAllEntriesByMonthString(this.dateService.getActualMonthString()).subscribe(entries => {
-      this.actualMonthEntries.length = 0;
-      this.totalActualMonthEntries = entries.length;
-      entries.forEach(entryRaw => {
-        const entry: Entry = entryRaw.payload.val() as Entry;
-        entry.key = entryRaw.key ? entryRaw.key : '';
-        this.pushEntryToList(entry, this.actualMonthEntries);
-      });
-      this.sortEntriesByDate(this.actualMonthEntries);
-      if (++this.loadedLists == this.endLoadingOnList) {this.loadingService.setLoading = false;}
+    const test = this.entryService.getAllEntriesByMonthString(this.dateService.getMonthStringFromMonth(1)).subscribe(values => {
+      console.log(values);
+  
+    });
+
+    forkJoin([actualMonth$, nextMonth$]).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(([actualEntries, nextEntries]) => {
+
+      // Process actual month entries
+      this.totalActualMonthEntries = actualEntries.length;
+      const filteredActual = this.isShowAll ? actualEntries : actualEntries.filter(entry => entry.date >= this.dateService.getActualDayTimestamp());
+      this.actualMonthEntries = this.sortEntriesByDate(filteredActual);
+
+      // Process next month entries
+      this.totalNextMonthEntries = nextEntries.length;
+      const filteredNext = this.isShowAll ? nextEntries : nextEntries.filter(entry => entry.date >= this.dateService.getActualDayTimestamp());
+      this.nextMonthEntries = this.sortEntriesByDate(filteredNext);
+
+      this.loadingService.setLoading = false;
     });
   }
 
-  loadNextMonthEntries() {
-    this.entryService.getAllEntriesByMonthString(this.dateService.getMonthStringFromMonth(1)).subscribe(entries => {
-      this.nextMonthEntries.length = 0;
-      this.totalNextMonthEntries = entries.length;
-      entries.forEach(entryRaw => {
-        const entry: Entry = entryRaw.payload.val() as Entry;
-        entry.key = entryRaw.key ? entryRaw.key : '';
-        this.pushEntryToList(entry, this.nextMonthEntries);
-      });
-      this.sortEntriesByDate(this.nextMonthEntries);
-      if (++this.loadedLists == this.endLoadingOnList) {this.loadingService.setLoading = false;}
-    });
-  }
-
-  private pushEntryToList(entry: Entry, entries: Entry[]) {
-    if (this.isShowAll) {
-      entries.push(entry);
-    } else {
-      if (entry.date >= this.dateService.getActualDayTimestamp()) {
-        entries.push(entry);
-      }
-    }
-  }
-
-  private sortEntriesByDate(entries: Entry[]) {
-    entries.sort((one, two) => {
+  private sortEntriesByDate(entries: (Entry & { id: string })[]) {
+    // Create a new array to avoid mutating the original one
+    return [...entries].sort((one, two) => {
       return one.date < two.date ? -1 : 1;
     });
   }
 
   checkForAccounts() {
-    this.accountService.getAllAccounts().subscribe(accounts => {
+    this.accountService.getAllAccounts().pipe(
+      take(1), // Es ist auch eine gute Praxis, dies hier hinzuzufügen
+      map(accounts => accounts as Account[]), // Die Typ-Zuweisung ist hier wahrscheinlich nicht nötig, wenn der Service schon den richtigen Typ zurückgibt
+      takeUntil(this.destroy$)
+    ).subscribe(accounts => {
       this.isAccountAvailable = accounts.length > 0;
       this.isToastNoAccountShown = !this.isAccountAvailable;
     });
@@ -122,7 +110,7 @@ export class EntryListComponent {
     }
   }
 
-  onEntryClick(entry: Entry) {
+  onEntryClick(entry: Entry & { id: string }) {
     this.selectedEntry = entry;
     this.openAddOrEditEntryModal();
   }
@@ -134,6 +122,11 @@ export class EntryListComponent {
   onButtonShowAllClick() {
     this.isShowAll = !this.isShowAll;
     this.loadEntries();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
 }

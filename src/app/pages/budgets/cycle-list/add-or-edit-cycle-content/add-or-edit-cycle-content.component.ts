@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import { Component, EventEmitter, inject, Injector, Input, Output, runInInjectionContext } from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {Cycle} from "../../../../../shared/interfaces/cycle.model";
 import {CycleType} from "../../../../../shared/enums/cycle-type.enum";
@@ -7,6 +7,7 @@ import {ToastService} from "../../../../services/toast/toast.service";
 import {Budget} from "../../../../../shared/interfaces/budget.model";
 import {HelperService} from "../../../../services/helper/helper.service";
 import {DateService} from "../../../../services/date/date.service";
+import { map } from 'rxjs/operators';
 
 @Component({
     selector: 'app-add-or-edit-cycle-content',
@@ -15,8 +16,15 @@ import {DateService} from "../../../../services/date/date.service";
     standalone: false
 })
 export class AddOrEditCycleContentComponent {
+  private formBuilder = inject(FormBuilder);
+  private toastService = inject(ToastService);
+  private helperService = inject(HelperService);
+  private dateService = inject(DateService);
+  private budgetService = inject(BudgetService);
+  private injector = inject(Injector);
 
-  @Input() cycle: Cycle | undefined;
+
+  @Input() cycle: (Cycle & { id: string }) | undefined;
 
   @Output() onClose: EventEmitter<any> = new EventEmitter<any>();
 
@@ -34,7 +42,7 @@ export class AddOrEditCycleContentComponent {
 
   chosenCycleType: CycleType = CycleType.monthly;
 
-  budgets: Budget[] = [];
+  budgets: (Budget & { id: string })[] = [];
 
   addCycleFormGroup: FormGroup = new FormGroup({
     name: new FormControl(''),
@@ -43,13 +51,6 @@ export class AddOrEditCycleContentComponent {
     transfer: new FormControl(''),
     createNow: new FormControl('')
   });
-
-  constructor(private formBuilder: FormBuilder,
-              private toastService: ToastService,
-              private helperService: HelperService,
-              private dateService: DateService,
-              private budgetService: BudgetService) {
-  }
 
   ngOnInit() {
     this.loadBudgets();
@@ -106,14 +107,11 @@ export class AddOrEditCycleContentComponent {
 
   loadBudgets(): void {
     if (this.cycle) {
-      this.budgetService.getAllBudgetsByCycle(this.cycle.key!).subscribe(budgets => {
-        this.budgets.length = 0;
-        budgets.forEach(budgetRaw => {
-          const budget: Budget = budgetRaw.payload.val() as Budget;
-          budget.key = budgetRaw.key ? budgetRaw.key : '';
-          this.budgets.push(budget);
-        });
-      });
+      this.budgetService.getAllBudgetsByCycle(this.cycle.id).pipe(
+        map(budgets => budgets as (Budget & { id: string })[])
+      ).subscribe(budgets => runInInjectionContext(this.injector, () => {
+        this.budgets = budgets;
+      }));
     }
   }
 
@@ -131,7 +129,7 @@ export class AddOrEditCycleContentComponent {
 
   onDelete() {
     if (this.cycle && this.cycle.key) {
-      this.budgetService.deleteCycle(this.cycle.key).then(() => {
+      this.budgetService.deleteCycle(this.cycle.id).then(() => {
         this.toastService.showSuccess(this.deleteSuccessMessage);
         this.onClose.emit();
       });
@@ -158,9 +156,8 @@ export class AddOrEditCycleContentComponent {
 
   changeCycle(cycle: Cycle) {
     if (this.cycle && this.cycle.key) {
-      const key: string = this.cycle.key;
-      delete cycle['key'];
-      this.budgetService.updateCycle(cycle, key).then(() => {
+      const { id, ...cycleToUpdate } = this.cycle;
+      this.budgetService.updateCycle(cycle, id).then(() => {
         this.onClose.emit();
       });
     } else {
@@ -215,4 +212,5 @@ export class AddOrEditCycleContentComponent {
   }
 
   protected readonly CycleType = CycleType;
+
 }

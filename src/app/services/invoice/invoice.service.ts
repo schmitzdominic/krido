@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {DbService} from "../db.service";
 import {InvoiceSettings} from "../../../shared/interfaces/invoice-settings.model";
 
@@ -6,10 +6,15 @@ import {InvoiceSettings} from "../../../shared/interfaces/invoice-settings.model
   providedIn: 'root'
 })
 export class InvoiceService {
+  private dbService = inject(DbService);
+
 
   private rootPath: string =  `homes/${this.dbService.home}/invoice`;
 
-  constructor(private dbService: DbService) { }
+  /** Inserted by Angular inject() migration for backwards compatibility */
+  constructor(...args: unknown[]);
+
+  constructor() { }
 
   addInvoiceSettings(invoiceSettings: InvoiceSettings) {
     return this.dbService.create(`${this.rootPath}/settings`, invoiceSettings);

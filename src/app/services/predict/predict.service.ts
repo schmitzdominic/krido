@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import { Injectable, inject, Injector, runInInjectionContext } from '@angular/core';
 import {BudgetService} from "../budget/budget.service";
 import {HomeService} from "../home/home.service";
 import {DateService} from "../date/date.service";
@@ -15,114 +15,129 @@ import {AccountService} from "../account/account.service";
 import {AccountType} from "../../../shared/enums/account-type.enum";
 import {Account} from "../../../shared/interfaces/account.model";
 import {EntryType} from "../../../shared/enums/entry-type.enum";
+import { map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PredictService {
+  private budgetService = inject(BudgetService);
+  private userService = inject(UserService);
+  private homeService = inject(HomeService);
+  private dateService = inject(DateService);
+  private regularlyService = inject(RegularlyService);
+  private entryService = inject(EntryService);
+  private toastService = inject(ToastService);
+  private accountService = inject(AccountService);
+  private injector = inject(Injector);
+
 
   private lastMonthString: string = '';
   private nextMonthString: string = '';
 
-  constructor(private budgetService: BudgetService,
-              private userService: UserService,
-              private homeService: HomeService,
-              private dateService: DateService,
-              private regularlyService: RegularlyService,
-              private entryService: EntryService,
-              private toastService: ToastService,
-              private accountService: AccountService) { }
-
   public createEntries() {
     if (this.userService.home) {
-      this.homeService.getActualMonthString().subscribe(dbMonthString => {
-        if (dbMonthString.payload.val()) {
-          // if the db monthString is lower than the actual one
+      this.homeService.getActualMonthString().pipe(
+        map(dbMonthString => dbMonthString as number | null)
+      ).subscribe(dbMonthString => runInInjectionContext(this.injector, () => {
+        // If no month string is set in the DB, set it for the first time and stop.
+        if (!dbMonthString) {
+          // If no month string is set in the DB, set it for the first time.
+          this.homeService.setActualMonthString().then();
+          return;
+        }
 
-          if ((dbMonthString.payload.val() as number) < (Number(this.dateService.getMonthStringFromMonth(0)))) {
-            this.lastMonthString = this.dateService.getMonthStringFromMonth(-1);
+        // if the db monthString is lower than the actual one, create entries for the next month.
+        if (dbMonthString < Number(this.dateService.getMonthStringFromMonth(0))) {
+          this.lastMonthString = this.dateService.getMonthStringFromMonth(-1);
+          this.nextMonthString = this.dateService.getMonthStringFromMonth(1);
 
-            this.nextMonthString = this.dateService.getMonthStringFromMonth(1);
-            this.homeService.setActualMonthString().then(() => {
-
+          this.homeService.setActualMonthString().then(() => {            
+            runInInjectionContext(this.injector, () => {
               this.createBudgets();
               this.createRegularEntries();
               this.createCreditCardEntries();
-
               this.toastService.showSuccess('Nächster Monat wurde angelegt', 3000);
             });
-          }
-        } else {
-          this.homeService.setActualMonthString().then();
+          });
         }
-      });
+      }));
     }
   }
 
   private createBudgets() {
-    this.budgetService.getAllMonthBudgetsByMonthString(this.lastMonthString).subscribe(budgets => {
-      budgets.forEach(budgetRaw => {
-        const budget: Budget = budgetRaw.payload.val() as Budget;
-        budget.key = budgetRaw.key ? budgetRaw.key : '';
-        if (!budget.isArchived) {
+    this.budgetService.getAllMonthBudgetsByMonthString(this.lastMonthString).pipe(
+      map(budgets => budgets as (Budget & { id: string })[])
+    ).subscribe(budgets => runInInjectionContext(this.injector, () => {
+      // The service now returns a clean array of Budget objects.
+      budgets.forEach(budget => {
+        if (!budget.isArchived && budget.id) {
           this.updateBudget(budget);
         }
       });
-    });
+    }));
   }
 
-  private updateBudget(budget: Budget) {
+  private updateBudget(budget: Budget & { id: string }) {
     this.setBudgetValues(budget);
     budget.isArchived = true;
-    this.budgetService.getCycle(budget.cycleKey!).subscribe(cycleRaw => {
-      const cycle: Cycle = cycleRaw.payload.val() as Cycle;
-      this.budgetService.updateMonthBudget(budget, budget.key!).then(() => {
-        this.createNewBudgetFromOldBudget(budget, cycle);
-      });
-    });
+
+    if (budget.cycleKey && budget.id) {
+      this.budgetService.getCycle(budget.cycleKey).pipe(
+        map(cycle => cycle as Cycle | null)
+      ).subscribe(cycle => runInInjectionContext(this.injector, () => {
+        if (cycle) {          
+          this.budgetService.updateMonthBudget(budget, budget.id)
+            .then(() => runInInjectionContext(this.injector, () => this.createNewBudgetFromOldBudget(budget, cycle)));
+        }
+      }));
+    }
   }
 
   private setBudgetValues(budget: Budget) {
-    budget.limit = budget.limit ? budget.limit : 0;
-    budget.usedLimit = budget.usedLimit ? budget.usedLimit : 0;
-    budget.entries = budget.entries ? budget.entries : [];
+    budget.limit = budget.limit ?? 0;
+    budget.usedLimit = budget.usedLimit ?? 0;
+    budget.entries = budget.entries ?? [];
   }
 
-  private createNewBudgetFromOldBudget(budget: Budget, cycle: Cycle) {
+  private createNewBudgetFromOldBudget(budget: Budget & { id: string }, cycle: Cycle) {
     // If Rest Budget should be used
     if (cycle.isTransfer) {
-      const restBudget: number = budget.limit! - budget.usedLimit!
-      budget.limit = cycle.limit! + restBudget;
+      const restBudget: number = (budget.limit ?? 0) - (budget.usedLimit ?? 0);
+      budget.limit = (cycle.limit ?? 0) + restBudget;
     }
-    delete budget['key'];
-    budget.isArchived = false;
-    budget.usedLimit = 0;
-    budget.entries!.length = 0;
-    budget.validityPeriod = this.dateService.getActualMonthString();
-    this.budgetService.addMonthBudget(budget);
+
+    // Create a new object without the 'id' property for the new DB entry.
+    const { id, ...newBudget } = budget;
+
+    newBudget.isArchived = false;
+    newBudget.usedLimit = 0;
+    newBudget.entries = [];
+    newBudget.validityPeriod = this.dateService.getActualMonthString();
+    this.budgetService.addMonthBudget(newBudget);
   }
 
   private createRegularEntries() {
 
     // Month
-    this.regularlyService.getAllByCycleType(RegularlyCycleType.month).subscribe(regularities => {
-      regularities.forEach(regularlyRaw => {
-        const regularly: Regularly = regularlyRaw.payload.val() as Regularly;
-        regularly.key = regularlyRaw.key ? regularlyRaw.key : '';
+    this.regularlyService.getAllByCycleType(RegularlyCycleType.month).pipe(
+      map(regularities => regularities as Regularly[])
+    ).subscribe(regularities => runInInjectionContext(this.injector, () => {
+      regularities.forEach(regularly => {
         this.checkRegularMonth(regularly);
       });
-    });
+    }));
 
     // TODO: Quarter
 
     // Year
-    this.regularlyService.getAllByCycleType(RegularlyCycleType.year).subscribe(regularities => {
-      regularities.forEach(regularlyRaw => {
-        const regularly: Regularly = regularlyRaw.payload.val() as Regularly;
-        regularly.key = regularlyRaw.key ? regularlyRaw.key : '';
+    this.regularlyService.getAllByCycleType(RegularlyCycleType.year).pipe(
+      map(regularities => regularities as Regularly[])
+    ).subscribe(regularities => runInInjectionContext(this.injector, () => {
+      regularities.forEach(regularly => {
         this.checkRegularYear(regularly);
       });
-    });
+    }));
   }
 
   private checkRegularMonth(regularly: Regularly) {
@@ -161,8 +176,8 @@ export class PredictService {
   }
 
   private createEntryObjectFromAccount(account: Account, date: number, monthString: string): Entry {
-    const value: number = account.value ? account.value : 0;
-    const referenceAccount: Account = account.referenceAccount ? account.referenceAccount : this.accountService.noAccountValue;
+    const value: number = account.value ?? 0;
+    const referenceAccount: Account = account.referenceAccount ?? this.accountService.noAccountValue;
     return {
       name: account.name,
       searchName: account.searchName,
@@ -175,20 +190,18 @@ export class PredictService {
   }
 
   private createCreditCardEntries() {
-    this.accountService.getAllAccountsFilteredByAccountType(AccountType.creditCard).subscribe(accounts => {
-      accounts.forEach(accountRaw => {
-        const account: Account = accountRaw.payload.val() as Account;
-        account.key = accountRaw.key ? accountRaw.key : '';
-        this.checkAccountAndCreateEntry(account);
-      });
-    });
+    this.accountService.getAllAccountsFilteredByAccountType(AccountType.creditCard).pipe(
+      map(accounts => accounts as Account[]) // Safely cast the type within the pipe
+    ).subscribe(accounts => runInInjectionContext(this.injector, () => {
+      accounts.forEach(account => this.checkAccountAndCreateEntry(account));
+    }));
   }
 
   private checkAccountAndCreateEntry(account: Account) {
     // Calculate Time for monthly regular entry
     const year: number = this.dateService.getYear(this.nextMonthString);
     const month: number = this.dateService.getNextMonthNumber();
-    const day: number = account.creditLastDay ? this.dateService.setDateToLastDayOfMonth(new Date(year, month)) : account.creditDay!;
+    const day: number = account.creditLastDay ? this.dateService.setDateToLastDayOfMonth(new Date(year, month)) : (account.creditDay ?? 1);
 
     const date: Date = new Date(year, month, day);
     const entry: Entry = this.createEntryObjectFromAccount(account, this.dateService.getAvailableWeekdayAsTimestampFromTimestamp(date.getTime()), this.nextMonthString);

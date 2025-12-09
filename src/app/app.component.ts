@@ -1,10 +1,10 @@
-import {Component, ViewChild} from '@angular/core';
+import { Component, ViewChild, inject } from '@angular/core';
 import {UserService} from "./services/user/user.service";
 import {Router} from "@angular/router";
-import {AngularFireAuth} from "@angular/fire/compat/auth";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap";
 import {LoadingService} from "./services/loading/loading.service";
+import {Auth, onAuthStateChanged} from "@angular/fire/auth";
 
 @Component({
     selector: 'app-root',
@@ -13,6 +13,12 @@ import {LoadingService} from "./services/loading/loading.service";
     standalone: false
 })
 export class AppComponent {
+  private userService = inject(UserService);
+  private router = inject(Router);
+  private auth: Auth = inject(Auth);
+  private modalService = inject(NgbModal);
+  private loadingService = inject(LoadingService);
+
 
   @ViewChild('loadingModal') loadingModal: NgbModalRef | undefined;
 
@@ -25,11 +31,7 @@ export class AppComponent {
   showHomeSetup:  boolean = false;
   showMain:       boolean = false;
 
-  constructor(private userService: UserService,
-              private router: Router,
-              private angularFireAuth: AngularFireAuth,
-              private modalService: NgbModal,
-              private loadingService: LoadingService) {
+  constructor() {
   }
 
   ngOnInit() {
@@ -51,15 +53,18 @@ export class AppComponent {
   private subscribeLoadingService() {
     this.loadingService.isLoading.subscribe(isLoading => {
       if (isLoading) {
-        this.openLoading();
+        // this.openLoading();
+        console.log('loading');
       } else {
+        // this.closeLoading();
+        console.log('not loading');
         this.closeLoading();
       }
     });
   }
 
   private checkIfUserLoggedIn() {
-    this.angularFireAuth.authState.subscribe((firebaseUser) => {
+    onAuthStateChanged(this.auth, (firebaseUser) => {
       if (firebaseUser) {
         this.userService.getUserObservable(firebaseUser).subscribe(user => {
           if (!this.userService.isLoggedIn) {

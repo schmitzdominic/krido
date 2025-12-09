@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import {Budget} from "../../../../../shared/interfaces/budget.model";
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {BudgetService} from "../../../../services/budget/budget.service";
@@ -12,6 +12,11 @@ import {ToastService} from "../../../../services/toast/toast.service";
     standalone: false
 })
 export class AddOrEditBudgetContentComponent {
+  private formBuilder = inject(FormBuilder);
+  private budgetService = inject(BudgetService);
+  private helperService = inject(HelperService);
+  private toastService = inject(ToastService);
+
 
   @Input() budget: Budget | undefined;
 
@@ -33,10 +38,10 @@ export class AddOrEditBudgetContentComponent {
     limit: new FormControl('')
   });
 
-  constructor(private formBuilder: FormBuilder,
-              private budgetService: BudgetService,
-              private helperService: HelperService,
-              private toastService: ToastService) {
+  /** Inserted by Angular inject() migration for backwards compatibility */
+  constructor(...args: unknown[]);
+
+  constructor() {
   }
 
   ngOnInit() {

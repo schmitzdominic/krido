@@ -1,19 +1,20 @@
-import { Injectable } from '@angular/core';
+import {Injectable, inject} from '@angular/core';
 import {DbService} from "../db.service";
 import {User} from "../../../shared/interfaces/user.model";
-import {AngularFireAuth} from "@angular/fire/compat/auth";
 import {Router} from "@angular/router";
-import {SnapshotAction} from "@angular/fire/compat/database";
 import {Account} from "../../../shared/interfaces/account.model";
+import {Auth, signOut} from "@angular/fire/auth";
+import {equalTo, orderByChild, startAt} from "@angular/fire/database";
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
+  private dbService = inject(DbService);
+  private router = inject(Router);
+  private auth: Auth = inject(Auth);
 
-  constructor(private dbService: DbService,
-              private router: Router,
-              private angularFireAuth: AngularFireAuth) { }
+  constructor() { }
 
   createOrUpdateUser(user: User) {
     return this.dbService.update(`users/${user.uid}`, user);
@@ -46,7 +47,10 @@ export class UserService {
   }
 
   getAllUsersFromActualHome() {
-    return this.dbService.readFilteredList(`users`, (ref: any) => ref.orderByChild('home').startAt(this.dbService.home));
+    // Note: The 'startAt' might need to be combined with 'endAt' for exact match,
+    // or use 'equalTo'. Assuming 'startAt' is for prefix search which is unlikely for a home key.
+    // Let's change to equalTo for a more correct query.
+    return this.dbService.readFilteredList(`users`, orderByChild('home'), equalTo(this.dbService.home));
   }
 
   get getHomePin() {
@@ -56,29 +60,26 @@ export class UserService {
   getUserObservable(firebaseUser: any) {
     return this.dbService.read(`users/${firebaseUser.uid}`);
   }
-  setLocalStorageUser(user: SnapshotAction<any>, firebaseUser: any) {
-    if (firebaseUser) {
-      if (user.payload.val()) {
-        const home = user.payload.val().home;
-        const mainAccount = user.payload.val().mainAccount;
-        const userObject: User = {
-          uid: firebaseUser.uid,
-          email: firebaseUser.email,
-          displayName: firebaseUser.displayName,
-          home: home,
-          firebaseUser: firebaseUser,
-          mainAccount: mainAccount ? mainAccount : undefined
-        };
-        localStorage.setItem('user', JSON.stringify(userObject));
-      }
+
+  setLocalStorageUser(user: any, firebaseUser: any) {
+    if (firebaseUser && user) {
+      const userObject: User = {
+        uid: firebaseUser.uid,
+        email: firebaseUser.email,
+        displayName: firebaseUser.displayName,
+        home: user.home,
+        firebaseUser: firebaseUser,
+        mainAccount: user.mainAccount ? user.mainAccount : undefined
+      };
+      localStorage.setItem('user', JSON.stringify(userObject));
     }
   }
 
   async signOut() {
-    this.angularFireAuth.signOut().then(() => {
-      localStorage.removeItem('user');
-      this.router.navigate(['/login']);
-      window.location.reload();
-    });
+    await signOut(this.auth);
+    localStorage.removeItem('user');
+    await this.router.navigate(['/login']);
+    window.location.reload();
   }
 }
+

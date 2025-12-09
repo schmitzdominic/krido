@@ -1,10 +1,11 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import { Component, EventEmitter, inject, Injector, Input, Output, runInInjectionContext } from '@angular/core';
 import {Budget} from "../../../../../shared/interfaces/budget.model";
 import {PriceService} from "../../../../services/price/price.service";
 import {NgbProgressbarConfig} from "@ng-bootstrap/ng-bootstrap";
 import {ProgressBarService} from "../../../../services/progress-bar/progress-bar.service";
 import {Entry} from "../../../../../shared/interfaces/entry.model";
 import {EntryService} from "../../../../services/entry/entry.service";
+import { map } from 'rxjs/operators';
 
 @Component({
     selector: 'app-view-budget-content',
@@ -13,23 +14,23 @@ import {EntryService} from "../../../../services/entry/entry.service";
     standalone: false
 })
 export class ViewBudgetContentComponent {
+  private ngbProgressbarConfig = inject(NgbProgressbarConfig);
+  private entryService = inject(EntryService);
+  progressBarService = inject(ProgressBarService);
+  private injector = inject(Injector);
+  priceService = inject(PriceService);
 
-  @Input() budget: Budget | undefined;
+
+  @Input() budget: (Budget & { id: string }) | undefined;
 
   @Output() onClose: EventEmitter<any> = new EventEmitter<any>();
 
   isContentReadOnly: boolean = true;
   isEditButtonShown: boolean = true;
 
-  entries: Entry[] = [];
+  entries: (Entry & { id: string })[] = [];
 
   usedLimit: number = 0;
-
-  constructor(private ngbProgressbarConfig: NgbProgressbarConfig,
-              private entryService: EntryService,
-              public progressBarService: ProgressBarService,
-              public priceService: PriceService) {
-  }
 
   ngOnInit(): void {
     this.checkIfLimitIsSet();
@@ -58,16 +59,13 @@ export class ViewBudgetContentComponent {
   }
 
   loadEntries() {
-    if (this.budget!.key!) {
-      this.entryService.getAllEntriesByBudgetKey(this.budget!.key).subscribe(entries => {
-        this.entries = [];
-        entries.forEach(entryRaw => {
-          const entry: Entry = entryRaw.payload.val() as Entry;
-          entry.key = entryRaw.key ? entryRaw.key : '';
-          this.entries.push(entry);
-        });
+    if (this.budget?.id) {
+      this.entryService.getAllEntriesByBudgetKey(this.budget.id).pipe(
+        map(entries => entries as (Entry & { id: string })[])
+      ).subscribe(entries => runInInjectionContext(this.injector, () => {
+        this.entries = entries;
         this.sortEntriesByDate(this.entries);
-      });
+      }));
     }
   }
 

@@ -15,9 +15,9 @@
     <div class="row">
       <label for="add-account-type" class="form-label">Kontotyp</label>
       <div class="mb-3">
-        <select class="form-select" id="add-account-type" aria-label="Select Owner" formControlName="type">
+        <select class="form-select" id="add-account-type" aria-label="Select Owner" formControlName="accountType">
           @for (accountType of accountTypes; track accountType) {
-            <option value="{{ accountType }}">{{ accountType }}</option>
+            <option value="{{ accountType.value }}">{{ accountType.label }}</option>
           }
         </select>
       </div>
@@ -28,7 +28,7 @@
         <div class="col-12 mb-3">
           <select class="form-select" id="add-account-credit-card-reference-account" aria-label="Select Owner" formControlName="referenceAccount">
             @for (referenceAccount of referenceAccounts; track referenceAccount) {
-              <option value="{{ referenceAccount.key }}">{{ referenceAccount.name }}</option>
+              <option value="{{ referenceAccount.id }}">{{ referenceAccount.name }}</option>
             }
           </select>
         </div>
@@ -68,7 +68,7 @@
         <div class="col-10 mb-3">
           <select class="form-select" id="add-account-owner" aria-label="Select Owner" formControlName="owners">
             @for (owner of owners; track owner) {
-              <option value="{{ owner.uid }}">{{ owner.email }}</option>
+              <option value="{{ owner.id }}">{{ owner.email }}</option>
             }
           </select>
         </div>
@@ -82,8 +82,8 @@
         <ul class="list-group list-group-flush p-3">
           <label for="add-account-selected-owner" class="form-label">Ausgewählte Besitzer</label>
           @for (owner of selectedOwners; track owner) {
-            <li class="list-group-item" id="add-account-selected-owner">{{ owner.email }}
-              <button type="button" class="btn btn btn-dark position-absolute btn-sm end-0 top-0" (click)="onRemoveOwnerButtonClick(owner)"><i class="bi bi-dash-lg"></i></button>
+            <li class="list-group-item position-relative" id="add-account-selected-owner">{{ owner.email }}
+              <button type="button" class="btn btn-sm btn-outline-danger position-absolute end-0 top-0" (click)="onRemoveOwnerButtonClick(owner)"><i class="bi bi-trash"></i></button>
             </li>
           }
         </ul>
@@ -92,11 +92,10 @@
   </form>
 </div>
 <div class="modal-footer">
-  <button type="button" class="btn btn-dark" (click)="onCancel()">Abbrechen</button>
+  <button type="button" class="btn btn-dark" (click)="onButtonCancel()">Abbrechen</button>
   <button
     type="button"
     class="btn btn-light"
-    [disabled]="addOrEditAccountFormGroup.invalid || selectedOwners.length == 0 || isMonthDayInvalid || (selectedType === AccountType.creditCard && !selectedReferenceAccount)"
+    [disabled]="addOrEditAccountFormGroup.invalid || selectedOwners.length == 0 || isMonthDayInvalid || (selectedType === AccountType.creditCard && !addOrEditAccountFormGroup.value.referenceAccount)"
   (click)="onSubmit()">{{ submitButtonText }}</button>
 </div>
-

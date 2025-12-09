@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject, Injector, runInInjectionContext } from '@angular/core';
 import {UserService} from "../../../services/user/user.service";
 
 @Component({
@@ -8,12 +8,12 @@ import {UserService} from "../../../services/user/user.service";
     standalone: false
 })
 export class SettingsHomeComponent {
+  userService = inject(UserService);
+  private injector = inject(Injector);
+
 
   home: string = '';
   pin: string = '';
-
-  constructor(public userService: UserService) {
-  }
 
   ngOnInit() {
     this.home = this.userService.home;
@@ -21,9 +21,11 @@ export class SettingsHomeComponent {
   }
 
   setPin() {
-    this.userService.getHomePin.subscribe(pinReference => {
-      this.pin = pinReference.payload.val() as string;
-    });
+    this.userService.getHomePin.subscribe(pinReference => runInInjectionContext(this.injector, () => {
+      // The service now returns the value directly.
+      // We convert it to a string and handle null/undefined cases.
+      this.pin = pinReference ? String(pinReference) : '';
+    }));
   }
 
 }

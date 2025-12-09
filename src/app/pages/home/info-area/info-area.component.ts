@@ -1,10 +1,11 @@
-import {Component, ViewChild} from '@angular/core';
+import { Component, inject, Injector, runInInjectionContext, ViewChild } from '@angular/core';
 import {AccountService} from "../../../services/account/account.service";
 import {AccountType} from "../../../../shared/enums/account-type.enum";
 import {Account} from "../../../../shared/interfaces/account.model";
 import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {UserService} from "../../../services/user/user.service";
+import { map } from 'rxjs/operators';
 
 @Component({
     selector: 'app-info-area',
@@ -13,6 +14,11 @@ import {UserService} from "../../../services/user/user.service";
     standalone: false
 })
 export class InfoAreaComponent {
+  private accountService = inject(AccountService);
+  private ngbModal = inject(NgbModal);
+  private userService = inject(UserService);
+  private injector = inject(Injector);
+
 
   @ViewChild('updateAccountValueModal') updateAccountValueModal: NgbModalRef | undefined;
 
@@ -20,30 +26,23 @@ export class InfoAreaComponent {
 
   updateAccountValueModalRef: NgbModalRef | undefined;
 
-  accounts: Account[] = [];
-
-  constructor(private accountService: AccountService,
-              private ngbModal: NgbModal,
-              private userService: UserService) {
-  }
+  accounts: (Account & { id: string })[] = [];
 
   ngOnInit() {
     this.loadGiroAccounts();
   }
 
   loadGiroAccounts() {
-    this.accountService.getAllAccountsFilteredByAccountType(AccountType.giro).subscribe(accounts => {
-      this.accounts.length = 0;
+    this.accountService.getAllAccountsFilteredByAccountType(AccountType.giro).pipe(
+      map(accounts => accounts as (Account & { id: string })[])
+    ).subscribe(accounts => runInInjectionContext(this.injector, () => {
       if (this.userService.mainAccount) {
-        accounts.forEach(accountsRaw => {
-          const account: Account = accountsRaw.payload.val() as Account;
-          account.key = accountsRaw.key ? accountsRaw.key : '';
-          if (account.key === this.userService.mainAccount!.key) {
-            this.accounts.push(account);
-          }
-        });
+        // Filter the accounts to only include the main account
+        this.accounts = accounts.filter(
+          account => account.id === (this.userService.mainAccount as any)?.id
+        );
       }
-    });
+    }));
   }
 
   openUpdateAccountValueModal(): void {

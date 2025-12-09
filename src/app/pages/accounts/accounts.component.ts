@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import {MenuTitleService} from "../../../shared/behavior/menu-title/menu-title.service";
 
 @Component({
@@ -8,10 +8,15 @@ import {MenuTitleService} from "../../../shared/behavior/menu-title/menu-title.s
     standalone: false
 })
 export class AccountsComponent {
+  private menuTitleService = inject(MenuTitleService);
+
 
   active: string = 'accounts';
 
-  constructor(private menuTitleService: MenuTitleService) {
+  /** Inserted by Angular inject() migration for backwards compatibility */
+  constructor(...args: unknown[]);
+
+  constructor() {
   }
 
   ngOnInit(): void {

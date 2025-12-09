@@ -1,4 +1,4 @@
-import {Component, ViewChild} from '@angular/core';
+import { Component, inject, Injector, runInInjectionContext, ViewChild } from '@angular/core';
 import {Regularly} from "../../../../shared/interfaces/regularly.model";
 import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
@@ -8,6 +8,7 @@ import {RegularlyCycleType} from "../../../../shared/enums/regularly-cycle-type.
 import {AccountService} from "../../../services/account/account.service";
 import {LoadingService} from "../../../services/loading/loading.service";
 import {DateService} from "../../../services/date/date.service";
+import { map } from 'rxjs/operators';
 
 @Component({
     selector: 'app-regularly-list',
@@ -16,6 +17,13 @@ import {DateService} from "../../../services/date/date.service";
     standalone: false
 })
 export class RegularlyListComponent {
+  private ngbModal = inject(NgbModal);
+  private regularlyService = inject(RegularlyService);
+  private accountService = inject(AccountService);
+  private loadingService = inject(LoadingService);
+  private dateService = inject(DateService);
+  private injector = inject(Injector);
+
 
   @ViewChild('addOrEditRegularlyModal') addOrEditRegularlyModal: NgbModalRef | undefined;
 
@@ -33,13 +41,6 @@ export class RegularlyListComponent {
   endLoadingOnList: number = 3;
 
   protected readonly RegularlyType = RegularlyType;
-
-  constructor(private ngbModal: NgbModal,
-              private regularlyService: RegularlyService,
-              private accountService: AccountService,
-              private loadingService: LoadingService,
-              private dateService: DateService) {
-  }
 
   ngOnInit() {
     this.loadingService.setLoading = true;
@@ -62,10 +63,12 @@ export class RegularlyListComponent {
   }
 
   private checkForAccounts() {
-    this.accountService.getAllAccounts().subscribe(accounts => {
+    this.accountService.getAllAccounts().pipe(
+      map(accounts => accounts as any[])
+    ).subscribe(accounts => runInInjectionContext(this.injector, () => {
       this.isAccountAvailable = accounts.length > 0;
       this.isToastNoAccountShown = !this.isAccountAvailable;
-    });
+    }));
   }
 
   private sortRegularly(cycleType: RegularlyCycleType, regularities: Regularly[]) {
@@ -100,16 +103,14 @@ export class RegularlyListComponent {
   }
 
   private loadRegularities(regularlyCycleType: RegularlyCycleType, list: Regularly[]) {
-    this.regularlyService.getAllByCycleType(regularlyCycleType).subscribe(regularities => {
-      list.length = 0;
-      regularities.forEach(regularlyRaw => {
-        const regularly: Regularly = regularlyRaw.payload.val() as Regularly;
-        regularly.key = regularlyRaw.key ? regularlyRaw.key : '';
-        list.push(regularly);
-      });
+    this.regularlyService.getAllByCycleType(regularlyCycleType).pipe(
+      map(regularities => regularities as Regularly[])
+    ).subscribe(regularities => runInInjectionContext(this.injector, () => {
+      // Assign the new array directly to the component's property
+      Object.assign(list, regularities);
       this.sortRegularly(regularlyCycleType, list);
       if (++this.loadedLists == this.endLoadingOnList) {this.loadingService.setLoading = false;}
-    });
+    }));
   }
 
   onRegularlyClicked(regularly: Regularly) {

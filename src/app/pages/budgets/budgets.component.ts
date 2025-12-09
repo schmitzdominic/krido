@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import {MenuTitleService} from "../../../shared/behavior/menu-title/menu-title.service";
 import {BudgetService} from "../../services/budget/budget.service";
 import {Budget} from "../../../shared/interfaces/budget.model";
+import { map } from 'rxjs/operators';
 
 @Component({
     selector: 'app-budgets',
@@ -10,13 +11,12 @@ import {Budget} from "../../../shared/interfaces/budget.model";
     standalone: false
 })
 export class BudgetsComponent {
+  private menuTitleService = inject(MenuTitleService);
+  private budgetService = inject(BudgetService);
+
 
   active: string = 'budgets';
   isArchiveShown: boolean = false;
-
-  constructor(private menuTitleService: MenuTitleService,
-              private budgetService: BudgetService) {
-  }
 
   ngOnInit(): void {
     this.setInitialValues();
@@ -32,14 +32,18 @@ export class BudgetsComponent {
   }
 
   checkForArchive() {
-    this.budgetService.getAllNoTimeLimitBudgets().subscribe(budgets => {
+    this.budgetService.getAllNoTimeLimitBudgets().pipe(
+      map(budgets => budgets as Budget[])
+    ).subscribe(budgets => {
       if (!this.isArchiveShown) {
-        this.isArchiveShown = !!budgets.find(b => (b.payload.val()! as Budget).isArchived);
+        this.isArchiveShown = !!budgets.find(b => b.isArchived);
       }
     });
-    this.budgetService.getAllMonthlyBudgets().subscribe(budgets => {
+    this.budgetService.getAllMonthlyBudgets().pipe(
+      map(budgets => budgets as Budget[])
+    ).subscribe(budgets => {
       if (!this.isArchiveShown) {
-        this.isArchiveShown = !!budgets.find(b => (b.payload.val()! as Budget).isArchived);
+        this.isArchiveShown = !!budgets.find(b => b.isArchived);
       }
     });
   }

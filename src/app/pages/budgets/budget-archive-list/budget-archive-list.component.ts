@@ -1,14 +1,15 @@
-import {Component, ViewChild} from '@angular/core';
+import { Component, inject, Injector, runInInjectionContext, ViewChild } from '@angular/core';
 import {Budget} from "../../../../shared/interfaces/budget.model";
 import {BudgetService} from "../../../services/budget/budget.service";
 import {DateService} from "../../../services/date/date.service";
 import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
+import { map } from 'rxjs/operators';
 
 interface MonthBudget {
   name: string,
   monthString: string,
-  budgets: Budget[]
+  budgets: (Budget & { id: string })[]
 }
 
 @Component({
@@ -18,20 +19,20 @@ interface MonthBudget {
     standalone: false
 })
 export class BudgetArchiveListComponent {
+  private ngbModal = inject(NgbModal);
+  private budgetService = inject(BudgetService);
+  private dateService = inject(DateService);
+  private injector = inject(Injector);
+
 
   @ViewChild('editBudgetModal') editBudgetModal: NgbModalRef | undefined;
 
   editBudgetModalRef: NgbModalRef | undefined;
 
-  noTimeLimitBudgets: Budget[] = [];
+  noTimeLimitBudgets: (Budget & { id: string })[] = [];
   monthBudgets: MonthBudget[] = [];
 
-  clickedBudget: Budget | undefined;
-
-  constructor(private ngbModal: NgbModal,
-              private budgetService: BudgetService,
-              private dateService: DateService) {
-  }
+  clickedBudget: (Budget & { id: string }) | undefined;
 
   ngOnInit() {
     this.loadNoTimeLimitBudgets();
@@ -39,38 +40,41 @@ export class BudgetArchiveListComponent {
   }
 
   loadNoTimeLimitBudgets() {
-    this.budgetService.getAllNoTimeLimitBudgets().subscribe(budgets => {
-      this.noTimeLimitBudgets = [];
-      budgets.forEach(budgetRaw => {
-        let budget: Budget = budgetRaw.payload.val() as Budget;
-        budget.key = budgetRaw.key!;
-        budget.usedLimit = budget.usedLimit ? budget.usedLimit : 0;
-        budget.limit = budget.limit ? Number(budget.limit) : undefined;
-        if (budget.isArchived) {
-          this.noTimeLimitBudgets.push(budget);
-        }
-      });
-    });
+    this.budgetService.getAllNoTimeLimitBudgets().pipe(
+      map(budgets => budgets as (Budget & { id: string })[])
+    ).subscribe(budgets => runInInjectionContext(this.injector, () => {
+      this.noTimeLimitBudgets = budgets
+        .filter(budget => budget.isArchived)
+        .map(budget => ({
+          ...budget,
+          usedLimit: budget.usedLimit ?? 0,
+          limit: budget.limit ? Number(budget.limit) : undefined
+        }));
+    }));
   }
 
   loadTimeLimitBudgets() {
-    this.budgetService.getAllMonthlyBudgets().subscribe(budgets => {
+    this.budgetService.getAllMonthlyBudgets().pipe(
+      map(budgets => budgets as (Budget & { id: string })[])
+    ).subscribe(budgets => runInInjectionContext(this.injector, () => {
       this.monthBudgets = [];
-      budgets.forEach(budgetRaw => {
-        let budget: Budget = budgetRaw.payload.val() as Budget;
-        budget.key = budgetRaw.key!;
-        budget.usedLimit = budget.usedLimit ? budget.usedLimit : 0;
-        budget.limit = budget.limit ? Number(budget.limit) : undefined;
+      const archivedBudgets = budgets.map(budget => ({
+        ...budget,
+        usedLimit: budget.usedLimit ?? 0,
+        limit: budget.limit ? Number(budget.limit) : undefined
+      }));
+
+      archivedBudgets.forEach(budget => {
         if (budget.isArchived) {
           this.addMonthlyBudgetToList(budget);
         }
       });
       // Sort descending
       this.monthBudgets.sort((one, two) => (one.monthString > two.monthString ? -1 : 1));
-    });
+    }));
   }
 
-  addMonthlyBudgetToList(budget: Budget) {
+  addMonthlyBudgetToList(budget: Budget & { id: string }) {
     const foundMonthBudget: MonthBudget | undefined = this.monthBudgets.find(monthBudget => monthBudget.monthString == budget.validityPeriod);
     if (foundMonthBudget) {
       foundMonthBudget.budgets.push(budget);
@@ -84,11 +88,11 @@ export class BudgetArchiveListComponent {
     }
   }
 
-  onCardClick(budget: Budget) {
+  onCardClick(budget: Budget & { id: string }) {
     this.openEditBudgetModal(budget);
   }
 
-  openEditBudgetModal(budget: Budget): void {
+  openEditBudgetModal(budget: Budget & { id: string }): void {
     this.clickedBudget = budget;
     this.editBudgetModalRef = this.ngbModal.open(
       this.editBudgetModal,

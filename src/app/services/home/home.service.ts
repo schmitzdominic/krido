@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {DbService} from "../db.service";
 import {Home} from "../../../shared/interfaces/home.model";
 import {UserService} from "../user/user.service";
@@ -9,12 +9,17 @@ import {DateService} from "../date/date.service";
   providedIn: 'root'
 })
 export class HomeService {
+  private dbService = inject(DbService);
+  private userService = inject(UserService);
+  private dateService = inject(DateService);
+
 
   rootPath: string = '/homes'
 
-  constructor(private dbService: DbService,
-              private userService: UserService,
-              private dateService: DateService) { }
+  /** Inserted by Angular inject() migration for backwards compatibility */
+  constructor(...args: unknown[]);
+
+  constructor() { }
 
   get getAllHomes() {
     return this.dbService.readList(this.rootPath);

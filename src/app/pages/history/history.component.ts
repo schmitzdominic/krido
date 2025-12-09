@@ -1,9 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import {MenuTitleService} from "../../../shared/behavior/menu-title/menu-title.service";
 import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
 import {AccountService} from "../../services/account/account.service";
 import {Account} from "../../../shared/interfaces/account.model";
 import {HistorySearchObject} from "./history-list/history-list.component";
+import { map, Subject, takeUntil } from 'rxjs';
 
 @Component({
     selector: 'app-expenditures',
@@ -11,9 +12,13 @@ import {HistorySearchObject} from "./history-list/history-list.component";
     styleUrls: ['./history.component.scss'],
     standalone: false
 })
-export class HistoryComponent {
+export class HistoryComponent implements OnInit, OnDestroy {
+  private menuTitleService = inject(MenuTitleService);
+  private formBuilder = inject(FormBuilder);
+  private accountService = inject(AccountService);
 
-  accounts: Account[] = [];
+
+  accounts: (Account & { id: string })[] = [];
   historySearchObject: HistorySearchObject = {
     searchValue: '',
     account: undefined,
@@ -25,10 +30,7 @@ export class HistoryComponent {
     accounts: new FormControl('')
   });
 
-  constructor(private menuTitleService: MenuTitleService,
-              private formBuilder: FormBuilder,
-              private accountService: AccountService) {
-  }
+  private destroy$ = new Subject<void>();
 
   ngOnInit(): void {
     this.setInitialValues();
@@ -47,14 +49,17 @@ export class HistoryComponent {
   }
 
   createListeners() {
-    this.searchFormGroup.controls['search'].valueChanges.subscribe(searchValue => {
+    this.searchFormGroup.controls['search'].valueChanges.pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(searchValue => {
       if (searchValue.length > 3) {
-        this.historySearchObject = this.getHistorySearchObject();
+        this.historySearchObject = this.getHistorySearchObject(searchValue, undefined, false);
       }
-      this.historySearchObject = this.getHistorySearchObject(searchValue, undefined, false);
     });
-    this.searchFormGroup.controls['accounts'].valueChanges.subscribe(value => {
-      const account: Account = this.accounts.filter(account => account.key === value)[0];
+    this.searchFormGroup.controls['accounts'].valueChanges.pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(value => {
+      const account = this.accounts.find(account => account.id === value);
       this.historySearchObject = this.getHistorySearchObject('', account, this.historySearchObject.isLastMonth);
     });
   }
@@ -72,13 +77,10 @@ export class HistoryComponent {
   }
 
   loadAccounts(): void {
-    this.accountService.getAllAccounts().subscribe(allAccounts => {
-      allAccounts.forEach(accountObject => {
-        const account: Account = accountObject.payload.val() as Account;
-        account.key = accountObject.key ? accountObject.key : '';
-        this.accounts.push(account);
-      });
-    });
+    this.accountService.getAllAccounts().pipe(
+      map(accounts => accounts as (Account & { id: string })[]),
+      takeUntil(this.destroy$)
+    ).subscribe(allAccounts => this.accounts = allAccounts);
   }
 
   getHistorySearchObject(searchValue: string = '', account: Account | undefined = undefined, isLastMonth: boolean = false) {
@@ -87,5 +89,10 @@ export class HistoryComponent {
       account: account,
       isLastMonth: isLastMonth
     } as HistorySearchObject;
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

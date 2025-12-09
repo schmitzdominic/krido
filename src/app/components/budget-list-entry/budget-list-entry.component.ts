@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import { Component, EnvironmentInjector, inject, Injector, Input, runInInjectionContext } from '@angular/core';
 import {Budget} from "../../../shared/interfaces/budget.model";
 import {ProgressBarService} from "../../services/progress-bar/progress-bar.service";
 import {NgbProgressbarConfig} from "@ng-bootstrap/ng-bootstrap";
@@ -7,6 +7,7 @@ import {EntryService} from "../../services/entry/entry.service";
 import {Entry} from "../../../shared/interfaces/entry.model";
 import {BudgetService} from "../../services/budget/budget.service";
 import {EntryType} from "../../../shared/enums/entry-type.enum";
+import { map } from 'rxjs/operators';
 
 @Component({
     selector: 'app-budget-list-entry',
@@ -15,49 +16,55 @@ import {EntryType} from "../../../shared/enums/entry-type.enum";
     standalone: false
 })
 export class BudgetListEntryComponent {
+  private ngbProgressbarConfig = inject(NgbProgressbarConfig);
+  progressBarService = inject(ProgressBarService);
+  priceService = inject(PriceService);
+  entryService = inject(EntryService);
+  budgetService = inject(BudgetService);
+  private injector = inject(Injector);
 
-  @Input({ required: true }) budget: Budget | undefined;
+
+  @Input({ required: true }) budget: (Budget & { id: string }) | undefined;
 
   usedLimit: number = 0;
 
-  constructor(private ngbProgressbarConfig: NgbProgressbarConfig,
-              public progressBarService: ProgressBarService,
-              public priceService: PriceService,
-              public entryService: EntryService,
-              public budgetService: BudgetService) {
+  constructor() {
     // WARNING Not part of lifecycle! This Config MUST be loaded before all.
     this.progressBarService.setProgressBarConfig(this.ngbProgressbarConfig);
   }
 
   ngOnInit() {
-    this.calculateUsedLimit();
+    if (this.budget) {
+      this.calculateUsedLimit();
+    }
   }
 
   calculateUsedLimit() {
-    if (this.budget!.key) {
-      this.entryService.getAllEntriesByBudgetKey(this.budget!.key).subscribe(entries => {
-        this.usedLimit = 0;
-        entries.forEach(entryRAW => {
-          const entry: Entry = entryRAW.payload.val() as Entry;
-          this.calculate(entry);
-        });
+    if (this.budget?.id) {
+      this.entryService.getAllEntriesByBudgetKey(this.budget.id).pipe(
+        map(entries => entries as Entry[])
+      ).subscribe(entries => {
+        this.usedLimit = entries.reduce((acc, entry) => this.calculate(acc, entry), 0);
 
         if (this.budget?.limit) {
           this.budget!.usedLimit = this.usedLimit;
-          if (this.budget!.validityPeriod) {
-            this.budgetService.updateMonthBudget(this.budget!, this.budget!.key!).then();
-          } else {
-            this.budgetService.updateNoTimeLimitBudget(this.budget!, this.budget!.key!).then();
-          }
+          runInInjectionContext(this.injector, () => {
+            if (this.budget!.validityPeriod) {
+              this.budgetService.updateMonthBudget(this.budget!, this.budget!.id);
+            } else {
+              this.budgetService.updateNoTimeLimitBudget(this.budget!, this.budget!.id);
+            }
+          });
         }
       });
     }
   }
 
-  calculate(entry: Entry) {
+  calculate(currentValue: number, entry: Entry): number {
     switch (entry.type) {
-      case EntryType.income: this.usedLimit = this.usedLimit - entry.value; break;
-      case EntryType.outcome: this.usedLimit = this.usedLimit + entry.value; break;
+      case EntryType.income: return currentValue - entry.value;
+      case EntryType.outcome: return currentValue + entry.value;
+      default: return currentValue;
     }
   }
 

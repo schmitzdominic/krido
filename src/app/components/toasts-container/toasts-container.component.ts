@@ -1,4 +1,4 @@
-import {Component, TemplateRef} from '@angular/core';
+import { Component, TemplateRef, inject } from '@angular/core';
 import {ToastService} from "../../services/toast/toast.service";
 
 @Component({
@@ -9,8 +9,13 @@ import {ToastService} from "../../services/toast/toast.service";
     standalone: false
 })
 export class ToastsContainerComponent {
+  toastService = inject(ToastService);
 
-  constructor(public toastService: ToastService) {}
+  /** Inserted by Angular inject() migration for backwards compatibility */
+  constructor(...args: unknown[]);
+
+
+  constructor() {}
 
   isTemplate(toast: { textOrTpl: any; }) {
     return toast.textOrTpl instanceof TemplateRef;

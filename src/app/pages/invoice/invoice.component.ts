@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import {MenuTitleService} from "../../../shared/behavior/menu-title/menu-title.service";
 import {InvoiceSettings} from "../../../shared/interfaces/invoice-settings.model";
 
@@ -9,6 +9,8 @@ import {InvoiceSettings} from "../../../shared/interfaces/invoice-settings.model
     standalone: false
 })
 export class InvoiceComponent {
+  private menuTitleService = inject(MenuTitleService);
+
 
   active: string = 'settings';
   breadCrumbActive: string = 'breadcrumb-item';
@@ -19,7 +21,10 @@ export class InvoiceComponent {
 
   invoiceSettings: InvoiceSettings | undefined;
 
-  constructor(private menuTitleService: MenuTitleService) {
+  /** Inserted by Angular inject() migration for backwards compatibility */
+  constructor(...args: unknown[]);
+
+  constructor() {
   }
 
   ngOnInit(): void {

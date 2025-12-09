@@ -1,9 +1,10 @@
-import {Component} from '@angular/core';
+import { Component, inject } from '@angular/core';
 import {UserService} from "../../../services/user/user.service";
 import {AccountService} from "../../../services/account/account.service";
 import {Account} from "../../../../shared/interfaces/account.model";
 import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
 import {AccountType} from "../../../../shared/enums/account-type.enum";
+import { map } from 'rxjs/operators';
 
 @Component({
     selector: 'app-settings-user',
@@ -12,6 +13,10 @@ import {AccountType} from "../../../../shared/enums/account-type.enum";
     standalone: false
 })
 export class SettingsUserComponent {
+  private formBuilder = inject(FormBuilder);
+  private accountService = inject(AccountService);
+  userService = inject(UserService);
+
 
   accounts: Account[] = [];
   mainAccount: Account | undefined;
@@ -19,11 +24,6 @@ export class SettingsUserComponent {
   settingsUserFormGroup: FormGroup = new FormGroup({
     mainAccount: new FormControl(''),
   });
-
-  constructor(private formBuilder: FormBuilder,
-              private accountService: AccountService,
-              public userService: UserService,) {
-  }
 
   ngOnInit() {
     this.mainAccount = this.userService.mainAccount;
@@ -41,27 +41,19 @@ export class SettingsUserComponent {
   }
 
   loadAccounts() {
-    this.accountService.getAllAccounts().subscribe(accounts => {
-      this.accounts = [];
-      accounts.forEach(accountRaw => {
-        const account: Account = accountRaw.payload.val() as Account;
-        account.key = accountRaw.key ? accountRaw.key : '';
-        this.accounts.push(account);
-      });
+    this.accountService.getAllAccounts().pipe(
+      map(accounts => accounts as (Account & { id: string })[])
+    ).subscribe(accounts => {
+      this.accounts = accounts;
       this.loadMainAccount();
     });
   }
 
   createListeners() {
     this.settingsUserFormGroup.valueChanges.subscribe(setting => {
-      const foundAccount: Account | undefined = this.accounts.find(account => account.key === setting.mainAccount);
+      // The 'id' property is added by the DbService
+      const foundAccount = this.accounts.find(account => (account as any).id === setting.mainAccount);
       if (foundAccount) this.updateMainAccount(foundAccount);
-      /* if (this.mainAccount && this.mainAccount.key !== setting.mainAccount) {
-        if (foundAccount) this.updateMainAccount(foundAccount);
-      }
-      if (!this.mainAccount) {
-
-      } */
     });
   }
 
@@ -77,7 +69,8 @@ export class SettingsUserComponent {
       return;
     } else {
       this.mainAccount = this.userService.mainAccount;
-      this.settingsUserFormGroup.controls['mainAccount'].setValue(this.mainAccount?.key);
+      // The 'id' property is added by the DbService
+      this.settingsUserFormGroup.controls['mainAccount'].setValue((this.mainAccount as any)?.id);
     }
   }
 
