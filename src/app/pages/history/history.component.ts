@@ -12,12 +12,17 @@ import { map, Subject, takeUntil } from 'rxjs';
     styleUrls: ['./history.component.scss'],
     standalone: false
 })
+/**
+ * @Component HistoryComponent
+ * Manages the search and filter controls for the history page.
+ * It constructs a search object and passes it to the `HistoryListComponent`.
+ */
 export class HistoryComponent implements OnInit, OnDestroy {
   private menuTitleService = inject(MenuTitleService);
   private formBuilder = inject(FormBuilder);
   private accountService = inject(AccountService);
 
-
+  /** A stream of all available accounts. */
   accounts: (Account & { id: string })[] = [];
   historySearchObject: HistorySearchObject = {
     searchValue: '',
@@ -25,6 +30,7 @@ export class HistoryComponent implements OnInit, OnDestroy {
     isLastMonth: false
   };
 
+  /** The form group for search and account selection. */
   searchFormGroup: FormGroup = new FormGroup({
     search: new FormControl(''),
     accounts: new FormControl('')
@@ -34,25 +40,34 @@ export class HistoryComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.setInitialValues();
-    this.createFormGroup();
+    this.searchFormGroup = this.createFormGroup();
     this.createListeners();
     this.loadAccounts();
   }
 
-  createFormGroup(): void {
-    this.searchFormGroup = this.formBuilder.group(
-      {
-        search: [''],
-        accounts: ['']
-      }
-    );
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  /** Handles the click event for the "Last Month" button. */
+  onClickLastMonth(): void {
+    this.historySearchObject = this.getHistorySearchObject('', this.historySearchObject.account, !this.historySearchObject.isLastMonth);
+  }
+
+  /** Creates the form group for the search controls. */
+  private createFormGroup(): FormGroup {
+    return this.formBuilder.group({
+      search: [''],
+      accounts: ['']
+    });
   }
 
   createListeners() {
     this.searchFormGroup.controls['search'].valueChanges.pipe(
       takeUntil(this.destroy$)
     ).subscribe(searchValue => {
-      if (searchValue.length > 3) {
+      if (searchValue.length > 2) {
         this.historySearchObject = this.getHistorySearchObject(searchValue, undefined, false);
       }
     });
@@ -63,20 +78,14 @@ export class HistoryComponent implements OnInit, OnDestroy {
       this.historySearchObject = this.getHistorySearchObject('', account, this.historySearchObject.isLastMonth);
     });
   }
-
-  onClickLastMonth() {
-    this.historySearchObject = this.getHistorySearchObject('', this.historySearchObject.account, !this.historySearchObject.isLastMonth);
-  }
-
-  /**
-   * Set initial values.
-   */
-  setInitialValues(): void {
+  /** Sets initial page values like the title. */
+  private setInitialValues(): void {
     this.menuTitleService.setTitle('Historie');
     this.menuTitleService.setActiveId(3);
   }
 
-  loadAccounts(): void {
+  /** Loads all accounts from the service. */
+  private loadAccounts(): void {
     this.accountService.getAllAccounts().pipe(
       map(accounts => accounts as (Account & { id: string })[]),
       takeUntil(this.destroy$)
@@ -89,10 +98,5 @@ export class HistoryComponent implements OnInit, OnDestroy {
       account: account,
       isLastMonth: isLastMonth
     } as HistorySearchObject;
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 }

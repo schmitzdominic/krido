@@ -9,6 +9,7 @@ import { CurrencyMaskModule } from 'ng2-currency-mask';
 
 import { HistoryComponent } from './history.component';
 import { HistoryListComponent } from './history-list/history-list.component';
+import { HomeModule } from "../home/home.module";
 
 @NgModule({
   declarations: [
@@ -24,7 +25,8 @@ import { HistoryListComponent } from './history-list/history-list.component';
     MatIconModule,
     MatButtonModule,
     CurrencyMaskModule,
-  ],
+    HomeModule
+],
   exports: [
     HistoryComponent,
     HistoryListComponent,

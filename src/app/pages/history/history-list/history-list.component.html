@@ -10,10 +10,10 @@
       <h1>{{ title }}</h1>
     </div>
   </div>
-  @for (entry of entries; track entry) {
+  @for (entry of entries; track entry.id) {
     <li class="list-group-item" id="entry-list-actual-month" (click)="onEntryClick(entry)">
       <app-entry-list-entry
-        [withMonth]="!historySearchObject!.isLastMonth"
+        [withMonth]="historySearchObject!.isLastMonth"
         [entry]="entry">
       </app-entry-list-entry>
     </li>

@@ -145,7 +145,7 @@ export class PredictService {
     // Calculate Time for monthly regular entry
     const year: number = this.dateService.getYear(this.nextMonthString);
     const month: number = this.dateService.getNextMonthNumber();
-    const day: number = regularly.isEndOfMonth ? this.dateService.setDateToLastDayOfMonth(new Date(year, month)) : regularly.monthDay;
+    const day: number = regularly.isEndOfMonth ? this.dateService.getLastDayOfMonth(new Date(year, month)) : regularly.monthDay;
 
     const date: Date = new Date(year, month, day);
     const entry: Entry = this.createEntryObjectFromRegularly(regularly, this.dateService.getAvailableWeekdayAsTimestampFromTimestamp(date.getTime()), this.nextMonthString);
@@ -201,7 +201,7 @@ export class PredictService {
     // Calculate Time for monthly regular entry
     const year: number = this.dateService.getYear(this.nextMonthString);
     const month: number = this.dateService.getNextMonthNumber();
-    const day: number = account.creditLastDay ? this.dateService.setDateToLastDayOfMonth(new Date(year, month)) : (account.creditDay ?? 1);
+    const day: number = account.creditLastDay ? this.dateService.getLastDayOfMonth(new Date(year, month)) : (account.creditDay ?? 1);
 
     const date: Date = new Date(year, month, day);
     const entry: Entry = this.createEntryObjectFromAccount(account, this.dateService.getAvailableWeekdayAsTimestampFromTimestamp(date.getTime()), this.nextMonthString);

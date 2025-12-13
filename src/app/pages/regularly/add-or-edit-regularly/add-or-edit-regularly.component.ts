@@ -60,7 +60,6 @@ export class AddOrEditRegularlyComponent {
   selectedDate: NgbDate = this.ngbCalendar.getToday();
   selectedDateTimestamp: number = this.dateService.getTimestampFromNgbDate(this.selectedDate);
 
-
   accounts: (Account & { id?: string })[] = [];
 
   title: string = this.selectedEntryType.label;
@@ -87,7 +86,7 @@ export class AddOrEditRegularlyComponent {
     this.createListeners();
     this.loadAccounts();
     this.fillFormIfRegularlyIsAvailable();
-    this.dateService.setDateToLastDayOfMonth(new Date(2023, 9));
+    this.dateService.getLastDayOfMonth(new Date(2023, 9));
   }
 
   private createFormGroup() {

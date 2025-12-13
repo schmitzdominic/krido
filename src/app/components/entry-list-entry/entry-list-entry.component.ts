@@ -21,15 +21,6 @@ export class EntryListEntryComponent {
 
   protected readonly AccountType = AccountType;
 
-  /** Inserted by Angular inject() migration for backwards compatibility */
-  constructor(...args: unknown[]);
-
-  constructor() {
-  }
-
-  ngOnInit() {
-  }
-
   getPrice(entry: Entry) {
     return `${entry.type === EntryType.outcome ? '-' : ''} ${this.priceService.convertNumberToEuro(entry!.value)}`
   }

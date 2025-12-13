@@ -7,7 +7,16 @@ export class HelperService {
 
   constructor() { }
 
-  createSearchName(name: string): string {
-    return name.replaceAll(' ', '').toLowerCase();
+  /**
+   * Creates a lowercase search key from a string, removing all whitespace.
+   * Umlauts and other special characters are preserved.
+   * @param name The input string.
+   * @returns A normalized string suitable for searching.
+   */
+  public createSearchName(name: string): string {
+    if (!name) {
+      return '';
+    }
+    return name.replace(/\s/g, '').toLowerCase();
   }
 }

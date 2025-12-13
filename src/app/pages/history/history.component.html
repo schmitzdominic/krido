@@ -9,7 +9,8 @@
   </div>
   <div class="col-md-12 mb-3">
     <select class="form-select" id="user" aria-label="Select user" formControlName="accounts">
-      @for (account of accounts; track account) {
+      <option value="">Alle Konten</option>
+      @for (account of accounts; track account.id) {
         <option value="{{ account.id }}">{{ account.name }}</option>
       }
     </select>
@@ -18,7 +19,7 @@
 @if (!historySearchObject.isLastMonth) {
   <div class="row">
     <div class="col-2">
-      <span class="badge bg-light-subtle" style="font-size: 16px" (click)="onClickLastMonth()">Letzter Monat</span>
+      <span class="badge bg-light-subtle" style="font-size: 16px; cursor: pointer;" (click)="onClickLastMonth()">Letzter Monat</span>
     </div>
   </div>
 }
