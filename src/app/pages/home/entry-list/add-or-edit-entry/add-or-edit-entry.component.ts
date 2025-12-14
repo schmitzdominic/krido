@@ -10,7 +10,7 @@ import {NgbCalendar, NgbDate} from "@ng-bootstrap/ng-bootstrap";
 import {Entry} from "../../../../../shared/interfaces/entry.model";
 import {HelperService} from "../../../../services/helper/helper.service";
 import {EntryService} from "../../../../services/entry/entry.service";
-import {forkJoin, map} from "rxjs";
+import {forkJoin, map, Subject, take, takeUntil} from "rxjs";
 import {UserService} from "../../../../services/user/user.service";
 
 interface EntryTypeInterface {
@@ -32,6 +32,8 @@ export class AddOrEditEntryComponent {
   private ngbCalendar = inject(NgbCalendar);
   private entryService = inject(EntryService);
   private injector = inject(Injector);
+
+  private destroy$ = new Subject<void>();
 
 
   @Input() entry: (Entry & { id: string; budget?: Budget }) | undefined;
@@ -75,6 +77,11 @@ export class AddOrEditEntryComponent {
     this.loadAccounts();
     this.loadBudgets();
     this.fillFormIfEntryIsAvailable();
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   private createFormGroup() {
@@ -126,32 +133,40 @@ export class AddOrEditEntryComponent {
   }
 
   private loadAccounts() {
-    this.accountService.getAllAccounts().pipe(
-      map(accounts => accounts as (Account & { id: string })[])
-    ).subscribe(accounts => runInInjectionContext(this.injector, () => {
-      this.accounts = accounts;
-      if (!this.entry && accounts.length > 0) {
-        this.addOrEditEntryFormGroup.controls['account'].setValue(accounts[0].id);
-      }
-    }));
+    this.accountService.getAllAccounts()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (accounts) => {
+          this.accounts = accounts as (Account & { id: string })[];
+          if (!this.entry && this.accounts.length > 0) {
+            this.addOrEditEntryFormGroup.controls['account'].setValue(this.accounts[0].id);
+          }
+        },
+        error: (err) => console.error('Fehler beim Laden der Konten', err)
+      });
   }
 
   private loadBudgets() {
     const monthString = this.dateService.getActualMonthString();
-    const monthlyBudgets$ = this.budgetService.getAllMonthBudgetsByMonthString(monthString).pipe(map(b => b as (Budget & { id: string })[]));
-    const allTimeBudgets$ = this.budgetService.getAllNoTimeLimitBudgets().pipe(map(b => b as (Budget & { id: string })[]));
+    const monthlyBudgets$ = this.budgetService.getAllMonthBudgetsByMonthString(monthString).pipe(take(1), map(b => b as (Budget & { id: string })[]));
+    const allTimeBudgets$ = this.budgetService.getAllNoTimeLimitBudgets().pipe(take(1), map(b => b as (Budget & { id: string })[]));
 
-    forkJoin([monthlyBudgets$, allTimeBudgets$]).subscribe(([monthlyBudgets, allTimeBudgets]) => runInInjectionContext(this.injector, () => {
-      const activeBudgets = [...monthlyBudgets, ...allTimeBudgets].filter(budget => !budget.isArchived);
-      this.budgets = [
-        { ...this.noBudgetValue, id: this.noBudgetKey },
-        ...activeBudgets
-      ];
-
-      if (!this.entry?.budget) {
-        this.addOrEditEntryFormGroup.controls['budget'].setValue(this.noBudgetKey);
-      }
-    }));
+    forkJoin([monthlyBudgets$, allTimeBudgets$])
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: ([monthlyBudgets, allTimeBudgets]) => {
+          const activeBudgets = [...monthlyBudgets, ...allTimeBudgets].filter(budget => !budget.isArchived);
+          this.budgets = [
+            { ...this.noBudgetValue, id: this.noBudgetKey },
+            ...activeBudgets
+          ];
+    
+          if (!this.entry?.budget) {
+            this.addOrEditEntryFormGroup.controls['budget'].setValue(this.noBudgetKey);
+          }
+        },
+        error: (err) => console.error('Fehler beim Laden der Budgets', err)
+      });
   }
 
   onDateSelected(ngbDate: NgbDate) {
