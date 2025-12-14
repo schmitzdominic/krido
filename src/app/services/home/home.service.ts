@@ -4,6 +4,7 @@ import {Home} from "../../../shared/interfaces/home.model";
 import {UserService} from "../user/user.service";
 import {User} from "../../../shared/interfaces/user.model";
 import {DateService} from "../date/date.service";
+import {Observable} from "rxjs";
 
 @Injectable({
   providedIn: 'root'
@@ -16,16 +17,11 @@ export class HomeService {
 
   rootPath: string = '/homes'
 
-  /** Inserted by Angular inject() migration for backwards compatibility */
-  constructor(...args: unknown[]);
-
-  constructor() { }
-
-  get getAllHomes() {
+  getAllHomes() {
     return this.dbService.readList(this.rootPath);
   }
 
-  get generatePin(): number {
+  generatePin(): number {
     return Math.floor(1000 + Math.random() * 9000);
   }
 
@@ -39,8 +35,8 @@ export class HomeService {
     return this.dbService.update(`${this.rootPath}/${home.searchName}`, home);
   }
 
-  getActualMonthString() {
-    return this.dbService.read(`${this.rootPath}/${this.userService.home}/actualMonthString`)
+  getActualMonthString(): Observable<number | null> {
+    return this.dbService.read<number>(`${this.rootPath}/${this.userService.home}/actualMonthString`)
   }
 
   setActualMonthString() {

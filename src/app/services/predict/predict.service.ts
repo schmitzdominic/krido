@@ -1,4 +1,4 @@
-import { Injectable, inject, Injector, runInInjectionContext } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {BudgetService} from "../budget/budget.service";
 import {HomeService} from "../home/home.service";
 import {DateService} from "../date/date.service";
@@ -15,7 +15,8 @@ import {AccountService} from "../account/account.service";
 import {AccountType} from "../../../shared/enums/account-type.enum";
 import {Account} from "../../../shared/interfaces/account.model";
 import {EntryType} from "../../../shared/enums/entry-type.enum";
-import { map } from 'rxjs/operators';
+import { from, of } from 'rxjs';
+import { map, switchMap, tap, mergeMap, filter, take } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -29,7 +30,6 @@ export class PredictService {
   private entryService = inject(EntryService);
   private toastService = inject(ToastService);
   private accountService = inject(AccountService);
-  private injector = inject(Injector);
 
 
   private lastMonthString: string = '';
@@ -38,44 +38,47 @@ export class PredictService {
   public createEntries() {
     if (this.userService.home) {
       this.homeService.getActualMonthString().pipe(
-        map(dbMonthString => dbMonthString as number | null)
-      ).subscribe(dbMonthString => runInInjectionContext(this.injector, () => {
-        // If no month string is set in the DB, set it for the first time and stop.
-        if (!dbMonthString) {
-          // If no month string is set in the DB, set it for the first time.
-          this.homeService.setActualMonthString().then();
-          return;
-        }
-
-        // if the db monthString is lower than the actual one, create entries for the next month.
-        if (dbMonthString < Number(this.dateService.getMonthStringFromMonth(0))) {
-          this.lastMonthString = this.dateService.getMonthStringFromMonth(-1);
-          this.nextMonthString = this.dateService.getMonthStringFromMonth(1);
-
-          this.homeService.setActualMonthString().then(() => {            
-            runInInjectionContext(this.injector, () => {
-              this.createBudgets();
-              this.createRegularEntries();
-              this.createCreditCardEntries();
-              this.toastService.showSuccess('Nächster Monat wurde angelegt', 3000);
-            });
-          });
-        }
-      }));
+        take(1), // Ensure the stream completes after the first value
+        switchMap(dbMonthString => {
+          // Case 1: No month string in DB, set it for the first time.
+          if (!dbMonthString) {
+            return from(this.homeService.setActualMonthString());
+          }
+          // Case 2: DB month is outdated, create next month's data.
+          const actualMonth = Number(this.dateService.getMonthStringFromMonth(0));
+          if (dbMonthString < actualMonth) {
+            this.lastMonthString = this.dateService.getMonthStringFromMonth(-1);
+            this.nextMonthString = this.dateService.getMonthStringFromMonth(1);
+            // Chain the promise to set the new month string
+            return from(this.homeService.setActualMonthString()).pipe(
+              tap(() => this.createNextMonthData())
+            );
+          }
+          // Case 3: DB is up-to-date, do nothing.
+          return of(undefined);
+        })
+      ).subscribe(); // A single subscription to trigger the whole chain.
     }
+  }
+
+  private createNextMonthData() {
+    this.createBudgets();
+    this.createRegularEntries();
+    this.createCreditCardEntries();
+    this.toastService.showSuccess('Nächster Monat wurde angelegt', 3000);
   }
 
   private createBudgets() {
     this.budgetService.getAllMonthBudgetsByMonthString(this.lastMonthString).pipe(
-      map(budgets => budgets as (Budget & { id: string })[])
-    ).subscribe(budgets => runInInjectionContext(this.injector, () => {
-      // The service now returns a clean array of Budget objects.
-      budgets.forEach(budget => {
-        if (!budget.isArchived && budget.id) {
-          this.updateBudget(budget);
-        }
-      });
-    }));
+      map(budgets => budgets as (Budget & { id: string })[]), // Explicitly type the stream
+      take(1),
+      // Flatten the array of budgets into individual budget emissions
+      mergeMap((budgets: (Budget & { id: string })[]) => from(budgets)),
+      // Filter out archived budgets
+      filter((budget: Budget & { id: string }) => !budget.isArchived && !!budget.id),
+      // Process each budget
+      tap((budget: Budget & { id: string }) => this.updateBudget(budget))
+    ).subscribe();
   }
 
   private updateBudget(budget: Budget & { id: string }) {
@@ -84,13 +87,15 @@ export class PredictService {
 
     if (budget.cycleKey && budget.id) {
       this.budgetService.getCycle(budget.cycleKey).pipe(
-        map(cycle => cycle as Cycle | null)
-      ).subscribe(cycle => runInInjectionContext(this.injector, () => {
-        if (cycle) {          
-          this.budgetService.updateMonthBudget(budget, budget.id)
-            .then(() => runInInjectionContext(this.injector, () => this.createNewBudgetFromOldBudget(budget, cycle)));
-        }
-      }));
+        map(cycle => cycle as Cycle | null), // Explicitly type the stream
+        take(1),
+        filter((cycle: Cycle | null): cycle is Cycle => !!cycle),
+        switchMap(cycle =>
+          from(this.budgetService.updateMonthBudget(budget, budget.id)).pipe(
+            tap(() => this.createNewBudgetFromOldBudget(budget, cycle))
+          )
+        )
+      ).subscribe();
     }
   }
 
@@ -121,23 +126,22 @@ export class PredictService {
 
     // Month
     this.regularlyService.getAllByCycleType(RegularlyCycleType.month).pipe(
-      map(regularities => regularities as Regularly[])
-    ).subscribe(regularities => runInInjectionContext(this.injector, () => {
-      regularities.forEach(regularly => {
-        this.checkRegularMonth(regularly);
-      });
-    }));
+      map(regularities => regularities as Regularly[]), // Explicitly type the stream
+      take(1),
+      mergeMap((regularities: Regularly[]) => from(regularities)),
+      tap((regularly: Regularly) => this.checkRegularMonth(regularly))
+    ).subscribe();
 
     // TODO: Quarter
 
     // Year
     this.regularlyService.getAllByCycleType(RegularlyCycleType.year).pipe(
-      map(regularities => regularities as Regularly[])
-    ).subscribe(regularities => runInInjectionContext(this.injector, () => {
-      regularities.forEach(regularly => {
-        this.checkRegularYear(regularly);
-      });
-    }));
+      map(regularities => regularities as Regularly[]), // Explicitly type the stream
+      take(1),
+      mergeMap((regularities: Regularly[]) => from(regularities)),
+      filter((regularly: Regularly) => !!regularly.date),
+      tap((regularly: Regularly) => this.checkRegularYear(regularly))
+    ).subscribe();
   }
 
   private checkRegularMonth(regularly: Regularly) {
@@ -191,10 +195,11 @@ export class PredictService {
 
   private createCreditCardEntries() {
     this.accountService.getAllAccountsFilteredByAccountType(AccountType.creditCard).pipe(
-      map(accounts => accounts as Account[]) // Safely cast the type within the pipe
-    ).subscribe(accounts => runInInjectionContext(this.injector, () => {
-      accounts.forEach(account => this.checkAccountAndCreateEntry(account));
-    }));
+      map(accounts => accounts as Account[]), // Explicitly type the stream
+      take(1),
+      mergeMap((accounts: Account[]) => from(accounts)),
+      tap((account: Account) => this.checkAccountAndCreateEntry(account))
+    ).subscribe();
   }
 
   private checkAccountAndCreateEntry(account: Account) {

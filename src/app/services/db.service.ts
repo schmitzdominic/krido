@@ -25,16 +25,20 @@ import {Observable} from "rxjs";
 export class DbService {
   private db: Database = inject(Database);
   private loadingService = inject(LoadingService);
+  private _home: string | null = null;
 
   /**
    * Gets the current user's home ID from local storage.
-   * @returns The home ID string, or an empty string if not found.
+   * The value is cached after the first read for efficiency.
+   * @returns The home ID string, or an empty string if not found or not yet read.
    */
   get home(): string {
+    if (this._home) return this._home;
     const userItem = localStorage.getItem('user');
     if (!userItem) return '';
     const home = (JSON.parse(userItem) as User).home;
-    return home ? home : '';
+    this._home = home ? home : '';
+    return this._home;
   }
 
   /**
@@ -47,7 +51,7 @@ export class DbService {
   async create<T>(path: string, object: T): Promise<void> {
     this.loadingService.setLoading = true;
     try {
-      return await set(ref(this.db, path), object);
+      return await set(ref(this.db, path), object); // set does not need the db instance directly
     } catch (error) {
       console.error(`Error creating data at path: ${path}`, error);
       throw error; // Re-throw the error to be handled by the caller
@@ -63,7 +67,7 @@ export class DbService {
    * @template T The expected type of the object.
    */
   public read<T>(path: string): Observable<T | null> {
-    return objectVal<T>(ref(this.db, path));
+    return objectVal<T>(ref(this.db, path)); // objectVal uses the Database instance from the DatabaseReference
   }
 
   /**
@@ -74,8 +78,7 @@ export class DbService {
    * @template T The expected type of objects in the list.
    */
   public readList<T>(path: string): Observable<T[]> {
-    // The 'id' will be automatically added to the object when using listVal with keyField.
-    return listVal<T>(ref(this.db, path), { keyField: 'id' });
+    return listVal<T>(ref(this.db, path), { keyField: 'id' }); // listVal uses the Database instance from the DatabaseReference
   }
 
   /**
@@ -88,7 +91,7 @@ export class DbService {
    */
   public readFilteredList<T>(path: string, ...constraints: QueryConstraint[]): Observable<T[]> {
     const q = query(ref(this.db, path), ...constraints);
-    return listVal<T>(q, { keyField: 'id' });
+    return listVal<T>(q, { keyField: 'id' }); // listVal uses the Database instance from the DatabaseReference
   }
 
   /**
@@ -102,7 +105,7 @@ export class DbService {
   public async update<T extends object>(path: string, object: Partial<T>, loading: boolean = true): Promise<void> {
     if (loading) this.loadingService.setLoading = true;
     try {
-      return await update(ref(this.db, path), object);
+      return await update(ref(this.db, path), object); // update does not need the db instance directly
     } catch (error) {
       console.error(`Error updating data at path: ${path}`, error);
       throw error;
@@ -119,7 +122,7 @@ export class DbService {
   public async delete(path: string): Promise<void> {
     this.loadingService.setLoading = true;
     try {
-      return await remove(ref(this.db, path));
+      return await remove(ref(this.db, path)); // remove does not need the db instance directly
     } catch (error) {
       console.error(`Error deleting data at path: ${path}`, error);
       throw error;
@@ -136,8 +139,7 @@ export class DbService {
    * @template T The type of the object being created.
    */
   public createListValue<T>(path: string, object: T): ThenableReference {
-    // This returns a "ThenableReference", which has a `key` property and can be awaited.
-    return push(ref(this.db, path), object);
+    return push(ref(this.db, path), object); // push does not need the db instance directly
   }
 
   /**
@@ -152,7 +154,10 @@ export class DbService {
   public async updateListValue<T extends object>(path: string, key: string, object: Partial<T>, loading: boolean = true): Promise<void> {
     if (loading) this.loadingService.setLoading = true;
     try {
-      return await update(ref(this.db, `${path}/${key}`), object);
+      await update(ref(this.db, `${path}/${key}`), object);
+    } catch (error) {
+      console.error(`Error updating list value at path: ${path}/${key}`, error);
+      throw error;
     } finally {
       if (loading) this.loadingService.setLoading = false;
     }
@@ -167,7 +172,10 @@ export class DbService {
   public async deleteListValue(path: string, key: string): Promise<void> {
     this.loadingService.setLoading = true;
     try {
-      return await remove(ref(this.db, `${path}/${key}`));
+      await remove(ref(this.db, `${path}/${key}`));
+    } catch (error) {
+      console.error(`Error deleting list value at path: ${path}/${key}`, error);
+      throw error;
     } finally {
       this.loadingService.setLoading = false;
     }

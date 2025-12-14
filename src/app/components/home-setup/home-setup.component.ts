@@ -59,7 +59,7 @@ export class HomeSetupComponent {
 
   subscribeAllHomes(): void {
     // With the new API, we get the array of homes directly.
-    this.homeService.getAllHomes.pipe(
+    this.homeService.getAllHomes().pipe(
       map(homes => homes as Home[])
     ).subscribe(homes => this.homes = homes);
   }
@@ -134,7 +134,7 @@ export class HomeSetupComponent {
       const home: Home = {
         searchName: searchName,
         name: this.createFormGroup.value.createHomeName,
-        pin: this.homeService.generatePin
+        pin: this.homeService.generatePin()
       };
       this.homeService.createHome(home).then(() => {
         runInInjectionContext(this.injector, () => {
