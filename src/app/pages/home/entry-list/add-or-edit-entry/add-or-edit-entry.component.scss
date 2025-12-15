@@ -1,7 +1,14 @@
-.positive {
+// Überschreibt die Standard-Bootstrap-Linienstärke für die Outline-Buttons,
+// um die Linienfarbe an das dunkle Design anzupassen.
+.btn-outline-light {
+  border-color: #495057;
 
-}
-
-.negative {
-
+  &:hover, &:focus, &:active, &.active, &.show {
+    color: inherit;
+    background-color: transparent;
+    border-color: #f8f9fa; // Bootstrap $light color
+    border-width: 2px;
+    // remove the blue box-shadow
+    box-shadow: none;
+  }
 }

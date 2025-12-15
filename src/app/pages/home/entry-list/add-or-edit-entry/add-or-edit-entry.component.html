@@ -7,11 +7,14 @@
 <div class="modal-body">
   <form class="needs-validation" [formGroup]="addOrEditEntryFormGroup" (ngSubmit)="onSubmit()" novalidate>
     <div class="mb-4">
-      <select class="form-select" id="add-entry-type" aria-label="Select entry type" formControlName="entryType">
-        @for (entryType of entryTypes; track entryType) {
-          <option value="{{ entryType.value }}">{{ entryType.label }}</option>
-        }
-      </select>
+      <div ngbDropdown class="d-block">
+        <button type="button" class="btn btn-outline-light w-100 d-flex justify-content-between align-items-center" id="dropdownEntryType" ngbDropdownToggle>{{ selectedEntryType.label }}</button>
+        <div ngbDropdownMenu aria-labelledby="dropdownEntryType" class="w-100">
+          @for (entryType of entryTypes; track entryType) {
+            <button type="button" ngbDropdownItem (click)="selectEntryType(entryType)">{{ entryType.label }}</button>
+          }
+        </div>
+      </div>
     </div>
     <div class="col-md-12 mb-3">
       <label for="add-entry-name" class="form-label bs-success-text-emphasis">Kurzbeschreibung</label>
@@ -60,19 +63,25 @@
     </div>
     <div class="col-md-12 mb-3">
       <label for="add-entry-account" class="form-label">Konto</label>
-      <select class="form-select" id="add-entry-account" aria-label="Select entry type" formControlName="account">
-        @for (account of accounts; track account) {
-          <option value="{{ account.id }}">{{ account.name }}</option>
-        }
-      </select>
+      <div ngbDropdown class="d-block">
+        <button type="button" class="btn btn-outline-light w-100 d-flex justify-content-between align-items-center" id="dropdownAccount" ngbDropdownToggle>{{ selectedAccount.name || 'Konto wählen' }}</button>
+        <div ngbDropdownMenu aria-labelledby="dropdownAccount" class="w-100">
+          @for (account of accounts; track account) {
+            <button type="button" ngbDropdownItem (click)="selectAccount(account)">{{ account.name }}</button>
+          }
+        </div>
+      </div>
     </div>
     <div class="col-md-12 mb-3">
       <label for="add-entry-budget" class="form-label">Budget</label>
-      <select class="form-select" id="add-entry-budget" aria-label="Select entry type" formControlName="budget">
-        @for (budget of budgets; track budget) {
-          <option value="{{ budget.id }}">{{ budget.name }}</option>
-        }
-      </select>
+      <div ngbDropdown class="d-block">
+        <button type="button" class="btn btn-outline-light w-100 d-flex justify-content-between align-items-center" id="dropdownBudget" ngbDropdownToggle>{{ selectedBudget?.name || 'Budget wählen' }}</button>
+        <div ngbDropdownMenu aria-labelledby="dropdownBudget" class="w-100">
+          @for (budget of budgets; track budget) {
+            <button type="button" ngbDropdownItem (click)="selectBudget(budget)">{{ budget.name }}</button>
+          }
+        </div>
+      </div>
     </div>
   </form>
   <div class="pt-2">

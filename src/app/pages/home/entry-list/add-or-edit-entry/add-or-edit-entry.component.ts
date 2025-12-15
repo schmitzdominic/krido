@@ -1,4 +1,4 @@
-import { Component, EventEmitter, inject, Injector, Input, Output, runInInjectionContext } from '@angular/core';
+import {Component, EventEmitter, inject, Input, Output} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {EntryType} from "../../../../../shared/enums/entry-type.enum";
 import {AccountService} from "../../../../services/account/account.service";
@@ -11,7 +11,6 @@ import {Entry} from "../../../../../shared/interfaces/entry.model";
 import {HelperService} from "../../../../services/helper/helper.service";
 import {EntryService} from "../../../../services/entry/entry.service";
 import {forkJoin, map, Subject, take, takeUntil} from "rxjs";
-import {UserService} from "../../../../services/user/user.service";
 
 interface EntryTypeInterface {
   value: EntryType,
@@ -31,7 +30,6 @@ export class AddOrEditEntryComponent {
   private helperService = inject(HelperService);
   private ngbCalendar = inject(NgbCalendar);
   private entryService = inject(EntryService);
-  private injector = inject(Injector);
 
   private destroy$ = new Subject<void>();
 
@@ -169,6 +167,18 @@ export class AddOrEditEntryComponent {
       });
   }
 
+  selectEntryType(entryType: EntryTypeInterface): void {
+    this.addOrEditEntryFormGroup.controls['entryType'].setValue(entryType.value);
+  }
+
+  selectAccount(account: Account & { id: string }): void {
+    this.addOrEditEntryFormGroup.controls['account'].setValue(account.id);
+  }
+
+  selectBudget(budget: Budget & { id: string }): void {
+    this.addOrEditEntryFormGroup.controls['budget'].setValue(budget.id);
+  }
+
   onDateSelected(ngbDate: NgbDate) {
     this.selectedDateTimestamp = this.dateService.getTimestampFromNgbDate(ngbDate);
   }
@@ -178,6 +188,7 @@ export class AddOrEditEntryComponent {
   }
 
   onSubmit() {
+    (document.activeElement as HTMLElement)?.blur();
     if (this.entry) {
       this.onEdit();
     } else {
