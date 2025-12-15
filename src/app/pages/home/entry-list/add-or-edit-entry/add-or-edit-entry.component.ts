@@ -1,5 +1,6 @@
 import {Component, EventEmitter, inject, Input, Output} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
+import {deleteField} from "@angular/fire/firestore";
 import {EntryType} from "../../../../../shared/enums/entry-type.enum";
 import {AccountService} from "../../../../services/account/account.service";
 import {Account} from "../../../../../shared/interfaces/account.model";
@@ -188,7 +189,6 @@ export class AddOrEditEntryComponent {
   }
 
   onSubmit() {
-    (document.activeElement as HTMLElement)?.blur();
     if (this.entry) {
       this.onEdit();
     } else {
@@ -197,7 +197,14 @@ export class AddOrEditEntryComponent {
   }
 
   onEdit() {
-    this.entryService.updateEntry(this.getEntryObject(), this.entry!.id).then(() => this.onClose.emit());
+    const entryData = this.getEntryObject();
+
+    // If you chose "no budget", the actual budget must be deleted
+    if (!this.selectedBudget && this.entry?.budget) {
+      (entryData as any).budget = deleteField();
+    }
+
+    this.entryService.updateEntry(entryData, this.entry!.id).then(() => this.onClose.emit());
   }
 
   onAdd() {
@@ -207,16 +214,20 @@ export class AddOrEditEntryComponent {
   getEntryObject(): Entry & { budget?: Budget } {
     const name: string = this.addOrEditEntryFormGroup.value.name;
     const value: number = this.addOrEditEntryFormGroup.value.value;
-    return {
+    const entry: Entry & { budget?: Budget } = {
       type: this.selectedEntryType.value,
       name: name,
       searchName: this.helperService.createSearchName(name),
       value: value,
       date: this.selectedDateTimestamp,
       account: this.selectedAccount,
-      budget: this.selectedBudget,
       monthString: this.dateService.getMonthStringFromDate(new Date(this.selectedDateTimestamp))
+    };
+
+    if (this.selectedBudget) {
+      entry.budget = this.selectedBudget;
     }
+    return entry;
   }
 
   onButtonCancel() {

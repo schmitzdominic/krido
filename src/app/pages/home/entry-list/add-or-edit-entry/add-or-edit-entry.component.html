@@ -75,7 +75,7 @@
     <div class="col-md-12 mb-3">
       <label for="add-entry-budget" class="form-label">Budget</label>
       <div ngbDropdown class="d-block">
-        <button type="button" class="btn btn-outline-light w-100 d-flex justify-content-between align-items-center" id="dropdownBudget" ngbDropdownToggle>{{ selectedBudget?.name || 'Budget wählen' }}</button>
+        <button type="button" class="btn btn-outline-light w-100 d-flex justify-content-between align-items-center" id="dropdownBudget" ngbDropdownToggle>{{ selectedBudget?.name || 'Kein Bduget gewählt' }}</button>
         <div ngbDropdownMenu aria-labelledby="dropdownBudget" class="w-100">
           @for (budget of budgets; track budget) {
             <button type="button" ngbDropdownItem (click)="selectBudget(budget)">{{ budget.name }}</button>
