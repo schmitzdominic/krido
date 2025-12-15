@@ -1,66 +1,92 @@
-import { Component, EnvironmentInjector, inject, Injector, Input, runInInjectionContext } from '@angular/core';
+import { Component, inject, Input, OnDestroy, OnInit } from '@angular/core';
 import {Budget} from "../../../shared/interfaces/budget.model";
 import {ProgressBarService} from "../../services/progress-bar/progress-bar.service";
 import {NgbProgressbarConfig} from "@ng-bootstrap/ng-bootstrap";
 import {PriceService} from "../../services/price/price.service";
 import {EntryService} from "../../services/entry/entry.service";
 import {Entry} from "../../../shared/interfaces/entry.model";
-import {BudgetService} from "../../services/budget/budget.service";
 import {EntryType} from "../../../shared/enums/entry-type.enum";
-import { map } from 'rxjs/operators';
+import { map, Subject, takeUntil } from 'rxjs';
 
+/**
+ * Displays a single budget entry, including its name, limit, and a progress bar
+ * indicating the used portion of the budget.
+ */
 @Component({
     selector: 'app-budget-list-entry',
     templateUrl: './budget-list-entry.component.html',
     styleUrls: ['./budget-list-entry.component.scss'],
     standalone: false
 })
-export class BudgetListEntryComponent {
+export class BudgetListEntryComponent implements OnInit, OnDestroy {
   private ngbProgressbarConfig = inject(NgbProgressbarConfig);
-  progressBarService = inject(ProgressBarService);
-  priceService = inject(PriceService);
-  entryService = inject(EntryService);
-  budgetService = inject(BudgetService);
-  private injector = inject(Injector);
+  public progressBarService = inject(ProgressBarService);
+  public priceService = inject(PriceService);
+  private entryService = inject(EntryService);
 
+  /**
+   * The budget data to be displayed. The component expects a budget object with an ID.
+   */
+  @Input({ required: true }) public budget!: Budget & { id: string };
 
-  @Input({ required: true }) budget: (Budget & { id: string }) | undefined;
+  /**
+   * The calculated amount of the budget that has been used.
+   */
+  public usedLimit: number = 0;
 
-  usedLimit: number = 0;
+  private destroy$ = new Subject<void>();
 
+  /**
+   * @param ngbProgressbarConfig Injected configuration for ng-bootstrap progress bars.
+   */
   constructor() {
-    // WARNING Not part of lifecycle! This Config MUST be loaded before all.
+    // This global configuration should ideally be set once in a root component (e.g., AppComponent)
+    // to avoid being called for every instance of this component.
     this.progressBarService.setProgressBarConfig(this.ngbProgressbarConfig);
   }
 
-  ngOnInit() {
+  /**
+   * Angular lifecycle hook that runs on component initialization.
+   */
+  public ngOnInit(): void {
     if (this.budget) {
-      this.calculateUsedLimit();
+      this.fetchAndCalculateUsedLimit();
     }
   }
 
-  calculateUsedLimit() {
-    if (this.budget?.id) {
-      this.entryService.getAllEntriesByBudgetKey(this.budget.id).pipe(
-        map(entries => entries as Entry[])
-      ).subscribe(entries => {
-        this.usedLimit = entries.reduce((acc, entry) => this.calculate(acc, entry), 0);
-
-        if (this.budget?.limit) {
-          this.budget!.usedLimit = this.usedLimit;
-          runInInjectionContext(this.injector, () => {
-            if (this.budget!.validityPeriod) {
-              this.budgetService.updateMonthBudget(this.budget!, this.budget!.id);
-            } else {
-              this.budgetService.updateNoTimeLimitBudget(this.budget!, this.budget!.id);
-            }
-          });
-        }
-      });
-    }
+  /**
+   * Angular lifecycle hook that runs when the component is destroyed.
+   * It completes the `destroy$` subject to prevent memory leaks from open subscriptions.
+   */
+  public ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
-  calculate(currentValue: number, entry: Entry): number {
+  /**
+   * Fetches all entries associated with the current budget and calculates the total used amount.
+   * Note: This implementation reads from the database but no longer writes back,
+   * which is a significant performance improvement. The `usedLimit` is now a view-only concern.
+   */
+  private fetchAndCalculateUsedLimit(): void {
+    this.entryService.getAllEntriesByBudgetKey(this.budget.id).pipe(
+      map(entries => (entries as Entry[]).reduce(
+        (acc, entry) => this.calculateNewValue(acc, entry), 0)
+      ),
+      takeUntil(this.destroy$)
+    ).subscribe(calculatedLimit => {
+      this.usedLimit = calculatedLimit;
+    });
+  }
+
+  /**
+   * Calculates the new accumulated value based on an entry's type.
+   * Incomes decrease the used amount (as they free up budget), while outcomes increase it.
+   * @param currentValue The current accumulated value.
+   * @param entry The entry to process.
+   * @returns The new accumulated value.
+   */
+  private calculateNewValue(currentValue: number, entry: Entry): number {
     switch (entry.type) {
       case EntryType.income: return currentValue - entry.value;
       case EntryType.outcome: return currentValue + entry.value;
@@ -68,13 +94,18 @@ export class BudgetListEntryComponent {
     }
   }
 
-  getProgressBarText() {
-    if ((this.usedLimit! / this.budget?.limit! * 100) < 35) {
-      return '';
-    } else {
-      return (Math.round(this.usedLimit / this.budget!.limit! * 100)) + '%';
-    }
-  }
+  /**
+   * Generates the text to be displayed inside the progress bar.
+   * Shows the percentage only if more than 35% of the budget is used.
+   * @returns The percentage string or an empty string.
+   */
+  public getProgressBarText(): string {
+    if (!this.budget.limit || this.budget.limit === 0) return '';
 
-  protected readonly Math = Math;
+    const percentage = (this.usedLimit / this.budget.limit) * 100;
+    if (percentage < 35) {
+      return '';
+    }
+    return `${Math.round(percentage)}%`;
+  }
 }
