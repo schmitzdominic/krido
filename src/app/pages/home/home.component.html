@@ -11,32 +11,19 @@
     <app-info-area>
     </app-info-area>
   </div>
-  @if (allTimeBudgets.length > 0 || monthlyBudgets.length > 0) {
-    <div class="row">
+  @if (allBudgets.length > 0) {
+    <div class="row mb-3">
       <!-- No Time Limit -->
       <h1>Budgets</h1>
-      <table class="table table-striped">
-        <tbody>
-          @for (budget of allTimeBudgets; track budget) {
-            <div class="card p-1 m-2" (click)="openViewBudgetModal(budget)">
-              <div class="card-body">
-                <app-budget-list-entry
-                  [budget]="budget">
-                </app-budget-list-entry>
-              </div>
+      <div class="d-flex flex-column">
+        @for (budget of allBudgets; track budget.id) {
+          <div class="card p-1 m-2" (click)="openViewBudgetModal(budget)" style="cursor: pointer;">
+            <div class="card-body">
+              <app-budget-list-entry [budget]="budget" class="w-100"></app-budget-list-entry>
             </div>
-          }
-          @for (budget of monthlyBudgets; track budget) {
-            <div class="card p-1 m-2" (click)="openViewBudgetModal(budget)">
-              <div class="card-body">
-                <app-budget-list-entry
-                  [budget]="budget">
-                </app-budget-list-entry>
-              </div>
-            </div>
-          }
-        </tbody>
-      </table>
+          </div>
+        }
+      </div>
     </div>
   }
   <div class="row">
