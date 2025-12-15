@@ -70,7 +70,10 @@ export class AddOrEditEntryComponent {
   title: string = this.selectedEntryType.label;
   submitButtonText: string = 'Eintragen';
 
-  ngOnInit() {
+  /**
+   * Lifecycle hook that is called after data-bound properties of a directive are initialized.
+   */
+  public ngOnInit(): void {
     this.createFormGroup();
     this.createListeners();
     this.loadAccounts();
@@ -78,12 +81,21 @@ export class AddOrEditEntryComponent {
     this.fillFormIfEntryIsAvailable();
   }
 
-  ngOnDestroy() {
+  /**
+   * Lifecycle hook that is called when a directive, pipe, or service is destroyed.
+   * Used for any custom cleanup that needs to occur when the instance is destroyed.
+   */
+  public ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
   }
 
-  private createFormGroup() {
+  /**
+   * Initializes the reactive form group for adding or editing an entry.
+   * It sets up the form controls and their initial values,
+   * either from an existing entry or with defaults for a new entry.
+   */
+  private createFormGroup(): void {
     this.addOrEditEntryFormGroup = this.formBuilder.group(
       {
         entryType: [this.entry ? this.entry.type : this.selectedEntryType.value],
@@ -96,7 +108,11 @@ export class AddOrEditEntryComponent {
     );
   }
 
-  private fillFormIfEntryIsAvailable() {
+  /**
+   * If an entry is being edited, this method pre-fills the form
+   * with the existing entry's data.
+   */
+  private fillFormIfEntryIsAvailable(): void {
     if (this.entry) {
       this.isNameInvalid = false;
       this.isValueInvalid = false;
@@ -109,7 +125,11 @@ export class AddOrEditEntryComponent {
     }
   }
 
-  private createListeners() {
+  /**
+   * Sets up listeners for form control value changes to react dynamically
+   * to user input, e.g., updating the title based on the selected entry type.
+   */
+  private createListeners(): void {
     this.addOrEditEntryFormGroup.controls['entryType'].valueChanges.subscribe(entryTypeName => {
       switch (entryTypeName) {
         case this.expenditureEntryType.value: {
@@ -131,7 +151,10 @@ export class AddOrEditEntryComponent {
     });
   }
 
-  private loadAccounts() {
+  /**
+   * Fetches all available accounts from the AccountService and populates the accounts list.
+   */
+  private loadAccounts(): void {
     this.accountService.getAllAccounts()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -145,7 +168,10 @@ export class AddOrEditEntryComponent {
       });
   }
 
-  private loadBudgets() {
+  /**
+   * Fetches all relevant budgets (monthly and all-time) from the BudgetService.
+   */
+  private loadBudgets(): void {
     const monthString = this.dateService.getActualMonthString();
     const monthlyBudgets$ = this.budgetService.getAllMonthBudgetsByMonthString(monthString).pipe(take(1), map(b => b as (Budget & { id: string })[]));
     const allTimeBudgets$ = this.budgetService.getAllNoTimeLimitBudgets().pipe(take(1), map(b => b as (Budget & { id: string })[]));
@@ -168,27 +194,50 @@ export class AddOrEditEntryComponent {
       });
   }
 
-  selectEntryType(entryType: EntryTypeInterface): void {
+  /**
+   * Sets the value of the 'entryType' form control.
+   * @param entryType The selected entry type object.
+   */
+  public selectEntryType(entryType: EntryTypeInterface): void {
     this.addOrEditEntryFormGroup.controls['entryType'].setValue(entryType.value);
   }
 
-  selectAccount(account: Account & { id: string }): void {
+  /**
+   * Sets the value of the 'account' form control.
+   * @param account The selected account object.
+   */
+  public selectAccount(account: Account & { id: string }): void {
     this.addOrEditEntryFormGroup.controls['account'].setValue(account.id);
   }
 
-  selectBudget(budget: Budget & { id: string }): void {
+  /**
+   * Sets the value of the 'budget' form control.
+   * @param budget The selected budget object.
+   */
+  public selectBudget(budget: Budget & { id: string }): void {
     this.addOrEditEntryFormGroup.controls['budget'].setValue(budget.id);
   }
 
-  onDateSelected(ngbDate: NgbDate) {
+  /**
+   * Handles the date selection event from the date picker.
+   * @param ngbDate The selected date from the NgbDatepicker.
+   */
+  public onDateSelected(ngbDate: NgbDate): void {
     this.selectedDateTimestamp = this.dateService.getTimestampFromNgbDate(ngbDate);
   }
 
-  onButtonDelete() {
+  /**
+   * Handles the delete button click. Deletes the current entry and closes the modal.
+   */
+  public onButtonDelete(): void {
     this.entryService.deleteEntry(this.entry!.id).then(() => this.onClose.emit());
   }
 
-  onSubmit() {
+  /**
+   * Handles the form submission.
+   * It determines whether to call the add or edit handler based on whether an entry is being edited.
+   */
+  public onSubmit(): void {
     if (this.entry) {
       this.onEdit();
     } else {
@@ -196,7 +245,10 @@ export class AddOrEditEntryComponent {
     }
   }
 
-  onEdit() {
+  /**
+   * Handles the logic for updating an existing entry.
+   */
+  private onEdit(): void {
     const entryData = this.getEntryObject();
 
     // If you chose "no budget", the actual budget must be deleted
@@ -207,11 +259,18 @@ export class AddOrEditEntryComponent {
     this.entryService.updateEntry(entryData, this.entry!.id).then(() => this.onClose.emit());
   }
 
-  onAdd() {
+  /**
+   * Handles the logic for adding a new entry.
+   */
+  private onAdd(): void {
     this.entryService.addEntry(this.getEntryObject()).then(() => this.onClose.emit());
   }
 
-  getEntryObject(): Entry & { budget?: Budget } {
+  /**
+   * Constructs and returns the entry object from the form group values.
+   * @returns The entry object, ready to be saved to the database.
+   */
+  private getEntryObject(): Entry & { budget?: Budget } {
     const name: string = this.addOrEditEntryFormGroup.value.name;
     const value: number = this.addOrEditEntryFormGroup.value.value;
     const entry: Entry & { budget?: Budget } = {
@@ -230,16 +289,25 @@ export class AddOrEditEntryComponent {
     return entry;
   }
 
-  onButtonCancel() {
+  /**
+   * Handles the cancel button click. Emits the onClose event to close the modal.
+   */
+  public onButtonCancel(): void {
     this.onClose.emit();
   }
 
-  get selectedAccount(): Account {
+  /**
+   * Getter for the currently selected account object.
+   */
+  public get selectedAccount(): Account {
     const account = this.accounts.find(acc => acc.id === this.addOrEditEntryFormGroup.value.account);
     return account ? account : this.accountService.noAccountValue;
   }
 
-  get selectedBudget(): (Budget & { id: string }) | undefined {
+  /**
+   * Getter for the currently selected budget object.
+   */
+  public get selectedBudget(): (Budget & { id: string }) | undefined {
     const budget = this.budgets.find(b => b.id === this.addOrEditEntryFormGroup.value.budget);
     if (budget?.id === this.noBudgetKey) {
       return undefined;
