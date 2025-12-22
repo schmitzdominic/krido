@@ -75,7 +75,7 @@ export class PredictService {
       // Flatten the array of budgets into individual budget emissions
       mergeMap((budgets: (Budget & { id: string })[]) => from(budgets)),
       // Filter out archived budgets
-      filter((budget: Budget & { id: string }) => !budget.isArchived && !!budget.id),
+      filter((budget: Budget & { id: string }) => !budget.isArchived && !!budget.key),
       // Process each budget
       tap((budget: Budget & { id: string }) => this.updateBudget(budget))
     ).subscribe();
@@ -85,13 +85,13 @@ export class PredictService {
     this.setBudgetValues(budget);
     budget.isArchived = true;
 
-    if (budget.cycleKey && budget.id) {
+    if (budget.cycleKey && budget.key) {
       this.budgetService.getCycle(budget.cycleKey).pipe(
         map(cycle => cycle as Cycle | null), // Explicitly type the stream
         take(1),
         filter((cycle: Cycle | null): cycle is Cycle => !!cycle),
         switchMap(cycle =>
-          from(this.budgetService.updateMonthBudget(budget, budget.id)).pipe(
+          from(this.budgetService.updateMonthBudget(budget, budget.key!)).pipe(
             tap(() => this.createNewBudgetFromOldBudget(budget, cycle))
           )
         )
@@ -113,7 +113,7 @@ export class PredictService {
     }
 
     // Create a new object without the 'id' property for the new DB entry.
-    const { id, ...newBudget } = budget;
+    const { key: id, ...newBudget } = budget;
 
     newBudget.isArchived = false;
     newBudget.usedLimit = 0;

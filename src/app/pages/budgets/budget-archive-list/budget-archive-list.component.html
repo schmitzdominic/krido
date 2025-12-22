@@ -10,7 +10,7 @@
   <div class="row">
     <table class="table">
       <tbody>
-        @for (budget of noTimeLimitBudgets; track budget) {
+        @for (budget of noTimeLimitBudgets; track budget.id) {
           <div class="card p-1 m-2" (click)="onCardClick(budget)">
             <div class="card-body">
               <app-budget-list-entry
@@ -25,10 +25,10 @@
   <div class="row">
     <table class="table">
       <tbody>
-        @for (monthBudget of monthBudgets; track monthBudget) {
+        @for (monthBudget of monthBudgets; track monthBudget.name) {
           <div>
             <h1>{{ monthBudget.name }}</h1>
-            @for (budget of monthBudget.budgets; track budget) {
+            @for (budget of monthBudget.budgets; track budget.id) {
               <div class="card p-1 m-2" (click)="onCardClick(budget)">
                 <div class="card-body">
                   <app-budget-list-entry

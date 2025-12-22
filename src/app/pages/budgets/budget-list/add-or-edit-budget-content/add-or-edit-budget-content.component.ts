@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, inject } from '@angular/core';
 import {Budget} from "../../../../../shared/interfaces/budget.model";
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {BudgetService} from "../../../../services/budget/budget.service";
@@ -11,162 +11,193 @@ import {ToastService} from "../../../../services/toast/toast.service";
     styleUrls: ['./add-or-edit-budget-content.component.scss'],
     standalone: false
 })
-export class AddOrEditBudgetContentComponent {
+export class AddOrEditBudgetContentComponent implements OnInit {
   private formBuilder = inject(FormBuilder);
   private budgetService = inject(BudgetService);
   private helperService = inject(HelperService);
   private toastService = inject(ToastService);
 
 
-  @Input() budget: Budget | undefined;
+  @Input() public budget: Budget & { id: string } | undefined;
 
-  @Output() onClose: EventEmitter<any> = new EventEmitter<any>();
+  @Output() public onClose: EventEmitter<any> = new EventEmitter<any>();
 
-  title: string = 'Budget erstellen';
-  submitButtonText: string = 'Erstellen';
+  public title: string = 'Budget erstellen';
+  public submitButtonText: string = 'Erstellen';
 
-  archiveSuccessArchivedMessage: string = '';
-  archiveSuccessDeArchivedMessage: string = '';
-  deleteSuccessMessage: string = '';
-  errorMessageDeleteNotPossible: string = 'Es tut mir leid, dein Budget enthält noch Einträge';
+  public archiveSuccessArchivedMessage: string = '';
+  public archiveSuccessDeArchivedMessage: string = '';
+  public deleteSuccessMessage: string = '';
+  public errorMessageDeleteNotPossible: string = 'Es tut mir leid, dein Budget enthält noch Einträge';
 
 
-  isDeleteAvailable: boolean = false;
+  public isDeleteAvailable: boolean = false;
 
-  addBudgetFormGroup: FormGroup = new FormGroup({
+  public addBudgetFormGroup: FormGroup = new FormGroup({
     name: new FormControl(''),
     limit: new FormControl('')
   });
 
-  ngOnInit() {
+  /**
+   * Initializes the component.
+   */
+  public ngOnInit() {
     this.createFormGroup();
-    this.setLimitValidator();
     this.fillFormIfBudget();
-    this.isDeleteAvailable = this.isDeleteButtonAvailable();
   }
 
-  createFormGroup() {
+  /**
+   * Creates the form group with validators.
+   */
+  private createFormGroup() {
     this.addBudgetFormGroup = this.formBuilder.group(
         {
           name: [this.budget ? this.budget.name : '', Validators.required],
-          limit: [this.budget ? this.budget.limit : '', Validators.required]
+          limit: [this.budget ? this.budget.limit : '', [Validators.required, Validators.min(0.01)]]
         }
     );
   }
 
-  setLimitValidator() {
-    this.addBudgetFormGroup.controls['limit'].valueChanges.subscribe(limit => {
-      if (limit && limit > 0) {
-        this.addBudgetFormGroup.controls['limit'].setErrors(null);
-      }
-    });
-  }
-
-  fillFormIfBudget() {
+  /**
+   * Fills the form and sets UI state if editing an existing budget.
+   */
+  private fillFormIfBudget() {
     if (this.budget) {
       this.title = 'Budget editieren';
       this.submitButtonText = 'Ändern';
+      this.isDeleteAvailable = this.isDeleteButtonAvailable();
 
       // Set Generic Error Messages
       this.archiveSuccessArchivedMessage = `Budget ${this.budget.name} erfolgreich archiviert`;
-      this.archiveSuccessDeArchivedMessage = `Bduget ${this.budget.name} erfolgreich aktiviert`;
+      this.archiveSuccessDeArchivedMessage = `Budget ${this.budget.name} erfolgreich aktiviert`;
       this.deleteSuccessMessage = `Budget ${this.budget.name} erfolgreich gelöscht`;
     }
   }
 
-  onArchive(): void {
+  /**
+   * Archives the current budget.
+   */
+  public onArchive(): void {
     this.setArchiveState(true);
   }
 
-  onDeArchive(): void {
+  /**
+   * De-archives the current budget.
+   */
+  public onDeArchive(): void {
     this.setArchiveState(false);
   }
 
-  onDelete(): void {
-    if (!this.budget?.entries) {
-      if (this.budget && this.budget.id && this.budget?.validityPeriod) {
-        this.budgetService.deleteMonthBudget(this.budget.id).then(() => {
-          this.toastService.showSuccess(this.deleteSuccessMessage);
-          this.onClose.emit();
-        });
-      }
-      if (this.budget && this.budget.id && !this.budget.validityPeriod) {
-        this.budgetService.deleteBudget(this.budget.id).then(() => {
-          this.toastService.showSuccess(this.deleteSuccessMessage);
-          this.onClose.emit();
-        });
-      }
+  /**
+   * Deletes the current budget if it has no entries.
+   */
+  public async onDelete(): Promise<void> {
+    if (!this.budget?.id) return;
+
+    if (!this.budget.entries || this.budget.entries.length === 0) {
+      const deletePromise = this.isMonthlyBudget()
+        ? this.budgetService.deleteMonthBudget(this.budget.id)
+        : this.budgetService.deleteBudget(this.budget.id);
+      await this.executeServiceAction(deletePromise, this.deleteSuccessMessage);
     } else {
       this.toastService.showDanger(this.errorMessageDeleteNotPossible);
     }
   }
 
-  onCancel() {
+  /**
+   * Closes the modal.
+   */
+  public onCancel() {
     this.onClose.emit();
   }
 
-  onSubmit() {
-    this.persistBudgetAndCloseModal();
+  /**
+   * Handles form submission.
+   */
+  public async onSubmit() {
+    await this.persistBudgetAndCloseModal();
   }
 
-  createBudgetObject(): Budget {
+  /**
+   * Creates a Budget object from form values.
+   * @returns {Budget} The created budget object.
+   */
+  private createBudgetObject(): Budget {
+    const formValue = this.addBudgetFormGroup.getRawValue();
     return {
-      searchName: this.helperService.createSearchName(this.addBudgetFormGroup.value.name),
-      name: this.addBudgetFormGroup.value.name,
-      limit: this.addBudgetFormGroup.value.limit,
+      searchName: this.helperService.createSearchName(formValue.name),
+      name: formValue.name,
+      limit: formValue.limit,
       isArchived: false
     };
   }
 
-  persistBudgetAndCloseModal() {
+  /**
+   * Saves the budget (create or update) and closes the modal.
+   */
+  private async persistBudgetAndCloseModal() {
     const budget = this.createBudgetObject();
-    if (this.budget) {
-      // Edit existing budget
-      if (this.budget.id) {
-        const key: string = this.budget.id;
-        delete budget['id'];
-        if (this.budget.validityPeriod) {
-          this.budgetService.updateMonthBudget(budget, key).then(() => {
-            this.onClose.emit();
-          });
-        } else {
-          this.budgetService.updateNoTimeLimitBudget(budget, key).then(() => {
-            this.onClose.emit();
-          });
-        }
-      } else {
-        this.toastService.showDanger('Es tut mir leid, dein Budget konnte nicht editiert werden!');
-        this.onClose.emit();
-      }
+
+    if (this.budget?.id) {
+      // Edit
+      const updatePromise = this.isMonthlyBudget()
+        ? this.budgetService.updateMonthBudget(budget, this.budget.id)
+        : this.budgetService.updateNoTimeLimitBudget(budget, this.budget.id);
+      await this.executeServiceAction(updatePromise);
     } else {
-     // Create new budget
-      this.budgetService.addBudget(budget).then(() => {
-        this.onClose.emit();
-      });
+      // Create
+      await this.executeServiceAction(Promise.resolve(this.budgetService.addBudget(budget)));
     }
   }
 
-  setArchiveState(state: boolean) {
-    let budget: Budget = this.createBudgetObject();
+  /**
+   * Sets the archive state of the budget.
+   * @param {boolean} state True to archive, false to de-archive.
+   */
+  private async setArchiveState(state: boolean) {
+    if (!this.budget?.id) return;
+
+    const budget: Budget = this.createBudgetObject();
     budget.isArchived = state;
-    if (this.budget && this.budget.id) {
-      const key: string = this.budget.id;
-      delete budget['id'];
-      if (this.budget?.validityPeriod) {
-        this.budgetService.updateMonthBudget(budget, key).then(() => {
-          this.toastService.showSuccess(state ? this.archiveSuccessArchivedMessage : this.archiveSuccessDeArchivedMessage);
-          this.onClose.emit();
-        });
-      } else {
-        this.budgetService.updateNoTimeLimitBudget(budget, key). then(() => {
-          this.toastService.showSuccess(state ? this.archiveSuccessArchivedMessage : this.archiveSuccessDeArchivedMessage);
-          this.onClose.emit();
-        });
+
+    const archivePromise = this.isMonthlyBudget()
+      ? this.budgetService.updateMonthBudget(budget, this.budget.id)
+      : this.budgetService.updateNoTimeLimitBudget(budget, this.budget.id);
+
+    const message = state ? this.archiveSuccessArchivedMessage : this.archiveSuccessDeArchivedMessage;
+    await this.executeServiceAction(archivePromise, message);
+  }
+
+  /**
+   * Executes a service promise and handles success/error toasts.
+   * @param {Promise<any>} promise The promise to execute.
+   * @param {string} [successMessage] Optional success message.
+   */
+  private async executeServiceAction(promise: Promise<any>, successMessage?: string): Promise<void> {
+    try {
+      await promise;
+      if (successMessage) {
+        this.toastService.showSuccess(successMessage);
       }
+      this.onClose.emit();
+    } catch (error) {
+      this.toastService.showDanger('Es tut mir leid, die Aktion konnte nicht ausgeführt werden.');
     }
   }
 
-  isDeleteButtonAvailable() {
-    return this.budget && this.budget.isArchived && !this.budget.entries || this.budget?.entries?.length == 0;
+  /**
+   * Checks if the delete button should be available.
+   * @returns {boolean} True if delete is possible.
+   */
+  private isDeleteButtonAvailable() {
+    return !!(this.budget?.isArchived && (!this.budget.entries || this.budget.entries.length === 0));
+  }
+
+  /**
+   * Checks if the current budget is a monthly budget.
+   * @returns {boolean} True if monthly.
+   */
+  private isMonthlyBudget(): boolean {
+    return !!this.budget?.validityPeriod;
   }
 }

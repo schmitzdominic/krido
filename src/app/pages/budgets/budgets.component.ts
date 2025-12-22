@@ -1,8 +1,9 @@
-import { Component, inject } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {MenuTitleService} from "../../../shared/behavior/menu-title/menu-title.service";
 import {BudgetService} from "../../services/budget/budget.service";
 import {Budget} from "../../../shared/interfaces/budget.model";
-import { map } from 'rxjs/operators';
+import { combineLatest } from 'rxjs';
 
 @Component({
     selector: 'app-budgets',
@@ -10,41 +11,48 @@ import { map } from 'rxjs/operators';
     styleUrls: ['./budgets.component.scss'],
     standalone: false
 })
-export class BudgetsComponent {
+export class BudgetsComponent implements OnInit {
   private menuTitleService = inject(MenuTitleService);
   private budgetService = inject(BudgetService);
+  private destroyRef = inject(DestroyRef);
 
 
-  active: string = 'budgets';
-  isArchiveShown: boolean = false;
+  public active: string = 'budgets';
+  public isArchiveShown: boolean = false;
 
-  ngOnInit(): void {
+  /**
+   * Initializes the component.
+   */
+  public ngOnInit(): void {
     this.setInitialValues();
     this.checkForArchive();
   }
 
   /**
-   * Set initial values.
+   * Sets initial values for the menu title.
    */
-  setInitialValues(): void {
+  private setInitialValues(): void {
     this.menuTitleService.setTitle('Budgets');
     this.menuTitleService.setActiveId(6);
   }
 
-  checkForArchive() {
-    this.budgetService.getAllNoTimeLimitBudgets().pipe(
-      map(budgets => budgets as Budget[])
-    ).subscribe(budgets => {
-      if (!this.isArchiveShown) {
-        this.isArchiveShown = !!budgets.find(b => b.isArchived);
-      }
-    });
-    this.budgetService.getAllMonthlyBudgets().pipe(
-      map(budgets => budgets as Budget[])
-    ).subscribe(budgets => {
-      if (!this.isArchiveShown) {
-        this.isArchiveShown = !!budgets.find(b => b.isArchived);
-      }
+  /**
+   * Checks if there are any archived budgets to toggle the archive view visibility.
+   * Uses combineLatest to react to changes in either budget list.
+   */
+  private checkForArchive() {
+    combineLatest([
+      this.budgetService.getAllNoTimeLimitBudgets(),
+      this.budgetService.getAllMonthlyBudgets()
+    ]).pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(([noTimeLimitBudgets, monthlyBudgets]) => {
+        const hasArchivedNoTimeLimit = (noTimeLimitBudgets as Budget[]).some(b => b.isArchived);
+        const hasArchivedMonthly = (monthlyBudgets as Budget[]).some(b => b.isArchived);
+        this.isArchiveShown = hasArchivedNoTimeLimit || hasArchivedMonthly;
+
+        if (!this.isArchiveShown) {
+          this.active = 'budgets';
+        }
     });
   }
 }

@@ -1,4 +1,5 @@
-import { Component, inject, Injector, runInInjectionContext, ViewChild } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, ViewChild } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {Cycle} from "../../../../shared/interfaces/cycle.model";
@@ -14,47 +15,64 @@ import { map } from 'rxjs/operators';
     styleUrls: ['./cycle-list.component.scss'],
     standalone: false
 })
-export class CycleListComponent {
+export class CycleListComponent implements OnInit {
   private ngbModal = inject(NgbModal);
   private budgetService = inject(BudgetService);
   private loadingService = inject(LoadingService);
-  private injector = inject(Injector);
-  priceService = inject(PriceService);
+  private destroyRef = inject(DestroyRef);
+  public priceService = inject(PriceService);
 
 
-  @ViewChild('addCycleModal') addCycleModal: NgbModalRef | undefined;
+  @ViewChild('addCycleModal') public addCycleModal: NgbModalRef | undefined;
 
-  addCycleModalRef: NgbModalRef | undefined;
-  isInitialized: boolean = false;
+  public addCycleModalRef: NgbModalRef | undefined;
+  public isInitialized: boolean = false;
 
-  cycles: (Cycle & { id: string })[] = [];
-  clickedCycle: (Cycle & { id: string }) | undefined;
+  public cycles: (Cycle & { id: string })[] = [];
+  public clickedCycle: (Cycle & { id: string }) | undefined;
 
-  ngOnInit() {
+  /**
+   * Initializes the component.
+   */
+  public ngOnInit() {
     this.loadAllCycles();
   }
 
-  loadAllCycles() {
+  /**
+   * Loads all cycles from the service.
+   */
+  private loadAllCycles() {
     this.loadingService.setLoading = true;
     this.budgetService.getAllCycles().pipe(
-      map(cycles => cycles as (Cycle & { id: string })[])
-    ).subscribe(cycles => runInInjectionContext(this.injector, () => {
+      map(cycles => cycles as (Cycle & { id: string })[]),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(cycles => {
       this.cycles = cycles;
       this.loadingService.setLoading = false;
       this.isInitialized = true;
-    }));
+    });
   }
 
-  onCardClick(cycle: Cycle & { id: string }) {
+  /**
+   * Handles the click on a cycle card to edit it.
+   * @param {Cycle & { id: string }} cycle The cycle to edit.
+   */
+  public onCardClick(cycle: Cycle & { id: string }) {
     this.clickedCycle = cycle;
     this.onAddClick();
   }
 
-  onAddClick(): void {
+  /**
+   * Opens the modal to add or edit a cycle.
+   */
+  public onAddClick(): void {
     this.openAddOrEditCycleModal();
   }
 
-  openAddOrEditCycleModal(): void {
+  /**
+   * Opens the modal instance.
+   */
+  public openAddOrEditCycleModal(): void {
     this.addCycleModalRef = this.ngbModal.open(
       this.addCycleModal,
       {
@@ -62,12 +80,15 @@ export class CycleListComponent {
       });
   }
 
-  onCloseAddOrEditCycleModal(): void {
+  /**
+   * Closes the modal and resets the selected cycle.
+   */
+  public onCloseAddOrEditCycleModal(): void {
     this.clickedCycle = undefined;
     if (this.addCycleModalRef) {
       this.addCycleModalRef.close();
     }
   }
 
-    protected readonly AccountType = AccountType;
+  public readonly AccountType = AccountType;
 }

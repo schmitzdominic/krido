@@ -1,4 +1,5 @@
-import { Component, EventEmitter, inject, Injector, Input, Output, runInInjectionContext } from '@angular/core';
+import { Component, DestroyRef, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {Budget} from "../../../../../shared/interfaces/budget.model";
 import {PriceService} from "../../../../services/price/price.service";
 import {NgbProgressbarConfig} from "@ng-bootstrap/ng-bootstrap";
@@ -13,44 +14,57 @@ import { map } from 'rxjs/operators';
     styleUrls: ['./view-budget-content.component.scss'],
     standalone: false
 })
-export class ViewBudgetContentComponent {
+export class ViewBudgetContentComponent implements OnInit {
   private ngbProgressbarConfig = inject(NgbProgressbarConfig);
   private entryService = inject(EntryService);
-  progressBarService = inject(ProgressBarService);
-  private injector = inject(Injector);
-  priceService = inject(PriceService);
+  public progressBarService = inject(ProgressBarService);
+  private destroyRef = inject(DestroyRef);
+  public priceService = inject(PriceService);
 
 
-  @Input() budget: Budget | undefined;
+  @Input() public budget: Budget & { id: string } | undefined;
 
-  @Output() onClose: EventEmitter<any> = new EventEmitter<any>();
+  @Output() public onClose: EventEmitter<any> = new EventEmitter<any>();
 
-  isContentReadOnly: boolean = true;
-  isEditButtonShown: boolean = true;
+  public isContentReadOnly: boolean = true;
+  public isEditButtonShown: boolean = true;
 
-  entries: (Entry & { id: string })[] = [];
+  public entries: (Entry & { id: string })[] = [];
 
-  usedLimit: number = 0;
+  public usedLimit: number = 0;
 
-  ngOnInit(): void {
+  /**
+   * Initializes the component.
+   */
+  public ngOnInit(): void {
     this.checkIfLimitIsSet();
     this.loadProgressBarConfig();
     this.setUsedLimit();
     this.loadEntries();
   }
 
-  checkIfLimitIsSet() {
+  /**
+   * Checks if a limit is set on the budget.
+   * If not, it enables edit mode and hides the edit button.
+   */
+  private checkIfLimitIsSet() {
     if (!this.budget?.limit) {
       this.isEditButtonShown = false;
       this.onEdit();
     }
   }
 
-  loadProgressBarConfig() {
+  /**
+   * Configures the progress bar.
+   */
+  private loadProgressBarConfig() {
     this.progressBarService.setProgressBarConfig(this.ngbProgressbarConfig);
   }
 
-  setUsedLimit() {
+  /**
+   * Sets the used limit value from the budget.
+   */
+  private setUsedLimit() {
     if (this.budget && this.budget.usedLimit) {
       this.usedLimit = this.budget.usedLimit;
     } else {
@@ -58,24 +72,36 @@ export class ViewBudgetContentComponent {
     }
   }
 
-  loadEntries() {
+  /**
+   * Loads entries associated with the budget.
+   */
+  private loadEntries() {
     if (this.budget && this.budget.id) {
       this.entryService.getAllEntriesByBudgetKey(this.budget.id).pipe(
-        map(entries => entries as (Entry & { id: string })[])
-      ).subscribe(entries => runInInjectionContext(this.injector, () => {
+        map(entries => entries as (Entry & { id: string })[]),
+        takeUntilDestroyed(this.destroyRef)
+      ).subscribe(entries => {
         this.entries = entries;
         this.sortEntriesByDate(this.entries);
-      }));
+      });
     }
   }
 
+  /**
+   * Sorts entries by date in descending order.
+   * @param {Entry[]} entries The entries to sort.
+   */
   private sortEntriesByDate(entries: Entry[]) {
     entries.sort((one, two) => {
       return one.date > two.date ? -1 : 1;
     });
   }
 
-  getRestBudget() {
+  /**
+   * Calculates the remaining budget.
+   * @returns {string} The formatted remaining budget or 'N/A'.
+   */
+  public getRestBudget() {
     if (this.budget!.limit && this.usedLimit) {
       const restBudget: number = this.budget!.limit - this.usedLimit;
       return this.priceService.convertNumberToEuro(restBudget);
@@ -84,7 +110,11 @@ export class ViewBudgetContentComponent {
     }
   }
 
-  getProgressBarText() {
+  /**
+   * Generates the text for the progress bar.
+   * @returns {string} The progress text (used / limit).
+   */
+  public getProgressBarText() {
     if ((this.usedLimit! / this.budget?.limit! * 100) < 35) {
       return '';
     } else {
@@ -94,11 +124,17 @@ export class ViewBudgetContentComponent {
     }
   }
 
-  onEdit() {
+  /**
+   * Toggles the read-only state.
+   */
+  public onEdit() {
     this.isContentReadOnly = !this.isContentReadOnly;
   }
 
-  onCancel() {
+  /**
+   * Closes the view.
+   */
+  public onCancel() {
     this.onClose.emit();
   }
 

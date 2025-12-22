@@ -1,4 +1,5 @@
-import { Component, inject, Injector, runInInjectionContext, ViewChild } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, ViewChild } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap";
 import {Budget} from "../../../../shared/interfaces/budget.model";
@@ -18,45 +19,58 @@ interface DropdownItem {
     styleUrls: ['./budget-list.component.scss'],
     standalone: false
 })
-export class BudgetListComponent {
+export class BudgetListComponent implements OnInit {
   private ngbModal = inject(NgbModal);
   private budgetService = inject(BudgetService);
   private loadingService = inject(LoadingService);
-  private injector = inject(Injector);
-  priceService = inject(PriceService);
+  private destroyRef = inject(DestroyRef);
+  public priceService = inject(PriceService);
 
 
-  @ViewChild('addBudgetModal') addBudgetModal: NgbModalRef | undefined;
-  @ViewChild('editBudgetModal') editBudgetModal: NgbModalRef | undefined;
+  @ViewChild('addBudgetModal') public addBudgetModal: NgbModalRef | undefined;
+  @ViewChild('editBudgetModal') public editBudgetModal: NgbModalRef | undefined;
 
-  addBudgetModalRef: NgbModalRef | undefined;
-  editBudgetModalRef: NgbModalRef | undefined;
+  public addBudgetModalRef: NgbModalRef | undefined;
+  public editBudgetModalRef: NgbModalRef | undefined;
 
-  typeNoTimeLimit: DropdownItem = {name: 'Ohne Zeitlimit', value: 'noTimeLimit'};
-  typeMonthly: DropdownItem = {name: 'Monatlich', value: 'monthly'};
+  public typeNoTimeLimit: DropdownItem = {name: 'Ohne Zeitlimit', value: 'noTimeLimit'};
+  public typeMonthly: DropdownItem = {name: 'Monatlich', value: 'monthly'};
 
-  noTimeLimitBudgets: (Budget & { id: string })[] = [];
-  monthlyBudgets: (Budget & { id: string })[] = [];
+  public noTimeLimitBudgets: (Budget & { id: string })[] = [];
+  public monthlyBudgets: (Budget & { id: string })[] = [];
 
-  isNoTimeLimitInitialized: boolean = false;
-  isMonthlyInitialized: boolean = false;
+  public isNoTimeLimitInitialized: boolean = false;
+  public isMonthlyInitialized: boolean = false;
 
-  clickedBudget: (Budget & { id: string }) | undefined;
+  public clickedBudget: (Budget & { id: string }) | undefined;
 
-  ngOnInit() {
+  /**
+   * Initializes the component.
+   */
+  public ngOnInit() {
       this.loadNoTimeLimitBudgets();
       this.loadTimeLimitBudgets();
   }
 
-  onAddClick(): void {
+  /**
+   * Opens the add budget modal.
+   */
+  public onAddClick(): void {
     this.openAddBudgetModal();
   }
 
-  onCardClick(budget: Budget & { id: string }): void {
+  /**
+   * Opens the edit budget modal for the selected budget.
+   * @param {Budget & { id: string }} budget The budget to edit.
+   */
+  public onCardClick(budget: Budget & { id: string }): void {
     this.openEditBudgetModal(budget);
   }
 
-  openAddBudgetModal(): void {
+  /**
+   * Opens the modal to add a new budget.
+   */
+  public openAddBudgetModal(): void {
     this.addBudgetModalRef = this.ngbModal.open(
       this.addBudgetModal,
       {
@@ -64,7 +78,11 @@ export class BudgetListComponent {
       });
   }
 
-  openEditBudgetModal(budget: Budget & { id: string }): void {
+  /**
+   * Opens the modal to edit an existing budget.
+   * @param {Budget & { id: string }} budget The budget to edit.
+   */
+  public openEditBudgetModal(budget: Budget & { id: string }): void {
     this.clickedBudget = budget;
     this.editBudgetModalRef = this.ngbModal.open(
       this.editBudgetModal,
@@ -73,47 +91,64 @@ export class BudgetListComponent {
       });
   }
 
-  onCloseAddBudgetModal(): void {
+  /**
+   * Closes the add budget modal.
+   */
+  public onCloseAddBudgetModal(): void {
     if (this.addBudgetModalRef) {
       this.addBudgetModalRef.close();
     }
   }
 
-  onCloseEditBudgetModal(): void {
+  /**
+   * Closes the edit budget modal.
+   */
+  public onCloseEditBudgetModal(): void {
     if (this.editBudgetModalRef) {
       this.editBudgetModalRef.close();
     }
   }
 
-  loadNoTimeLimitBudgets() {
+  /**
+   * Loads budgets without a time limit.
+   */
+  private loadNoTimeLimitBudgets() {
     this.budgetService.getAllNoTimeLimitBudgets().pipe(
-        map(budgets => budgets as (Budget & { id: string })[])
-    ).subscribe(budgets => runInInjectionContext(this.injector, () => {
-      this.noTimeLimitBudgets = budgets
-          .filter(budget => !budget.isArchived)
-          .map(budget => ({
-            ...budget,
-            usedLimit: budget.usedLimit ?? 0,
-            limit: budget.limit ? Number(budget.limit) : undefined
-          }));
+        map(budgets => budgets as (Budget & { id: string })[]),
+        takeUntilDestroyed(this.destroyRef)
+    ).subscribe(budgets => {
+      this.noTimeLimitBudgets = this.processBudgets(budgets);
       this.isNoTimeLimitInitialized = true;
       if (this.isMonthlyInitialized) this.loadingService.setLoading = false;
-    }));
+    });
   }
 
-  loadTimeLimitBudgets() {
+  /**
+   * Loads monthly budgets.
+   */
+  private loadTimeLimitBudgets() {
     this.budgetService.getAllMonthlyBudgets().pipe(
-        map(budgets => budgets as (Budget & { id: string })[])
-    ).subscribe(budgets => runInInjectionContext(this.injector, () => {
-      this.monthlyBudgets = budgets
-          .filter(budget => !budget.isArchived)
-          .map(budget => ({
-            ...budget,
-            usedLimit: budget.usedLimit ?? 0,
-            limit: budget.limit ? Number(budget.limit) : undefined
-          }));
+        map(budgets => budgets as (Budget & { id: string })[]),
+        takeUntilDestroyed(this.destroyRef)
+    ).subscribe(budgets => {
+      this.monthlyBudgets = this.processBudgets(budgets);
       this.isMonthlyInitialized = true;
       if (this.isNoTimeLimitInitialized) this.loadingService.setLoading = false;
-    }));
+    });
+  }
+
+  /**
+   * Processes the raw budget list: filters archived ones and formats numbers.
+   * @param {(Budget & { id: string })[]} budgets The raw budgets.
+   * @returns {(Budget & { id: string })[]} The processed budgets.
+   */
+  private processBudgets(budgets: (Budget & { id: string })[]): (Budget & { id: string })[] {
+    return budgets
+      .filter(budget => !budget.isArchived)
+      .map(budget => ({
+        ...budget,
+        usedLimit: budget.usedLimit ?? 0,
+        limit: budget.limit ? Number(budget.limit) : undefined
+      }));
   }
 }

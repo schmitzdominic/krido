@@ -64,7 +64,7 @@ export class BudgetService {
    * @param cycle The cycle object to add.
    * @returns A ThenableReference containing the key of the new entry.
    */
-  public addCycle(cycle: Cycle) {
+  public addCycle(cycle: (Cycle & { id: string })) {
     return this.dbService.createListValue(this.cyclePath, cycle);
   }
 

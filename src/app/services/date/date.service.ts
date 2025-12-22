@@ -139,7 +139,7 @@ export class DateService {
    * @returns {number} The year.
    */
   public getYear(monthString: string): number {
-    return Number(monthString.slice(0, 4));
+    return Number(String(monthString).slice(0, 4));
   }
 
   /**
@@ -149,7 +149,7 @@ export class DateService {
    */
   public getMonthName(monthString: string): string {
     // YYYYMM -> MM is 1-based, array is 0-based.
-    const monthIndex: number = Number(monthString.slice(-2)) - 1;
+    const monthIndex: number = Number(String(monthString).slice(-2)) - 1;
     return this.monthNames[monthIndex];
   }
 

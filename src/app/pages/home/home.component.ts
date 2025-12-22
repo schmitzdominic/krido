@@ -34,10 +34,9 @@ export class HomeComponent implements OnInit, OnDestroy {
   public monthString: string = this.dateService.getActualMonthString();
   public actualYear: number = this.dateService.getActualYear();
 
-  public clickedBudget: Budget | undefined;
+  public clickedBudget: Budget & { id: string } | undefined;
   public allBudgets: (Budget & { id: string })[] = [];
 
-  // Subject to automatically unsubscribe from observables on component destruction
   private destroy$ = new Subject<void>();
 
   /**
@@ -96,7 +95,7 @@ export class HomeComponent implements OnInit, OnDestroy {
    * Opens a modal to view the details of a selected budget.
    * @param budget The budget to be displayed in the modal.
    */
-  public openViewBudgetModal(budget: Budget): void {
+  public openViewBudgetModal(budget: Budget & { id: string }): void {
     this.clickedBudget = budget;
     this.activeModalRef = this.ngbModal.open(
       this.viewBudgetModalTemplate,

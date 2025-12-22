@@ -102,7 +102,7 @@ export class AddOrEditEntryComponent {
         name: [this.entry ? this.entry.name : '', Validators.required],
         value: [this.entry ? this.entry.value : ''],
         account: [this.entry ? (this.entry.account as any)?.id : ''],
-        budget: [this.entry ? (this.entry.budget as any)?.id : ''],
+        budget: [this.entry ? (this.entry.budget as any)?.key : ''],
         date: [this.entry ? this.entry.date : this.selectedDate]
       }
     );
@@ -113,7 +113,7 @@ export class AddOrEditEntryComponent {
    * with the existing entry's data.
    */
   private fillFormIfEntryIsAvailable(): void {
-    if (this.entry) {
+    if (this.entry?.id) {
       this.isNameInvalid = false;
       this.isValueInvalid = false;
       this.selectedEntryType = this.entry.type === EntryType.income ? this.incomeEntryType : this.expenditureEntryType;
@@ -215,7 +215,7 @@ export class AddOrEditEntryComponent {
    * @param budget The selected budget object.
    */
   public selectBudget(budget: Budget & { id: string }): void {
-    this.addOrEditEntryFormGroup.controls['budget'].setValue(budget.id);
+    this.addOrEditEntryFormGroup.controls['budget'].setValue(budget.key);
   }
 
   /**
@@ -230,7 +230,7 @@ export class AddOrEditEntryComponent {
    * Handles the delete button click. Deletes the current entry and closes the modal.
    */
   public onButtonDelete(): void {
-    this.entryService.deleteEntry(this.entry!.id).then(() => this.onClose.emit());
+    this.entryService.deleteEntry(this.entry!.id).then(() => this.onClose.emit()).catch(err => console.error("Error deleting entry:", err));
   }
 
   /**
@@ -253,17 +253,18 @@ export class AddOrEditEntryComponent {
 
     // If you chose "no budget", the actual budget must be deleted
     if (!this.selectedBudget && this.entry?.budget) {
+      (entryData as any).budgetKey = deleteField();
       (entryData as any).budget = deleteField();
     }
 
-    this.entryService.updateEntry(entryData, this.entry!.id).then(() => this.onClose.emit());
+    this.entryService.updateEntry(entryData, this.entry!.id).then(() => this.onClose.emit()).catch(err => console.error("Error updating entry:", err));
   }
 
   /**
    * Handles the logic for adding a new entry.
    */
   private onAdd(): void {
-    this.entryService.addEntry(this.getEntryObject()).then(() => this.onClose.emit());
+    this.entryService.addEntry(this.getEntryObject()).then(() => this.onClose.emit()).catch(err => console.error("Error adding entry:", err));
   }
 
   /**
@@ -284,6 +285,7 @@ export class AddOrEditEntryComponent {
     };
 
     if (this.selectedBudget) {
+      entry.budgetKey = this.selectedBudget.key;
       entry.budget = this.selectedBudget;
     }
     return entry;
@@ -308,8 +310,8 @@ export class AddOrEditEntryComponent {
    * Getter for the currently selected budget object.
    */
   public get selectedBudget(): (Budget & { id: string }) | undefined {
-    const budget = this.budgets.find(b => b.id === this.addOrEditEntryFormGroup.value.budget);
-    if (budget?.id === this.noBudgetKey) {
+    const budget = this.budgets.find(b => b.key === this.addOrEditEntryFormGroup.value.budget);
+    if (budget?.key === this.noBudgetKey) {
       return undefined;
     }
     return budget;
