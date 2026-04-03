@@ -1,55 +1,54 @@
-<div>
-  <h1 class="d-flex align-items-center justify-content-center pt-4" [ngClass]="{
-            'text-success' : selectedEntryType.value === incomeEntryType.value,
-            'text-danger' : selectedEntryType.value === expenditureEntryType.value
-         }">{{ title }}</h1>
+<div class="sheet-header" [ngClass]="{
+  'sheet-header--income':  selectedEntryType.value === incomeEntryType.value,
+  'sheet-header--outcome': selectedEntryType.value === expenditureEntryType.value
+}">
+  <span class="sheet-header__title">{{ title }}</span>
 </div>
-<div class="modal-body">
-  <form class="needs-validation" [formGroup]="addOrEditEntryFormGroup" (ngSubmit)="onSubmit()" novalidate>
-    <div class="mb-4">
-      <div ngbDropdown class="d-block">
-        <button type="button" class="btn btn-outline-light w-100 d-flex justify-content-between align-items-center" id="dropdownEntryType" ngbDropdownToggle>{{ selectedEntryType.label }}</button>
-        <div ngbDropdownMenu aria-labelledby="dropdownEntryType" class="w-100">
-          @for (entryType of entryTypes; track entryType.label) {
-            <button type="button" ngbDropdownItem (click)="selectEntryType(entryType)">{{ entryType.label }}</button>
-          }
-        </div>
-      </div>
+
+<div class="modal-body sheet-body">
+  <form [formGroup]="addOrEditEntryFormGroup" (ngSubmit)="onSubmit()" novalidate>
+
+    <!-- Typ-Segmented-Control -->
+    <div class="segment-control mb-4">
+      @for (entryType of entryTypes; track entryType.label) {
+        <button
+          type="button"
+          class="segment-control__btn"
+          [class.segment-control__btn--active]="selectedEntryType.value === entryType.value"
+          [class.segment-control__btn--income]="entryType.value === incomeEntryType.value && selectedEntryType.value === entryType.value"
+          [class.segment-control__btn--outcome]="entryType.value === expenditureEntryType.value && selectedEntryType.value === entryType.value"
+          (click)="selectEntryType(entryType)">{{ entryType.label }}</button>
+      }
     </div>
-    <div class="col-md-12 mb-3">
-      <label for="add-entry-name" class="form-label bs-success-text-emphasis">Kurzbeschreibung</label>
-      <div class="input-group has-validation">
-        <input formControlName="name" type="text" class="form-control" id="add-entry-name" aria-describedby="inputGroupPrepend" required>
-        <div class="invalid-feedback">
-          Kurzbeschreibung fehlt!
-        </div>
-      </div>
+
+    <!-- Kurzbeschreibung -->
+    <div class="form-field mb-3">
+      <label class="form-field__label">Kurzbeschreibung</label>
+      <input formControlName="name" type="text" class="form-field__input" placeholder="z. B. Einkauf Rewe" autocomplete="off">
     </div>
-    <div class="col-md-12 mb-3">
-      <label for="add-entry-value" class="form-label">Betrag</label>
-      <div class="input-group has-validation">
+
+    <!-- Betrag -->
+    <div class="form-field mb-3">
+      <label class="form-field__label">Betrag</label>
+      <div class="form-field__amount-wrap">
         <input
           currencyMask
-          class="form-control"
-          id="add-entry-value"
+          class="form-field__input form-field__input--amount"
           formControlName="value"
-          aria-describedby="inputGroupPrepend"
-          [options]="{ prefix: '', thousands: '', decimal: ',' }"
-          inputmode="numeric"
-          >
-        <span class="input-group-text" id="inputGroupPrepend">€</span>
-        <div class="invalid-feedback">
-          Betrag fehlt!
-        </div>
+          [options]="{ prefix: '', thousands: '.', decimal: ',' }"
+          inputmode="decimal"
+          placeholder="0,00">
+        <span class="form-field__currency">€</span>
       </div>
     </div>
-    <div class="col-md-12 mb-3">
-      <label for="add-entry-date" class="form-label">Datum</label>
-      <div class="input-group">
+
+    <!-- Datum -->
+    <div class="form-field mb-3">
+      <label class="form-field__label">Datum</label>
+      <div class="form-field__date-wrap">
         <input
-          id="add-entry-date"
-          class="form-control"
-          placeholder="{{ selectedDateTimestamp | date: 'dd.MM.yyyy'}}"
+          class="form-field__input"
+          placeholder="{{ selectedDateTimestamp | date: 'dd.MM.yyyy' }}"
           name="date"
           formControlName="date"
           ngbDatepicker
@@ -57,44 +56,58 @@
           [startDate]="selectedDate"
           (dateSelect)="onDateSelected($event)"
           #date="ngbDatepicker"
-          />
-        <button class="btn btn-outline-secondary bi bi-calendar3" (click)="date.toggle()" type="button"></button>
+          readonly />
+        <button class="form-field__date-btn" (click)="date.toggle()" type="button">
+          <i class="bi bi-calendar3"></i>
+        </button>
       </div>
     </div>
-    <div class="col-md-12 mb-3">
-      <label for="add-entry-account" class="form-label">Konto</label>
-      <div ngbDropdown class="d-block">
-        <button type="button" class="btn btn-outline-light w-100 d-flex justify-content-between align-items-center" id="dropdownAccount" ngbDropdownToggle>{{ selectedAccount.name || 'Konto wählen' }}</button>
-        <div ngbDropdownMenu aria-labelledby="dropdownAccount" class="w-100">
+
+    <!-- Konto -->
+    <div class="form-field mb-3">
+      <label class="form-field__label">Konto</label>
+      <div ngbDropdown container="body" class="d-block">
+        <button type="button" class="form-field__select" ngbDropdownToggle>
+          <span>{{ selectedAccount.name || 'Konto wählen' }}</span>
+          <i class="bi bi-chevron-down form-field__chevron"></i>
+        </button>
+        <div ngbDropdownMenu class="sheet-dropdown">
           @for (account of accounts; track account.id) {
             <button type="button" ngbDropdownItem (click)="selectAccount(account)">{{ account.name }}</button>
           }
         </div>
       </div>
     </div>
-    <div class="col-md-12 mb-3">
-      <label for="add-entry-budget" class="form-label">Budget</label>
-      <div ngbDropdown class="d-block">
-        <button type="button" class="btn btn-outline-light w-100 d-flex justify-content-between align-items-center" id="dropdownBudget" ngbDropdownToggle>{{ selectedBudget?.name || 'Kein Bduget gewählt' }}</button>
-        <div ngbDropdownMenu aria-labelledby="dropdownBudget" class="w-100">
+
+    <!-- Budget -->
+    <div class="form-field mb-1">
+      <label class="form-field__label">Budget</label>
+      <div ngbDropdown container="body" class="d-block">
+        <button type="button" class="form-field__select" ngbDropdownToggle>
+          <span>{{ selectedBudget?.name || 'Kein Budget gewählt' }}</span>
+          <i class="bi bi-chevron-down form-field__chevron"></i>
+        </button>
+        <div ngbDropdownMenu class="sheet-dropdown">
           @for (budget of budgets; track budget.id) {
             <button type="button" ngbDropdownItem (click)="selectBudget(budget)">{{ budget.name }}</button>
           }
         </div>
       </div>
     </div>
+
   </form>
-  <div class="pt-2">
-    @if (entry) {
-      <button type="button" class="btn btn-danger" (click)="onButtonDelete()"><i class="bi bi-trash pe-2"></i>Löschen</button>
-    }
-  </div>
 </div>
-<div class="modal-footer">
-  <button type="button" class="btn btn-dark" (click)="onButtonCancel()">Abbrechen</button>
+
+<div class="sheet-footer">
+  @if (entry) {
+    <button type="button" class="btn-sheet btn-sheet--danger" (click)="onButtonDelete()">
+      <i class="bi bi-trash"></i>
+    </button>
+  }
+  <button type="button" class="btn-sheet btn-sheet--ghost" (click)="onButtonCancel()">Abbrechen</button>
   <button
     type="button"
-    class="btn btn-light"
+    class="btn-sheet btn-sheet--primary"
     [disabled]="isNameInvalid || isValueInvalid || !isEdited"
-  (click)="onSubmit()">{{ submitButtonText }}</button>
+    (click)="onSubmit()">{{ submitButtonText }}</button>
 </div>
