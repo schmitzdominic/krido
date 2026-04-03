@@ -1,8 +1,17 @@
+<!-- Edit Entry Modal (opened from budget view) -->
+<ng-template #editEntryModal let-modal>
+  <app-add-or-edit-entry
+    [entry]="selectedEntry"
+    (onClose)="onCloseEditEntryModal()">
+  </app-add-or-edit-entry>
+</ng-template>
+
 <!-- View Budget -->
 <ng-template #viewBudgetModal let-modal>
   <app-view-budget-content
     [budget]="clickedBudget"
-    (onClose)="onCloseViewBudgetModal()">
+    (onClose)="onCloseViewBudgetModal()"
+    (onEditEntry)="onEditEntryFromBudget($event)">
   </app-view-budget-content>
 </ng-template>
 <div class="home-page">

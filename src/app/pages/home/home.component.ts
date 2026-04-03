@@ -3,6 +3,7 @@ import {DateService} from "../../services/date/date.service";
 import {MenuTitleService} from "../../../shared/behavior/menu-title/menu-title.service";
 import {BudgetService} from "../../services/budget/budget.service";
 import {Budget} from "../../../shared/interfaces/budget.model";
+import {Entry} from "../../../shared/interfaces/entry.model";
 import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {PredictService} from "../../services/predict/predict.service";
@@ -27,14 +28,17 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   // Reference to the <ng-template> in the HTML
   @ViewChild('viewBudgetModal') private viewBudgetModalTemplate: TemplateRef<any> | undefined;
+  @ViewChild('editEntryModal') private editEntryModalTemplate: TemplateRef<any> | undefined;
 
   private activeModalRef: NgbModalRef | undefined;
+  private editEntryModalRef: NgbModalRef | undefined;
 
   public actualMonth: string = this.dateService.getActualMonthName();
   public monthString: string = this.dateService.getActualMonthString();
   public actualYear: number = this.dateService.getActualYear();
 
   public clickedBudget: Budget & { id: string } | undefined;
+  public selectedEntry: (Entry & { id: string }) | undefined;
   public allBudgets: (Budget & { id: string })[] = [];
 
   private destroy$ = new Subject<void>();
@@ -114,5 +118,20 @@ export class HomeComponent implements OnInit, OnDestroy {
     if (this.activeModalRef) {
       this.activeModalRef.close();
     }
+  }
+
+  public onEditEntryFromBudget(entry: Entry & { id: string }): void {
+    this.onCloseViewBudgetModal();
+    this.selectedEntry = entry;
+    if (this.editEntryModalTemplate) {
+      this.editEntryModalRef = this.ngbModal.open(this.editEntryModalTemplate, { size: 'md' });
+    }
+  }
+
+  public onCloseEditEntryModal(): void {
+    if (this.editEntryModalRef) {
+      this.editEntryModalRef.close();
+    }
+    this.selectedEntry = undefined;
   }
 }

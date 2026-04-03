@@ -2,7 +2,8 @@ import { Injectable, inject } from '@angular/core';
 import {DbService} from "../db.service";
 import {Entry} from "../../../shared/interfaces/entry.model";
 import {equalTo, orderByChild, startAt} from "@angular/fire/database";
-import { Observable } from 'rxjs';
+import { Observable, combineLatest } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 /**
  * Service zur Verwaltung von Einträgen (Buchungen) in der Datenbank.
@@ -64,6 +65,26 @@ export class EntryService {
    */
   public getAllEntriesByBudgetKey(key: string): Observable<(Entry & { id: string })[]> {
     return this.dbService.readFilteredList(this.rootPath, orderByChild('budgetKey'), equalTo(key));
+  }
+
+  /**
+   * Ruft alle Einträge eines Budgets ab, kompatibel mit alten und neuen Datensätzen.
+   * Kombiniert Suche per budgetKey UND budget/id um alle historischen Daten abzudecken.
+   */
+  public getAllEntriesByBudgetId(budgetId: string): Observable<(Entry & { id: string })[]> {
+    const byBudgetKey$ = this.dbService.readFilteredList<Entry & { id: string }>(this.rootPath, orderByChild('budgetKey'), equalTo(budgetId));
+    const byBudgetObjectId$ = this.dbService.readFilteredList<Entry & { id: string }>(this.rootPath, orderByChild('budget/id'), equalTo(budgetId));
+
+    return combineLatest([byBudgetKey$, byBudgetObjectId$]).pipe(
+      map(([byKey, byId]) => {
+        const seen = new Set<string>();
+        return [...byKey, ...byId].filter(entry => {
+          if (seen.has(entry.id)) return false;
+          seen.add(entry.id);
+          return true;
+        });
+      })
+    );
   }
 
   /**

@@ -14,7 +14,7 @@
   }
 
   &--income &__title  { color: #22c55e; }
-  &--outcome &__title { color: #ef4444; }
+  &--outcome &__title { color: #c0595c; }
 }
 
 // ── Body ──────────────────────────────────────────────
@@ -47,7 +47,7 @@
       color: #e2e8f0;
     }
     &--income  { color: #22c55e; }
-    &--outcome { color: #ef4444; }
+    &--outcome { color: #c0595c; }
   }
 }
 
@@ -222,11 +222,11 @@
   }
 
   &--danger {
-    background: rgba(239, 68, 68, 0.12);
-    color: #ef4444;
+    background: rgba(192, 89, 92, 0.12);
+    color: #c0595c;
     padding: 11px 14px;
 
-    &:hover { background: rgba(239, 68, 68, 0.2); }
+    &:hover { background: rgba(192, 89, 92, 0.2); }
   }
 }
 

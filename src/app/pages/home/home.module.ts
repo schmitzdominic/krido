@@ -12,7 +12,6 @@ import { EntryListComponent } from './entry-list/entry-list.component';
 import { AddOrEditEntryComponent } from './entry-list/add-or-edit-entry/add-or-edit-entry.component';
 import { InfoAreaComponent } from './info-area/info-area.component';
 import { UpdateAccountValueComponent } from './info-area/update-account-value/update-account-value.component';
-import { EntryListEntryComponent } from '../../components/entry-list-entry/entry-list-entry.component';
 import { InfoListEntryComponent } from '../../components/info-list-entry/info-list-entry.component';
 import { BudgetsModule } from "../budgets/budgets.module";
 
@@ -23,7 +22,6 @@ import { BudgetsModule } from "../budgets/budgets.module";
     AddOrEditEntryComponent,
     InfoAreaComponent,
     UpdateAccountValueComponent,
-    EntryListEntryComponent,
     InfoListEntryComponent,
   ],
   imports: [
@@ -43,7 +41,6 @@ import { BudgetsModule } from "../budgets/budgets.module";
     AddOrEditEntryComponent,
     InfoAreaComponent,
     UpdateAccountValueComponent,
-    EntryListEntryComponent,
     InfoListEntryComponent,
   ],
   schemas: [NO_ERRORS_SCHEMA],

@@ -10,7 +10,12 @@
     [max]="budget.limit!"
     type="{{progressBarService.getProgressBarType(usedLimit, budget.limit!)}}"
   ></ngb-progressbar>
-  @if (getProgressBarText()) {
-    <div class="progress-label">{{ getProgressBarText() }}</div>
-  }
+  <div class="rest-row">
+    @if (getProgressBarText()) {
+      <span class="progress-label">{{ getProgressBarText() }}</span>
+    } @else {
+      <span></span>
+    }
+    <span class="rest-label">Rest: {{ priceService.convertNumberToEuro(budget.limit! - usedLimit) }}</span>
+  </div>
 }

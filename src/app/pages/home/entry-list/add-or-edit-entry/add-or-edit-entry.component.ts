@@ -302,7 +302,7 @@ export class AddOrEditEntryComponent {
     };
 
     if (this.selectedBudget) {
-      entry.budgetKey = this.selectedBudget.key;
+      entry.budgetKey = this.selectedBudget.id;  // id is always the reliable Firebase key
       entry.budget = this.selectedBudget;
     }
     return entry;

@@ -1,4 +1,5 @@
-import { Component, EventEmitter, Input, OnInit, Output, inject } from '@angular/core';
+import { Component, DestroyRef, EventEmitter, Input, OnInit, Output, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {Budget} from "../../../../../shared/interfaces/budget.model";
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {BudgetService} from "../../../../services/budget/budget.service";
@@ -32,6 +33,9 @@ export class AddOrEditBudgetContentComponent implements OnInit {
 
 
   public isDeleteAvailable: boolean = false;
+  public isEdited: boolean = false;
+
+  private destroyRef = inject(DestroyRef);
 
   public addBudgetFormGroup: FormGroup = new FormGroup({
     name: new FormControl(''),
@@ -44,6 +48,22 @@ export class AddOrEditBudgetContentComponent implements OnInit {
   public ngOnInit() {
     this.createFormGroup();
     this.fillFormIfBudget();
+    if (this.budget) {
+      this.trackChanges();
+    } else {
+      this.isEdited = true;
+    }
+  }
+
+  private trackChanges() {
+    const original = { name: this.budget!.name, limit: this.budget!.limit };
+    this.addBudgetFormGroup.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(val => {
+        this.isEdited =
+          val.name !== original.name ||
+          Number(val.limit) !== Number(original.limit);
+      });
   }
 
   /**

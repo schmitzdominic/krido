@@ -71,7 +71,7 @@ export class BudgetListEntryComponent implements OnInit, OnDestroy {
    * which is a significant performance improvement. The `usedLimit` is now a view-only concern.
    */
   private fetchAndCalculateUsedLimit(): void {
-    this.entryService.getAllEntriesByBudgetKey(this.budget.id).pipe(
+    this.entryService.getAllEntriesByBudgetId(this.budget.id).pipe(
       map(entries => (entries as Entry[]).reduce(
         (acc, entry) => this.calculateNewValue(acc, entry), 0)
       ),

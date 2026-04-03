@@ -7,6 +7,7 @@ import {ProgressBarService} from "../../../../services/progress-bar/progress-bar
 import {Entry} from "../../../../../shared/interfaces/entry.model";
 import {EntryService} from "../../../../services/entry/entry.service";
 import { map } from 'rxjs/operators';
+import { EntryType } from '../../../../../shared/enums/entry-type.enum';
 
 @Component({
     selector: 'app-view-budget-content',
@@ -25,6 +26,7 @@ export class ViewBudgetContentComponent implements OnInit {
   @Input() public budget: Budget & { id: string } | undefined;
 
   @Output() public onClose: EventEmitter<any> = new EventEmitter<any>();
+  @Output() public onEditEntry: EventEmitter<Entry & { id: string }> = new EventEmitter();
 
   public isContentReadOnly: boolean = true;
   public isEditButtonShown: boolean = true;
@@ -39,7 +41,6 @@ export class ViewBudgetContentComponent implements OnInit {
   public ngOnInit(): void {
     this.checkIfLimitIsSet();
     this.loadProgressBarConfig();
-    this.setUsedLimit();
     this.loadEntries();
   }
 
@@ -62,26 +63,20 @@ export class ViewBudgetContentComponent implements OnInit {
   }
 
   /**
-   * Sets the used limit value from the budget.
-   */
-  private setUsedLimit() {
-    if (this.budget && this.budget.usedLimit) {
-      this.usedLimit = this.budget.usedLimit;
-    } else {
-      this.usedLimit = 0;
-    }
-  }
-
-  /**
-   * Loads entries associated with the budget.
+   * Loads entries associated with the budget and calculates usedLimit from them.
    */
   private loadEntries() {
     if (this.budget && this.budget.id) {
-      this.entryService.getAllEntriesByBudgetKey(this.budget.id).pipe(
+      this.entryService.getAllEntriesByBudgetId(this.budget.id).pipe(
         map(entries => entries as (Entry & { id: string })[]),
         takeUntilDestroyed(this.destroyRef)
       ).subscribe(entries => {
         this.entries = entries;
+        this.usedLimit = entries.reduce((acc, entry) => {
+          if (entry.type === EntryType.outcome) return acc + entry.value;
+          if (entry.type === EntryType.income) return acc - entry.value;
+          return acc;
+        }, 0);
         this.sortEntriesByDate(this.entries);
       });
     }
@@ -136,6 +131,18 @@ export class ViewBudgetContentComponent implements OnInit {
    */
   public onCancel() {
     this.onClose.emit();
+  }
+
+  public getRestClass(): string {
+    if (!this.budget?.limit) return '';
+    const pct = this.usedLimit / this.budget.limit * 100;
+    if (pct >= 75) return 'rest--danger';
+    if (pct >= 50) return 'rest--warning';
+    return 'rest--success';
+  }
+
+  public onEntryClick(entry: Entry & { id: string }) {
+    this.onEditEntry.emit(entry);
   }
 
 }

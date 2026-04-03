@@ -18,7 +18,7 @@
           }
         },
         "entries": {
-          ".indexOn": ["monthString","budgetKey","account/key", "searchName"]
+          ".indexOn": ["monthString","budgetKey","account/key", "searchName", "budget/id"]
         },
         "regular": {
           ".indexOn": ["cycle"]

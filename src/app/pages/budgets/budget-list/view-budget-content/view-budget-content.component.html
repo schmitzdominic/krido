@@ -1,65 +1,61 @@
-@if (isEditButtonShown) {
-  <button type="button" class="btn btn-dark position-absolute end-0 top-0 mt-3 me-3" (click)="onEdit()"><i class="bi bi-pencil"></i></button>
-}
 <!-- Edit -->
 @if (!isContentReadOnly) {
-  <div>
-    <app-add-or-edit-budget-content
-      [budget]="budget"
-      (onClose)="onCancel()">
-    </app-add-or-edit-budget-content>
-  </div>
+  <app-add-or-edit-budget-content
+    [budget]="budget"
+    (onClose)="onCancel()">
+  </app-add-or-edit-budget-content>
 }
 
 <!-- View -->
 @if (isContentReadOnly) {
-  <div>
-    <h1 class="name-title pt-4 ps-3 pe-3">{{ budget?.name }}</h1>
-    <div class="modal-body">
-      <div class="text">
-        <ul class="list-group list-group-flush">
-          <li class="list-group-item" id="budget-max">
-            <div class="custom-list-item">
-              <i class="bi bi-cash-coin"></i>
-              <span class="name ps-2">Höhe</span>
-              <span class="limit position-absolute top-0 end-0 pe-3 pt-2">{{ priceService.convertNumberToEuro(budget?.limit) }}</span>
-            </div>
-          </li>
-          <li class="list-group-item pb-4" id="budget-rest">
-            <div class="pt-2 custom-list-item">
-              <i class="bi bi-arrow-bar-right"></i>
-              <span class="name ps-2">Rest</span>
-              <span class="limit position-absolute top-0 end-0 pe-3 pt-3">{{ getRestBudget() }}</span>
-            </div>
-          </li>
-        </ul>
-        <ngb-progressbar
-          [value]="usedLimit"
-          [max]="budget?.limit!"
-          type="{{ progressBarService.getProgressBarType(usedLimit, budget?.limit!) }}"
-        >{{ getProgressBarText() }}</ngb-progressbar>
+  <div class="modal-body sheet-body">
+    <div class="view-header">
+      <div class="budget-title">{{ budget?.name }}</div>
+      @if (isEditButtonShown) {
+        <button type="button" class="edit-btn" (click)="onEdit()"><i class="bi bi-pencil"></i></button>
+      }
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-item">
+        <span class="stat-label">Höhe</span>
+        <span class="stat-value">{{ priceService.convertNumberToEuro(budget?.limit) }}</span>
       </div>
-      <div class="pt-4">
-        <ul class="list-group list-group-flush">
-          @if (entries.length > 0) {
-            <h1>Einträge</h1>
-          }
-          @for (entry of entries; track entry.id) {
-            <li class="list-group-item" id="entry-list-actual-month">
-              <app-entry-list-entry
-                [withMonth]="true"
-                [entry]="entry">
-              </app-entry-list-entry>
-            </li>
-          }
-        </ul>
+      <div class="stat-sep"></div>
+      <div class="stat-item stat-item--right">
+        <span class="stat-label">Rest</span>
+        <span class="stat-value" [ngClass]="getRestClass()">{{ getRestBudget() }}</span>
       </div>
     </div>
-    <div class="modal-footer">
-      <button
-        type="button"
-        class="btn btn-light"
-      (click)="onCancel()">Schließen</button>
+
+    <!-- Progress bar -->
+    <div class="progress-wrap">
+      <ngb-progressbar
+        [value]="usedLimit"
+        [max]="budget?.limit!"
+        type="{{ progressBarService.getProgressBarType(usedLimit, budget?.limit!) }}"
+      ></ngb-progressbar>
+      <div class="progress-label">{{ getProgressBarText() }}</div>
     </div>
+
+    <!-- Entries -->
+    @if (entries.length > 0) {
+      <div class="entries-header">Einträge</div>
+    }
+    <div class="entries-card-group">
+      @for (entry of entries; track entry.id) {
+        <div class="entry-row" (click)="onEntryClick(entry)">
+          <app-entry-list-entry
+            [withMonth]="true"
+            [entry]="entry">
+          </app-entry-list-entry>
+        </div>
+      }
+    </div>
+  </div>
+
+  <div class="sheet-footer">
+    <button type="button" class="btn-sheet btn-sheet--ghost" (click)="onCancel()">Schließen</button>
   </div>
 }

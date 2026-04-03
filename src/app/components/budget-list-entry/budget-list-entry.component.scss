@@ -28,10 +28,21 @@
   }
 }
 
+.rest-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 5px;
+}
+
 .progress-label {
   font-size: 11px;
   font-weight: 600;
   color: var(--app-text-muted);
-  margin-top: 5px;
-  text-align: right;
+}
+
+.rest-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--app-text-muted);
 }

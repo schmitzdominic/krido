@@ -15,6 +15,7 @@ import { ViewBudgetContentComponent } from './budget-list/view-budget-content/vi
 import { AddOrEditCycleContentComponent } from './cycle-list/add-or-edit-cycle-content/add-or-edit-cycle-content.component';
 import { BudgetArchiveListComponent } from './budget-archive-list/budget-archive-list.component';
 import { BudgetListEntryComponent } from '../../components/budget-list-entry/budget-list-entry.component';
+import { EntryListEntryComponent } from '../../components/entry-list-entry/entry-list-entry.component';
 
 @NgModule({
   declarations: [
@@ -26,6 +27,7 @@ import { BudgetListEntryComponent } from '../../components/budget-list-entry/bud
     AddOrEditCycleContentComponent,
     BudgetArchiveListComponent,
     BudgetListEntryComponent,
+    EntryListEntryComponent,
   ],
   imports: [
     CommonModule,
@@ -46,6 +48,7 @@ import { BudgetListEntryComponent } from '../../components/budget-list-entry/bud
     AddOrEditCycleContentComponent,
     BudgetArchiveListComponent,
     BudgetListEntryComponent,
+    EntryListEntryComponent,
   ],
   schemas: [NO_ERRORS_SCHEMA],
 })

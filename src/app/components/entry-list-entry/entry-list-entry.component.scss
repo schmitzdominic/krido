@@ -16,7 +16,7 @@
   }
 
   &--outcome &__indicator {
-    background: rgba(239, 68, 68, 0.55);
+    background: rgba(192, 89, 92, 0.65);
   }
 
   &__body {
@@ -51,6 +51,6 @@
     flex-shrink: 0;
     letter-spacing: -0.2px;
 
-    &--outcome { color: #ef4444; }
+    &--outcome { color: #c0595c; }
   }
 }
