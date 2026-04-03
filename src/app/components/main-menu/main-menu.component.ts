@@ -1,4 +1,5 @@
-import { ChangeDetectorRef, Component, inject } from '@angular/core';
+import { Component, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {MenuTitleService} from "../../../shared/behavior/menu-title/menu-title.service";
 import {Router} from "@angular/router";
 
@@ -9,7 +10,7 @@ import {Router} from "@angular/router";
     standalone: false
 })
 export class MainMenuComponent {
-  private changeDetectorRef = inject(ChangeDetectorRef);
+  private destroyRef = inject(DestroyRef);
   private router = inject(Router);
   private menuTitleService = inject(MenuTitleService);
 
@@ -27,18 +28,14 @@ export class MainMenuComponent {
     this.subscribeBehaviors();
   }
 
-  ngAfterContentChecked() {
-    this.changeDetectorRef.detectChanges();
-  }
-
   /**
    * Subscribe all behaviors
    */
   subscribeBehaviors(): void {
-    this.menuTitleService.title.subscribe(newTitle => {
+    this.menuTitleService.title.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(newTitle => {
       this.title = newTitle;
     });
-    this.menuTitleService.activeId.subscribe(newActiveId => {
+    this.menuTitleService.activeId.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(newActiveId => {
       this.activeId = newActiveId;
     });
   }

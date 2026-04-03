@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import {Account} from "../../../../../shared/interfaces/account.model";
 import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
 import {NgbCalendar, NgbDate} from "@ng-bootstrap/ng-bootstrap";
@@ -9,7 +9,8 @@ import {AccountService} from "../../../../services/account/account.service";
     selector: 'app-update-account-value',
     templateUrl: './update-account-value.component.html',
     styleUrls: ['./update-account-value.component.scss'],
-    standalone: false
+    standalone: false,
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class UpdateAccountValueComponent {
   private formBuilder = inject(FormBuilder);

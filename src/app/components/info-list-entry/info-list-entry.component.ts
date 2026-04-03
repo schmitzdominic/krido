@@ -1,4 +1,4 @@
-import { Component, inject, Injector, Input, OnChanges, runInInjectionContext, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, Injector, Input, OnChanges, runInInjectionContext, SimpleChanges } from '@angular/core';
 import {Account} from "../../../shared/interfaces/account.model";
 import {AccountType} from "../../../shared/enums/account-type.enum";
 import {PriceService} from "../../services/price/price.service";
@@ -14,7 +14,8 @@ import {forkJoin, map} from "rxjs";
     selector: 'app-info-list-entry',
     templateUrl: './info-list-entry.component.html',
     styleUrls: ['./info-list-entry.component.scss'],
-    standalone: false
+    standalone: false,
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class InfoListEntryComponent implements OnChanges {
   priceService = inject(PriceService);
@@ -22,6 +23,7 @@ export class InfoListEntryComponent implements OnChanges {
   private entryService = inject(EntryService);
   private budgetService = inject(BudgetService);
   private injector = inject(Injector);
+  private cdr = inject(ChangeDetectorRef);
 
 
   @Input() account: Account | undefined;
@@ -70,6 +72,8 @@ export class InfoListEntryComponent implements OnChanges {
         this.overallValueEntries = entries
           .filter(entry => (entry.account as any)?.id === (this.account as any)?.id && entry.date >= this.account!.updatedDate!)
           .reduce((acc, entry) => acc + this.getValueLeftByEntry(entry), 0);
+
+        this.cdr.markForCheck();
       }));
     }
   }

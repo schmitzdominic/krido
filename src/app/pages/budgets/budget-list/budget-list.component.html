@@ -17,7 +17,7 @@
       <!-- No Time Limit -->
       <table class="table table-striped">
         <tbody>
-          @for (budget of noTimeLimitBudgets; track budget) {
+          @for (budget of noTimeLimitBudgets; track budget.id) {
             <div class="card p-1 m-2" (click)="onCardClick(budget)">
               <div class="card-body">
                 <app-budget-list-entry
@@ -36,7 +36,7 @@
       <!-- Monthly -->
       <table class="table table-striped">
         <tbody>
-          @for (budget of monthlyBudgets; track budget) {
+          @for (budget of monthlyBudgets; track budget.id) {
             <div class="card p-1 m-2" (click)="onCardClick(budget)">
               <div class="card-body">
                 <app-budget-list-entry

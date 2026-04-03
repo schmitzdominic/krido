@@ -23,7 +23,7 @@
           </div>
         }
       </div>
-      @for (entry of actualMonthEntries; track entry) {
+      @for (entry of actualMonthEntries; track entry.id) {
         <li class="list-group-item" id="entry-list-actual-month" (click)="onEntryClick(entry)">
           <app-entry-list-entry
             [entry]="entry">
@@ -47,7 +47,7 @@
   @if (totalNextMonthEntries > 0) {
     <ul class="list-group list-group-flush">
       <h1>{{ nextMonthName }}</h1>
-      @for (entry of nextMonthEntries; track entry) {
+      @for (entry of nextMonthEntries; track entry.id) {
         <li class="list-group-item" id="entry-list-next-month" (click)="onEntryClick(entry)">
           <app-entry-list-entry
             [entry]="entry">

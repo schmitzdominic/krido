@@ -15,7 +15,7 @@
             <h1>Monatlich</h1>
           </div>
         </div>
-        @for (regularly of monthRegularities; track regularly) {
+        @for (regularly of monthRegularities; track regularly.searchName) {
           <li class="list-group-item" id="entry-list-month-regularities" (click)="onRegularlyClicked(regularly)">
             <app-regularly-list-entry [regularly]="regularly"
               >
@@ -33,7 +33,7 @@
             <h1>Quartal</h1>
           </div>
         </div>
-        @for (regularly of quarterRegularities; track regularly) {
+        @for (regularly of quarterRegularities; track regularly.searchName) {
           <li class="list-group-item" id="entry-list-quarter-regularities" (click)="onRegularlyClicked(regularly)">
             <app-regularly-list-entry [regularly]="regularly"
               >
@@ -51,7 +51,7 @@
             <h1>Jährlich</h1>
           </div>
         </div>
-        @for (regularly of yearRegularities; track regularly) {
+        @for (regularly of yearRegularities; track regularly.searchName) {
           <li class="list-group-item" id="entry-list-year-regularities" (click)="onRegularlyClicked(regularly)">
             <app-regularly-list-entry [regularly]="regularly"
               >

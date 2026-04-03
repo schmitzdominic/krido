@@ -35,6 +35,9 @@ export class EntryListComponent implements OnInit, OnDestroy {
   actualMonthEntries: (Entry & { id: string })[] = [];
   nextMonthEntries: (Entry & { id: string })[] = [];
 
+  private allActualMonthEntries: (Entry & { id: string })[] = [];
+  private allNextMonthEntries: (Entry & { id: string })[] = [];
+
   totalActualMonthEntries: number = -1;
   totalNextMonthEntries: number = -1;
 
@@ -57,19 +60,23 @@ export class EntryListComponent implements OnInit, OnDestroy {
     combineLatest([actualMonth$, nextMonth$]).pipe(
       takeUntil(this.destroy$)).
       subscribe(([actualEntries, nextEntries]) => {
-      
-        // Process actual month entries
-      this.totalActualMonthEntries = actualEntries.length;
-      const filteredActual = this.isShowAll ? actualEntries : actualEntries.filter(entry => entry.date >= this.dateService.getActualDayTimestamp());
-      this.actualMonthEntries = this.sortEntriesByDate(filteredActual);
 
-      // Process next month entries
+      this.allActualMonthEntries = actualEntries;
+      this.allNextMonthEntries = nextEntries;
+      this.totalActualMonthEntries = actualEntries.length;
       this.totalNextMonthEntries = nextEntries.length;
-      const filteredNext = this.isShowAll ? nextEntries : nextEntries.filter(entry => entry.date >= this.dateService.getActualDayTimestamp());
-      this.nextMonthEntries = this.sortEntriesByDate(filteredNext);
+      this.filterAndSortEntries();
 
       this.loadingService.setLoading = false;
       });
+  }
+
+  private filterAndSortEntries() {
+    const filteredActual = this.isShowAll ? this.allActualMonthEntries : this.allActualMonthEntries.filter(entry => entry.date >= this.dateService.getActualDayTimestamp());
+    this.actualMonthEntries = this.sortEntriesByDate(filteredActual);
+
+    const filteredNext = this.isShowAll ? this.allNextMonthEntries : this.allNextMonthEntries.filter(entry => entry.date >= this.dateService.getActualDayTimestamp());
+    this.nextMonthEntries = this.sortEntriesByDate(filteredNext);
   }
 
   private sortEntriesByDate(entries: (Entry & { id: string })[]) {
@@ -114,7 +121,7 @@ export class EntryListComponent implements OnInit, OnDestroy {
 
   onButtonShowAllClick() {
     this.isShowAll = !this.isShowAll;
-    this.loadEntries();
+    this.filterAndSortEntries();
   }
 
   ngOnDestroy(): void {

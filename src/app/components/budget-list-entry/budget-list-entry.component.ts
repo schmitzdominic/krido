@@ -1,4 +1,4 @@
-import { Component, inject, Input, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, Input, OnDestroy, OnInit } from '@angular/core';
 import {Budget} from "../../../shared/interfaces/budget.model";
 import {ProgressBarService} from "../../services/progress-bar/progress-bar.service";
 import {NgbProgressbarConfig} from "@ng-bootstrap/ng-bootstrap";
@@ -16,13 +16,15 @@ import { map, Subject, takeUntil } from 'rxjs';
     selector: 'app-budget-list-entry',
     templateUrl: './budget-list-entry.component.html',
     styleUrls: ['./budget-list-entry.component.scss'],
-    standalone: false
+    standalone: false,
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class BudgetListEntryComponent implements OnInit, OnDestroy {
   private ngbProgressbarConfig = inject(NgbProgressbarConfig);
   public progressBarService = inject(ProgressBarService);
   public priceService = inject(PriceService);
   private entryService = inject(EntryService);
+  private cdr = inject(ChangeDetectorRef);
 
   /**
    * The budget data to be displayed. The component expects a budget object with an ID.
@@ -76,6 +78,7 @@ export class BudgetListEntryComponent implements OnInit, OnDestroy {
       takeUntil(this.destroy$)
     ).subscribe(calculatedLimit => {
       this.usedLimit = calculatedLimit;
+      this.cdr.markForCheck();
     });
   }
 

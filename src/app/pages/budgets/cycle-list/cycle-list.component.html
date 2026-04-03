@@ -8,7 +8,7 @@
 <div class="container">
   <div class="row">
     <ul class="list-group list-group-flush">
-      @for (cycle of cycles; track cycle) {
+      @for (cycle of cycles; track cycle.id) {
         <li class="list-group-item" id="list-cycles" (click)="onCardClick(cycle)">
           <div class="custom-list-item d-flex justify-content-between align-items-center">
             <span class="name ps-2"> {{ cycle.name }} </span>

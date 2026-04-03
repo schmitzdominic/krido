@@ -13,7 +13,7 @@
 <div class="container">
   <div class="row">
     <ul class="list-group list-group-flush">
-      @for (account of accounts; track account) {
+      @for (account of accounts; track account.id) {
         <li class="list-group-item" id="list-accounts" (click)="onClickAccount(account)">
           <div class="custom-list-item">
             @if (account.accountType === AccountType.giro) {

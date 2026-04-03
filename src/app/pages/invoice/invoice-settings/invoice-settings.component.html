@@ -4,7 +4,7 @@
       <label for="invoice-settings-invoice-accounts" class="form-label">Abrechnungskonto</label>
       <div class="mb-3">
         <select class="form-select" id="invoice-settings-invoice-accounts" aria-label="Select Invoice Account" formControlName="invoiceAccounts">
-          @for (invoiceAccount of invoiceAccounts; track invoiceAccount) {
+          @for (invoiceAccount of invoiceAccounts; track invoiceAccount.id) {
             <option value="{{ invoiceAccount.id }}">{{ invoiceAccount.name }}</option>
           }
         </select>
@@ -19,7 +19,7 @@
           <div class="row mb-3">
             <div class="col-10">
               <select class="form-select" id="invoice-settings-beneficiary-accounts-select" aria-label="Select Beneficiary Account" formControlName="beneficiaryAccounts">
-                @for (beneficiaryAccount of beneficiaryAccounts; track beneficiaryAccount) {
+                @for (beneficiaryAccount of beneficiaryAccounts; track beneficiaryAccount.id) {
                   <option value="{{ beneficiaryAccount.id }}">{{ beneficiaryAccount.name }}</option>
                 }
               </select>
@@ -33,7 +33,7 @@
       @if (selectedBeneficiaryAccounts.length > 0) {
         <div class="row">
           <ul class="list-group list-group-flush px-3">
-            @for (beneficiaryAccount of selectedBeneficiaryAccounts; track beneficiaryAccount) {
+            @for (beneficiaryAccount of selectedBeneficiaryAccounts; track beneficiaryAccount.id) {
               <li class="list-group-item" id="invoice-account-settings-beneficiary-accounts">{{ beneficiaryAccount.name }}
                 <button type="button" class="btn btn btn-dark position-absolute btn-sm end-0 top-0" (click)="onRemoveBeneficiaryAccountButtonClick(beneficiaryAccount)"><i class="bi bi-dash-lg"></i></button>
               </li>

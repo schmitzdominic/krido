@@ -49,7 +49,7 @@
       </ul>
       <p>Eigentümer</p>
       <ul class="list-group list-group-flush">
-        @for (owner of account?.owners; track owner) {
+        @for (owner of account?.owners; track $index) {
           <li class="list-group-item" id="account-owners">
             <i class="bi bi-person"></i>
             <span class="name ps-2">{{ owner.email }}</span>

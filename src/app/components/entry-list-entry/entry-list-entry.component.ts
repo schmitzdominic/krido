@@ -1,4 +1,4 @@
-import { Component, Input, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, inject } from '@angular/core';
 import {Entry} from "../../../shared/interfaces/entry.model";
 import {AccountType} from "../../../shared/enums/account-type.enum";
 import {PriceService} from "../../services/price/price.service";
@@ -9,7 +9,8 @@ import {EntryType} from "../../../shared/enums/entry-type.enum";
     selector: 'app-entry-list-entry',
     templateUrl: './entry-list-entry.component.html',
     styleUrls: ['./entry-list-entry.component.scss'],
-    standalone: false
+    standalone: false,
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class EntryListEntryComponent {
   priceService = inject(PriceService);

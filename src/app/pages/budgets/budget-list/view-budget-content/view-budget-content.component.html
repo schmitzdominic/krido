@@ -44,7 +44,7 @@
           @if (entries.length > 0) {
             <h1>Einträge</h1>
           }
-          @for (entry of entries; track entry) {
+          @for (entry of entries; track entry.id) {
             <li class="list-group-item" id="entry-list-actual-month">
               <app-entry-list-entry
                 [withMonth]="true"

@@ -8,7 +8,7 @@
   <div>
     <h1>Konten</h1>
     <ul class="list-group list-group-flush pb-3">
-      @for (account of accounts; track account) {
+      @for (account of accounts; track account.id) {
         <li class="list-group-item" id="entry-list-actual-month" (click)="onAccountClick(account)">
           <app-info-list-entry
             [account]="account">

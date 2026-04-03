@@ -1,4 +1,4 @@
-import { Component, inject, Injectable, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import {DateService} from "../../services/date/date.service";
 import {MenuTitleService} from "../../../shared/behavior/menu-title/menu-title.service";
 import {BudgetService} from "../../services/budget/budget.service";
@@ -11,7 +11,6 @@ import { forkJoin, map, Subject, take, takeUntil } from 'rxjs';
 /**
  * HomeComponent displays the main dashboard, showing budgets for the current month and all-time budgets.
  */
-@Injectable()
 @Component({
     selector: 'app-actual-month',
     templateUrl: './home.component.html',
@@ -52,6 +51,9 @@ export class HomeComponent implements OnInit, OnDestroy {
    * Angular lifecycle hook that runs when the component is destroyed.
    */
   public ngOnDestroy(): void {
+    if (this.activeModalRef) {
+      this.activeModalRef.close();
+    }
     this.destroy$.next();
     this.destroy$.complete();
   }
@@ -77,12 +79,10 @@ export class HomeComponent implements OnInit, OnDestroy {
       monthlyBudgets$.pipe(take(1))
     ]).pipe(
       map(([allTime, monthly]) => {
-        const allTimeTyped = allTime as (Budget & { id: string })[];
-        const monthlyTyped = monthly as (Budget & { id: string })[];
         // Filter out archived budgets and combine them into a single array
         return [
-          ...allTimeTyped.filter(budget => !budget.isArchived),
-          ...monthlyTyped.filter(budget => !budget.isArchived)
+          ...(allTime as (Budget & { id: string })[]).filter(budget => !budget.isArchived),
+          ...(monthly as (Budget & { id: string })[]).filter(budget => !budget.isArchived)
         ];
       }),
       takeUntil(this.destroy$)
@@ -96,6 +96,9 @@ export class HomeComponent implements OnInit, OnDestroy {
    * @param budget The budget to be displayed in the modal.
    */
   public openViewBudgetModal(budget: Budget & { id: string }): void {
+    if (!this.viewBudgetModalTemplate) {
+      return;
+    }
     this.clickedBudget = budget;
     this.activeModalRef = this.ngbModal.open(
       this.viewBudgetModalTemplate,
