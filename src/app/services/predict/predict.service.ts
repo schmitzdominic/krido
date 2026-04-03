@@ -15,7 +15,7 @@ import {AccountService} from "../account/account.service";
 import {AccountType} from "../../../shared/enums/account-type.enum";
 import {Account} from "../../../shared/interfaces/account.model";
 import {EntryType} from "../../../shared/enums/entry-type.enum";
-import { from, of } from 'rxjs';
+import { from, of, forkJoin } from 'rxjs';
 import { map, switchMap, tap, mergeMap, filter, take } from 'rxjs/operators';
 
 @Injectable({
@@ -47,7 +47,7 @@ export class PredictService {
           // Case 2: DB month is outdated, create next month's data.
           const actualMonth = Number(this.dateService.getMonthStringFromMonth(0));
           if (dbMonthString < actualMonth) {
-            this.lastMonthString = this.dateService.getMonthStringFromMonth(-1);
+            this.lastMonthString = String(dbMonthString);
             this.nextMonthString = this.dateService.getMonthStringFromMonth(1);
             // Chain the promise to set the new month string
             return from(this.homeService.setActualMonthString()).pipe(
@@ -69,29 +69,67 @@ export class PredictService {
   }
 
   private createBudgets() {
-    this.budgetService.getAllMonthBudgetsByMonthString(this.lastMonthString).pipe(
-      map(budgets => budgets as (Budget & { id: string })[]), // Explicitly type the stream
-      take(1),
-      // Flatten the array of budgets into individual budget emissions
-      mergeMap((budgets: (Budget & { id: string })[]) => from(budgets)),
-      // Filter out archived budgets
-      filter((budget: Budget & { id: string }) => !budget.isArchived && !!budget.key),
-      // Process each budget
-      tap((budget: Budget & { id: string }) => this.updateBudget(budget))
-    ).subscribe();
+    const currentMonth = this.dateService.getActualMonthString();
+
+    forkJoin([
+      this.budgetService.getAllMonthlyBudgets().pipe(take(1), map(b => b as (Budget & { id: string })[])),
+      this.budgetService.getAllCycles().pipe(take(1), map(c => c as (Cycle & { id: string })[])),
+    ]).subscribe(([allBudgets, allCycles]) => {
+
+      // CycleKeys that already have a budget for the current month (no duplicate needed)
+      const existingThisMonth = new Set(
+        allBudgets
+          .filter(b => !!b.cycleKey && String(b.validityPeriod) === currentMonth)
+          .map(b => b.cycleKey as string)
+      );
+
+      for (const cycle of allCycles) {
+        // Already has a budget this month → skip
+        if (existingThisMonth.has(cycle.id)) continue;
+
+        // Look for the previous-month budget to archive and roll over
+        const prevBudget = allBudgets.find(b =>
+          !b.isArchived &&
+          b.cycleKey === cycle.id &&
+          String(b.validityPeriod) === this.lastMonthString
+        );
+
+        if (prevBudget) {
+          // Archive previous month's budget and create new one via cycle config
+          this.updateBudget(prevBudget);
+        } else {
+          // No previous-month budget found (new cycle, skipped month, etc.) → create fresh
+          this.createFreshBudgetFromCycle(cycle, currentMonth);
+        }
+      }
+    });
+  }
+
+  private createFreshBudgetFromCycle(cycle: Cycle & { id: string }, monthString: string) {
+    const budget: Budget = {
+      searchName: cycle.searchName,
+      name: cycle.name,
+      limit: cycle.limit ?? 0,
+      usedLimit: 0,
+      isArchived: false,
+      validityPeriod: monthString,
+      cycleKey: cycle.id,
+      entries: []
+    };
+    this.budgetService.addMonthBudget(budget);
   }
 
   private updateBudget(budget: Budget & { id: string }) {
     this.setBudgetValues(budget);
     budget.isArchived = true;
 
-    if (budget.cycleKey && budget.key) {
+    if (budget.cycleKey) {
       this.budgetService.getCycle(budget.cycleKey).pipe(
         map(cycle => cycle as Cycle | null), // Explicitly type the stream
         take(1),
         filter((cycle: Cycle | null): cycle is Cycle => !!cycle),
         switchMap(cycle =>
-          from(this.budgetService.updateMonthBudget(budget, budget.key!)).pipe(
+          from(this.budgetService.updateMonthBudget(budget, budget.id)).pipe(
             tap(() => this.createNewBudgetFromOldBudget(budget, cycle))
           )
         )
@@ -112,8 +150,8 @@ export class PredictService {
       budget.limit = (cycle.limit ?? 0) + restBudget;
     }
 
-    // Create a new object without the 'id' property for the new DB entry.
-    const { key: id, ...newBudget } = budget;
+    // Create a new object without the 'id' and 'key' properties for the new DB entry.
+    const { key, id, ...newBudget } = budget;
 
     newBudget.isArchived = false;
     newBudget.usedLimit = 0;
