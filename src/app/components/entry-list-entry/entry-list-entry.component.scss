@@ -4,19 +4,19 @@
   gap: 12px;
 
   &__indicator {
-    width: 4px;
-    height: 36px;
+    width: 3px;
+    height: 32px;
     border-radius: 4px;
     flex-shrink: 0;
     background: #2a2d35;
   }
 
   &--income &__indicator {
-    background: var(--green, #22c55e);
+    background: rgba(34, 197, 94, 0.55);
   }
 
   &--outcome &__indicator {
-    background: var(--red, #ef4444);
+    background: rgba(239, 68, 68, 0.55);
   }
 
   &__body {

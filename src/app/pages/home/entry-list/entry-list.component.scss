@@ -1,5 +1,9 @@
 .entry-section {
-  // spacing comes from home-page gap
+  margin-bottom: 24px;
+
+  &:last-of-type {
+    margin-bottom: 0;
+  }
 
   &__header {
     display: flex;
