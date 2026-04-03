@@ -1,10 +1,3 @@
-<div class="sheet-header" [ngClass]="{
-  'sheet-header--income':  selectedEntryType.value === incomeEntryType.value,
-  'sheet-header--outcome': selectedEntryType.value === expenditureEntryType.value
-}">
-  <span class="sheet-header__title">{{ title }}</span>
-</div>
-
 <div class="modal-body sheet-body">
   <form [formGroup]="addOrEditEntryFormGroup" (ngSubmit)="onSubmit()" novalidate>
 
@@ -52,6 +45,7 @@
           name="date"
           formControlName="date"
           ngbDatepicker
+          container="body"
           [showWeekNumbers]="true"
           [startDate]="selectedDate"
           (dateSelect)="onDateSelected($event)"

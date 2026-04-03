@@ -7,7 +7,7 @@
       <span class="entry-item__name">{{ entry!.name }}</span>
       <span class="entry-item__value" [ngClass]="{
         'text-success': entry!.type === EntryType.income,
-        'text-danger':  entry!.type === EntryType.outcome
+        'entry-item__value--outcome':  entry!.type === EntryType.outcome
       }">{{ getPrice(entry!) }}</span>
     </div>
     <div class="entry-item__row entry-item__row--sub">
