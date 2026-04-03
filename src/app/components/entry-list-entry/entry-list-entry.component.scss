@@ -4,19 +4,19 @@
   gap: 12px;
 
   &__indicator {
-    width: 3px;
-    height: 38px;
-    border-radius: 2px;
+    width: 4px;
+    height: 36px;
+    border-radius: 4px;
     flex-shrink: 0;
-    background: #4b5563;
+    background: #2a2d35;
   }
 
   &--income &__indicator {
-    background: #22c55e;
+    background: var(--green, #22c55e);
   }
 
   &--outcome &__indicator {
-    background: #ef4444;
+    background: var(--red, #ef4444);
   }
 
   &__body {
@@ -27,13 +27,13 @@
   &__row {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: baseline;
   }
 
   &__row--sub {
     font-size: 12px;
-    color: #6b7280;
-    margin-top: 2px;
+    color: var(--app-text-muted, #6b7280);
+    margin-top: 3px;
   }
 
   &__name {
@@ -47,7 +47,8 @@
 
   &__value {
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 700;
     flex-shrink: 0;
+    letter-spacing: -0.2px;
   }
 }

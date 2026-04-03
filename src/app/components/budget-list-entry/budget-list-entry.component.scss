@@ -9,11 +9,21 @@
 
 .limit {
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   flex-shrink: 0;
+  letter-spacing: -0.2px;
 }
 
-:host ::ng-deep .progress {
-  height: 6px;
-  border-radius: 3px;
+:host ::ng-deep {
+  .progress {
+    height: 5px;
+    border-radius: 99px;
+    background: rgba(255, 255, 255, 0.06);
+    overflow: hidden;
+    margin-top: 10px;
+  }
+
+  .progress-bar {
+    border-radius: 99px;
+  }
 }

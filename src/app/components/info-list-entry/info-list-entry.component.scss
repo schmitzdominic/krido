@@ -4,15 +4,15 @@
   gap: 14px;
 
   &__icon {
-    width: 42px;
-    height: 42px;
-    border-radius: 12px;
-    background: rgba(59, 130, 246, 0.12);
+    width: 44px;
+    height: 44px;
+    border-radius: 13px;
+    background: rgba(59, 130, 246, 0.14);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 18px;
-    color: #3b82f6;
+    font-size: 19px;
+    color: var(--accent, #3b82f6);
     flex-shrink: 0;
   }
 
@@ -24,13 +24,13 @@
   &__row {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: baseline;
   }
 
   &__row--sub {
     font-size: 12px;
-    color: #6b7280;
-    margin-top: 3px;
+    color: var(--app-text-muted, #6b7280);
+    margin-top: 4px;
   }
 
   &__name {
@@ -43,8 +43,9 @@
   }
 
   &__value {
-    font-size: 15px;
-    font-weight: 600;
+    font-size: 17px;
+    font-weight: 700;
     flex-shrink: 0;
+    letter-spacing: -0.3px;
   }
 }
