@@ -5,30 +5,23 @@
     (onClose)="onCloseViewBudgetModal()">
   </app-view-budget-content>
 </ng-template>
-<div class="container">
-  <div class="row">
-    <!-- Info area -->
-    <app-info-area>
-    </app-info-area>
-  </div>
+<div class="home-page">
+  <!-- Info area -->
+  <app-info-area></app-info-area>
+
   @if (allBudgets.length > 0) {
-    <div class="row mb-3">
-      <!-- No Time Limit -->
-      <h1>Budgets</h1>
-      <div class="d-flex flex-column">
+    <section class="home-section">
+      <h2 class="section-label">Budgets</h2>
+      <div class="budget-cards">
         @for (budget of allBudgets; track budget.id) {
-          <div class="card p-1 m-2" (click)="openViewBudgetModal(budget)" style="cursor: pointer;">
-            <div class="card-body">
-              <app-budget-list-entry [budget]="budget" class="w-100"></app-budget-list-entry>
-            </div>
+          <div class="budget-card" (click)="openViewBudgetModal(budget)">
+            <app-budget-list-entry [budget]="budget" class="w-100"></app-budget-list-entry>
           </div>
         }
       </div>
-    </div>
+    </section>
   }
-  <div class="row">
-    <!-- Entries -->
-    <app-entry-list>
-    </app-entry-list>
-  </div>
+
+  <!-- Entries -->
+  <app-entry-list></app-entry-list>
 </div>

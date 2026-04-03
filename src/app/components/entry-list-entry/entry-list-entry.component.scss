@@ -1,19 +1,53 @@
-.list-icon {
-  font-size: 18px;
-}
+.entry-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 
-.name {
-  display: inline-block;
-  width: 200px;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
+  &__indicator {
+    width: 3px;
+    height: 38px;
+    border-radius: 2px;
+    flex-shrink: 0;
+    background: #4b5563;
+  }
 
-.upside {
+  &--income &__indicator {
+    background: #22c55e;
+  }
 
-}
+  &--outcome &__indicator {
+    background: #ef4444;
+  }
 
-.downside {
-  font-size: 12px;
+  &__body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &__row--sub {
+    font-size: 12px;
+    color: #6b7280;
+    margin-top: 2px;
+  }
+
+  &__name {
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 58%;
+  }
+
+  &__value {
+    font-size: 14px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
 }

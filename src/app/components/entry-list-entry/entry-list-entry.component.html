@@ -1,45 +1,18 @@
-<div class="container">
-  <div class="row">
-    <div class="col-1 list-icon">
-      @if (entry!.account.accountType === AccountType.giro) {
-        <div class="position-absolute start-0 top-0 ps-3 pt-3">
-          <i class="bi bi-bank"></i>
-        </div>
-      }
-      @if (entry!.account.accountType === AccountType.creditCard) {
-        <div class="position-absolute start-0 top-0 ps-3 pt-3">
-          <i class="bi bi-credit-card-2-front"></i>
-        </div>
-      }
+<div class="entry-item"
+     [class.entry-item--income]="entry!.type === EntryType.income"
+     [class.entry-item--outcome]="entry!.type === EntryType.outcome">
+  <div class="entry-item__indicator"></div>
+  <div class="entry-item__body">
+    <div class="entry-item__row">
+      <span class="entry-item__name">{{ entry!.name }}</span>
+      <span class="entry-item__value" [ngClass]="{
+        'text-success': entry!.type === EntryType.income,
+        'text-danger':  entry!.type === EntryType.outcome
+      }">{{ getPrice(entry!) }}</span>
     </div>
-    <div class="col-11">
-      <div class="container">
-        <!-- upside -->
-        <div class="row upside">
-          <div class="col-9 name">
-            {{ entry!.name }}
-          </div>
-          <div class="col-3">
-            <div class="position-absolute end-0 top-0 pt-2" [ngClass]="{
-            'text-success' : entry!.type === EntryType.income,
-            'text-danger' : entry!.type === EntryType.outcome
-         }">
-              {{ getPrice(entry!) }}
-            </div>
-          </div>
-        </div>
-        <!-- downside -->
-        <div class="row downside text-white-50">
-          <div class="col-9 name">
-            {{ entry!.account.name }}
-          </div>
-          <div class="col-3">
-            <div class="position-absolute end-0 top-0 pt-4">
-              {{ getDateFromTimestamp(entry!.date) }}
-            </div>
-          </div>
-        </div>
-      </div>
+    <div class="entry-item__row entry-item__row--sub">
+      <span>{{ entry!.account.name }}</span>
+      <span>{{ getDateFromTimestamp(entry!.date) }}</span>
     </div>
   </div>
 </div>

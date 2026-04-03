@@ -5,16 +5,14 @@
   </app-update-account-value>
 </ng-template>
 @if (accounts().length > 0) {
-  <div>
-    <h1>Konten</h1>
-    <ul class="list-group list-group-flush pb-3">
+  <section class="accounts-section">
+    <h2 class="section-label">Konten</h2>
+    <div class="account-cards">
       @for (account of accounts(); track account.id) {
-        <li class="list-group-item" id="entry-list-actual-month" (click)="onAccountClick(account)">
-          <app-info-list-entry
-            [account]="account">
-          </app-info-list-entry>
-        </li>
+        <div class="account-card" (click)="onAccountClick(account)">
+          <app-info-list-entry [account]="account"></app-info-list-entry>
+        </div>
       }
-    </ul>
-  </div>
+    </div>
+  </section>
 }

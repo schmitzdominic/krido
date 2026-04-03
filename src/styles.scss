@@ -1,6 +1,22 @@
 @use "bootstrap/scss/bootstrap" as *;
 
 /* You can add global styles to this file, and also import other style files */
+
+:root {
+  --app-card-bg: #1c1f26;
+  --app-border: rgba(255, 255, 255, 0.07);
+  --app-radius: 14px;
+  --app-text-muted: #6b7280;
+}
+
+.section-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--app-text-muted, #6b7280);
+  margin: 0 0 10px;
+}
 $position-values: (
   0: 0,
   50: 50%,

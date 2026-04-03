@@ -1,0 +1,22 @@
+.accounts-section {
+  margin-bottom: 4px;
+}
+
+.account-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.account-card {
+  background: var(--app-card-bg, #1c1f26);
+  border-radius: var(--app-radius, 14px);
+  padding: 16px;
+  cursor: pointer;
+  border: 1px solid var(--app-border, rgba(255, 255, 255, 0.07));
+  transition: background 0.15s ease;
+
+  &:active {
+    background: #252830;
+  }
+}

@@ -4,85 +4,80 @@
     (onClose)="onCloseAddOrEditEntryModal()">
   </app-add-or-edit-entry>
 </ng-template>
-<!-- Entry list -->
-<div>
-  @if (totalActualMonthEntries > 0) {
-    <ul class="list-group list-group-flush pb-3">
-      <div class="row">
-        <div class="col-8">
-          <h1>Aktuell</h1>
-        </div>
-        @if (!isShowAll) {
-          <div class="col-4">
-            <button type="button" class="btn btn btn-dark position-absolute end-0 me-4" (click)="onButtonShowAllClick()"><i class="bi bi-arrow-90deg-left"></i></button>
-          </div>
-        }
-        @if (isShowAll) {
-          <div class="col-4">
-            <button type="button" class="btn btn btn-dark position-absolute end-0 me-4" (click)="onButtonShowAllClick()"><i class="bi bi-arrow-90deg-down"></i></button>
+
+<!-- Current month entries -->
+@if (totalActualMonthEntries > 0) {
+  <section class="entry-section">
+    <div class="entry-section__header">
+      <h2 class="section-label">Aktuell</h2>
+      <button type="button" class="btn-icon" (click)="onButtonShowAllClick()">
+        <i class="bi" [ngClass]="isShowAll ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
+      </button>
+    </div>
+    @if (actualMonthEntries.length > 0) {
+      <div class="entry-card-group">
+        @for (entry of actualMonthEntries; track entry.id) {
+          <div class="entry-row" (click)="onEntryClick(entry)">
+            <app-entry-list-entry [entry]="entry"></app-entry-list-entry>
           </div>
         }
       </div>
-      @for (entry of actualMonthEntries; track entry.id) {
-        <li class="list-group-item" id="entry-list-actual-month" (click)="onEntryClick(entry)">
-          <app-entry-list-entry
-            [entry]="entry">
-          </app-entry-list-entry>
-        </li>
-      }
-      @if (actualMonthEntries.length === 0) {
-        <div class="card">
-          <div class="m-2 mt-2">
-            <img src="assets/img/party.gif" class="card-img-top" alt="nothing left" style="border-radius: 6px;">
-          </div>
-          <div class="card-body">
-            <h1 class="card-title">Gratulation!</h1>
-            <p class="card-text">Diesen Monat gibt es weder Ausgaben noch Einnahmen. Möchtest du diesen Monat nochmal anschauen?</p>
-            <a (click)="onButtonShowAllClick()" class="btn btn-primary">Dieser Monat</a>
-          </div>
+    } @else {
+      <div class="empty-state-card">
+        <img src="assets/img/party.gif" class="empty-state-card__img" alt="nothing left">
+        <div class="empty-state-card__body">
+          <h3>Gratulation!</h3>
+          <p>Diesen Monat gibt es weder Ausgaben noch Einnahmen. Möchtest du diesen Monat nochmal anschauen?</p>
+          <button type="button" class="btn btn-primary btn-sm" (click)="onButtonShowAllClick()">Dieser Monat</button>
         </div>
-      }
-    </ul>
-  }
-  @if (totalNextMonthEntries > 0) {
-    <ul class="list-group list-group-flush">
-      <h1>{{ nextMonthName }}</h1>
+      </div>
+    }
+  </section>
+}
+
+<!-- Next month entries -->
+@if (totalNextMonthEntries > 0) {
+  <section class="entry-section">
+    <div class="entry-section__header">
+      <h2 class="section-label">{{ nextMonthName }}</h2>
+    </div>
+    <div class="entry-card-group">
       @for (entry of nextMonthEntries; track entry.id) {
-        <li class="list-group-item" id="entry-list-next-month" (click)="onEntryClick(entry)">
-          <app-entry-list-entry
-            [entry]="entry">
-          </app-entry-list-entry>
-        </li>
-      }
-    </ul>
-  }
-</div>
-@if (totalActualMonthEntries == 0 && totalNextMonthEntries == 0) {
-  <div class="row">
-    <div class="card">
-      <div class="m-2 mt-3">
-        <img src="assets/img/no-entries.gif" class="card-img-top" alt="no entry" style="border-radius: 6px;">
-      </div>
-      <div class="card-body">
-        <h1 class="card-title">Keine Ein- oder Ausgaben</h1>
-        <div class="no-entry-card-content">
-          <p class="card-text">Du hast noch keine Ein- oder Ausgaben angelegt. Lege jetzt direkt welche an.</p>
+        <div class="entry-row" (click)="onEntryClick(entry)">
+          <app-entry-list-entry [entry]="entry"></app-entry-list-entry>
         </div>
-        @if (isAccountAvailable) {
-          <div class="position-absolute end-0 bottom-0 me-4 mb-4">
-            <button type="button" class="btn btn-primary" (click)="onButtonAddClick()">Anlegen</button>
-          </div>
-        }
-      </div>
+      }
+    </div>
+  </section>
+}
+
+<!-- No entries empty state -->
+@if (totalActualMonthEntries == 0 && totalNextMonthEntries == 0) {
+  <div class="empty-state-card">
+    <img src="assets/img/no-entries.gif" class="empty-state-card__img" alt="no entry">
+    <div class="empty-state-card__body">
+      <h3>Keine Ein- oder Ausgaben</h3>
+      <p>Du hast noch keine Ein- oder Ausgaben angelegt. Lege jetzt direkt welche an.</p>
+      @if (isAccountAvailable) {
+        <button type="button" class="btn btn-primary btn-sm" (click)="onButtonAddClick()">Anlegen</button>
+      }
     </div>
   </div>
 }
-<!-- No Account Toast and Add Button -->
+
+<!-- No Account Toast -->
 @if (isToastNoAccountShown) {
-  <ngb-toast class="position-fixed bottom-0 mb-4" [autohide]="false"> Um eine Ein- oder Ausgabe anzulegen, benötigst du ein Konto. <a [routerLink]="['/accounts']">Hier</a> kannst du ein Konto anlegen. </ngb-toast>
+  <ngb-toast class="position-fixed bottom-0 mb-4" [autohide]="false">
+    Um eine Ein- oder Ausgabe anzulegen, benötigst du ein Konto.
+    <a [routerLink]="['/accounts']">Hier</a> kannst du ein Konto anlegen.
+  </ngb-toast>
 }
+
+<!-- FAB add button -->
 @if (isAccountAvailable && totalActualMonthEntries || totalNextMonthEntries) {
   <div class="position-fixed end-0 bottom-0 me-4 mb-4">
-    <button type="button" class="btn btn-primary" (click)="onButtonAddClick()"><i class="bi bi-plus-lg"></i></button>
+    <button type="button" class="btn btn-primary fab" (click)="onButtonAddClick()">
+      <i class="bi bi-plus-lg"></i>
+    </button>
   </div>
 }
