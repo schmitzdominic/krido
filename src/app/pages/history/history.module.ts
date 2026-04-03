@@ -18,7 +18,7 @@ import { HomeModule } from "../home/home.module";
   ],
   imports: [
     CommonModule,
-    RouterModule,
+    RouterModule.forChild([{ path: '', component: HistoryComponent }]),
     ReactiveFormsModule,
     FormsModule,
     NgbModule,

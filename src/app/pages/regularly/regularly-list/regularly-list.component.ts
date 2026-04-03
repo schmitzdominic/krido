@@ -1,4 +1,5 @@
-import { Component, inject, Injector, runInInjectionContext, ViewChild } from '@angular/core';
+import { Component, DestroyRef, inject, ViewChild } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {Regularly} from "../../../../shared/interfaces/regularly.model";
 import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
@@ -22,7 +23,7 @@ export class RegularlyListComponent {
   private accountService = inject(AccountService);
   private loadingService = inject(LoadingService);
   private dateService = inject(DateService);
-  private injector = inject(Injector);
+  private destroyRef = inject(DestroyRef);
 
 
   @ViewChild('addOrEditRegularlyModal') addOrEditRegularlyModal: NgbModalRef | undefined;
@@ -64,11 +65,12 @@ export class RegularlyListComponent {
 
   private checkForAccounts() {
     this.accountService.getAllAccounts().pipe(
-      map(accounts => accounts as any[])
-    ).subscribe(accounts => runInInjectionContext(this.injector, () => {
+      map(accounts => accounts as any[]),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(accounts => {
       this.isAccountAvailable = accounts.length > 0;
       this.isToastNoAccountShown = !this.isAccountAvailable;
-    }));
+    });
   }
 
   private sortRegularly(cycleType: RegularlyCycleType, regularities: Regularly[]) {
@@ -104,13 +106,13 @@ export class RegularlyListComponent {
 
   private loadRegularities(regularlyCycleType: RegularlyCycleType, list: Regularly[]) {
     this.regularlyService.getAllByCycleType(regularlyCycleType).pipe(
-      map(regularities => regularities as Regularly[])
-    ).subscribe(regularities => runInInjectionContext(this.injector, () => {
-      // Assign the new array directly to the component's property
+      map(regularities => regularities as Regularly[]),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(regularities => {
       Object.assign(list, regularities);
       this.sortRegularly(regularlyCycleType, list);
       if (++this.loadedLists == this.endLoadingOnList) {this.loadingService.setLoading = false;}
-    }));
+    });
   }
 
   onRegularlyClicked(regularly: Regularly) {

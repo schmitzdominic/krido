@@ -1,4 +1,5 @@
-import { Component, inject, Injector, runInInjectionContext } from '@angular/core';
+import { Component, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {UserService} from "../../../services/user/user.service";
 
 @Component({
@@ -9,7 +10,7 @@ import {UserService} from "../../../services/user/user.service";
 })
 export class SettingsHomeComponent {
   userService = inject(UserService);
-  private injector = inject(Injector);
+  private destroyRef = inject(DestroyRef);
 
 
   home: string = '';
@@ -21,11 +22,11 @@ export class SettingsHomeComponent {
   }
 
   setPin() {
-    this.userService.getHomePin.subscribe(pinReference => runInInjectionContext(this.injector, () => {
-      // The service now returns the value directly.
-      // We convert it to a string and handle null/undefined cases.
+    this.userService.getHomePin.pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(pinReference => {
       this.pin = pinReference ? String(pinReference) : '';
-    }));
+    });
   }
 
 }

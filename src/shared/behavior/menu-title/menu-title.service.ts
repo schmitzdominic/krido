@@ -17,7 +17,7 @@ export class MenuTitleService {
    * @param newTitle to set
    */
   setTitle(newTitle: string): void {
-    this.title.next(newTitle);
+    queueMicrotask(() => this.title.next(newTitle));
   }
 
   /**
@@ -26,6 +26,6 @@ export class MenuTitleService {
    * @param {number} newActiveId to set
    */
   setActiveId(newActiveId: number): void {
-    this.activeId.next(newActiveId);
+    queueMicrotask(() => this.activeId.next(newActiveId));
   }
 }

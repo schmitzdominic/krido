@@ -19,7 +19,7 @@ import { SettingsHomeComponent } from './settings-home/settings-home.component';
   ],
   imports: [
     CommonModule,
-    RouterModule,
+    RouterModule.forChild([{ path: '', component: SettingsComponent }]),
     ReactiveFormsModule,
     FormsModule,
     NgbModule,

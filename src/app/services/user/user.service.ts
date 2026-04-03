@@ -21,12 +21,20 @@ export class UserService {
   }
 
   get isLoggedIn(): boolean {
-    const user = JSON.parse(localStorage.getItem('user')!);
-    return user !== null;
+    try {
+      const user = JSON.parse(localStorage.getItem('user') || 'null');
+      return user !== null;
+    } catch {
+      return false;
+    }
   }
 
   get user(): User {
-    return JSON.parse(localStorage.getItem('user')!) as User;
+    try {
+      return JSON.parse(localStorage.getItem('user') || 'null') as User;
+    } catch {
+      return { uid: '', email: null, displayName: null };
+    }
   }
 
   get home(): string {
@@ -68,7 +76,6 @@ export class UserService {
         email: firebaseUser.email,
         displayName: firebaseUser.displayName,
         home: user.home,
-        firebaseUser: firebaseUser,
         mainAccount: user.mainAccount ? user.mainAccount : undefined
       };
       localStorage.setItem('user', JSON.stringify(userObject));

@@ -23,7 +23,7 @@ import { RegularlyListEntryComponent } from '../../components/regularly-list-ent
   ],
   imports: [
     CommonModule,
-    RouterModule,
+    RouterModule.forChild([{ path: '', component: RegularlyComponent }]),
     ReactiveFormsModule,
     FormsModule,
     NgbModule,

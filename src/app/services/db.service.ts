@@ -13,7 +13,8 @@ import {
   set,
   update, ThenableReference
 } from "@angular/fire/database";
-import {Observable} from "rxjs";
+import {Observable, of} from "rxjs";
+import {catchError} from "rxjs/operators";
 
 /**
  * A generic service for interacting with the Firebase Realtime Database.
@@ -36,8 +37,12 @@ export class DbService {
     if (this._home) return this._home;
     const userItem = localStorage.getItem('user');
     if (!userItem) return '';
-    const home = (JSON.parse(userItem) as User).home;
-    this._home = home ? home : '';
+    try {
+      const home = (JSON.parse(userItem) as User).home;
+      this._home = home ? home : '';
+    } catch {
+      this._home = '';
+    }
     return this._home;
   }
 
@@ -67,7 +72,12 @@ export class DbService {
    * @template T The expected type of the object.
    */
   public read<T>(path: string): Observable<T | null> {
-    return objectVal<T>(ref(this.db, path)); // objectVal uses the Database instance from the DatabaseReference
+    return objectVal<T>(ref(this.db, path)).pipe(
+      catchError(error => {
+        console.error(`Error reading data at path: ${path}`, error);
+        return of(null);
+      })
+    );
   }
 
   /**
@@ -78,7 +88,12 @@ export class DbService {
    * @template T The expected type of objects in the list.
    */
   public readList<T>(path: string): Observable<T[]> {
-    return listVal<T>(ref(this.db, path), { keyField: 'id' }); // listVal uses the Database instance from the DatabaseReference
+    return listVal<T>(ref(this.db, path), { keyField: 'id' }).pipe(
+      catchError(error => {
+        console.error(`Error reading list at path: ${path}`, error);
+        return of([] as T[]);
+      })
+    );
   }
 
   /**
@@ -91,7 +106,12 @@ export class DbService {
    */
   public readFilteredList<T>(path: string, ...constraints: QueryConstraint[]): Observable<T[]> {
     const q = query(ref(this.db, path), ...constraints);
-    return listVal<T>(q, { keyField: 'id' }); // listVal uses the Database instance from the DatabaseReference
+    return listVal<T>(q, { keyField: 'id' }).pipe(
+      catchError(error => {
+        console.error(`Error reading filtered list at path: ${path}`, error);
+        return of([] as T[]);
+      })
+    );
   }
 
   /**

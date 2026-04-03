@@ -17,15 +17,6 @@ import { ToastsContainerComponent } from './components/toasts-container/toasts-c
 import { ServiceWorkerModule } from '@angular/service-worker';
 import {NgbDateCustomParserFormatter} from "../shared/formatter/ngb-date-custom-parser-formatter";
 
-// Import page modules
-import { SettingsModule } from './pages/settings/settings.module';
-import { RegularlyModule } from './pages/regularly/regularly.module';
-import { HomeModule } from './pages/home/home.module';
-import { BudgetsModule } from './pages/budgets/budgets.module';
-import { AccountsModule } from './pages/accounts/accounts.module';
-import { HistoryModule } from './pages/history/history.module';
-import { InvoiceModule } from './pages/invoice/invoice.module';
-
 // AngularFire Modular Imports
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { getDatabase, provideDatabase } from '@angular/fire/database';
@@ -42,13 +33,6 @@ import { getAuth, provideAuth } from '@angular/fire/auth';
   imports: [
     BrowserModule,
     CommonModule,
-    SettingsModule,
-    RegularlyModule,
-    HomeModule,
-    BudgetsModule,
-    AccountsModule,
-    HistoryModule,
-    InvoiceModule,
     NgbModule,
     AppRoutingModule,
     BrowserAnimationsModule,

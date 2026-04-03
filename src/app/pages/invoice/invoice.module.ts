@@ -19,7 +19,7 @@ import { InvoiceListComponent } from './invoice-list/invoice-list.component';
   ],
   imports: [
     CommonModule,
-    RouterModule,
+    RouterModule.forChild([{ path: '', component: InvoiceComponent }]),
     ReactiveFormsModule,
     FormsModule,
     NgbModule,

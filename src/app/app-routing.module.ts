@@ -1,24 +1,17 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import {HomeComponent} from "./pages/home/home.component";
-import {AccountsComponent} from "./pages/accounts/accounts.component";
-import {BudgetsComponent} from "./pages/budgets/budgets.component";
-import {HistoryComponent} from "./pages/history/history.component";
-import {RegularlyComponent} from "./pages/regularly/regularly.component";
 import {LoginComponent} from "./components/login/login.component";
 import {AuthGuard} from "./services/auth/auth.guard";
-import {SettingsComponent} from "./pages/settings/settings.component";
-import {InvoiceComponent} from "./pages/invoice/invoice.component";
 
 const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
-  { path: 'home', component: HomeComponent, canActivate: [AuthGuard] },
-  { path: 'invoice', component: InvoiceComponent, canActivate: [AuthGuard] },
-  { path: 'regularly', component: RegularlyComponent, canActivate: [AuthGuard] },
-  { path: 'accounts', component: AccountsComponent, canActivate: [AuthGuard] },
-  { path: 'budgets', component: BudgetsComponent, canActivate: [AuthGuard] },
-  { path: 'history', component: HistoryComponent, canActivate: [AuthGuard] },
-  { path: 'settings', component: SettingsComponent, canActivate: [AuthGuard] },
+  { path: 'home', loadChildren: () => import('./pages/home/home-routing.module').then(m => m.HomeRoutingModule), canActivate: [AuthGuard] },
+  { path: 'invoice', loadChildren: () => import('./pages/invoice/invoice.module').then(m => m.InvoiceModule), canActivate: [AuthGuard] },
+  { path: 'regularly', loadChildren: () => import('./pages/regularly/regularly.module').then(m => m.RegularlyModule), canActivate: [AuthGuard] },
+  { path: 'accounts', loadChildren: () => import('./pages/accounts/accounts.module').then(m => m.AccountsModule), canActivate: [AuthGuard] },
+  { path: 'budgets', loadChildren: () => import('./pages/budgets/budgets-routing.module').then(m => m.BudgetsRoutingModule), canActivate: [AuthGuard] },
+  { path: 'history', loadChildren: () => import('./pages/history/history.module').then(m => m.HistoryModule), canActivate: [AuthGuard] },
+  { path: 'settings', loadChildren: () => import('./pages/settings/settings.module').then(m => m.SettingsModule), canActivate: [AuthGuard] },
   { path: 'login', component: LoginComponent },
   { path: '**', component: LoginComponent },  // Wildcard route for a 404 page
 ];

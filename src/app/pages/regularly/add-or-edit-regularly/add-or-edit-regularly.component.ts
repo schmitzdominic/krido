@@ -1,4 +1,5 @@
-import { Component, EventEmitter, inject, Injector, Input, Output, runInInjectionContext } from '@angular/core';
+import { Component, DestroyRef, EventEmitter, inject, Input, Output } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {EntryType} from "../../../../shared/enums/entry-type.enum";
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {RegularlyCycleType} from "../../../../shared/enums/regularly-cycle-type.enum";
@@ -38,7 +39,7 @@ export class AddOrEditRegularlyComponent {
   private dateService = inject(DateService);
   private ngbCalendar = inject(NgbCalendar);
   private entryService = inject(EntryService);
-  private injector = inject(Injector);
+  private destroyRef = inject(DestroyRef);
 
 
   @Input() regularly: Regularly | undefined;
@@ -204,15 +205,16 @@ export class AddOrEditRegularlyComponent {
 
   private loadAccounts() {
     this.accountService.getAllAccounts().pipe(
-      map(accounts => accounts as (Account & { id: string })[])
-    ).subscribe(accounts => runInInjectionContext(this.injector, () => {
+      map(accounts => accounts as (Account & { id: string })[]),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(accounts => {
       this.accounts = accounts;
       if (!this.regularly) {
         if (accounts.length > 0) {
           this.addOrEditRegularlyFormGroup.controls['account'].setValue(this.accounts[0].id);
         }
       }
-    }));
+    });
   }
 
   get isMonthDayNeeded() {

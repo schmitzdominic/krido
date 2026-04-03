@@ -1,4 +1,5 @@
-import { Component, inject } from '@angular/core';
+import { Component, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {UserService} from "../../../services/user/user.service";
 import {AccountService} from "../../../services/account/account.service";
 import {Account} from "../../../../shared/interfaces/account.model";
@@ -15,6 +16,7 @@ import { map } from 'rxjs/operators';
 export class SettingsUserComponent {
   private formBuilder = inject(FormBuilder);
   private accountService = inject(AccountService);
+  private destroyRef = inject(DestroyRef);
   userService = inject(UserService);
 
 
@@ -42,7 +44,8 @@ export class SettingsUserComponent {
 
   loadAccounts() {
     this.accountService.getAllAccounts().pipe(
-      map(accounts => accounts as (Account & { id: string })[])
+      map(accounts => accounts as (Account & { id: string })[]),
+      takeUntilDestroyed(this.destroyRef)
     ).subscribe(accounts => {
       this.accounts = accounts;
       this.loadMainAccount();

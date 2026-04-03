@@ -1,4 +1,5 @@
-import { Component, inject, Injector, runInInjectionContext } from '@angular/core';
+import { Component, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {HomeService} from "../../services/home/home.service";
 import {Home} from "../../../shared/interfaces/home.model";
@@ -17,7 +18,7 @@ export class HomeSetupComponent {
   private homeService = inject(HomeService);
   private helperService = inject(HelperService);
   private toastService = inject(ToastService);
-  private injector = inject(Injector);
+  private destroyRef = inject(DestroyRef);
 
 
   joinFormGroup: FormGroup = new FormGroup({
@@ -58,9 +59,9 @@ export class HomeSetupComponent {
   }
 
   subscribeAllHomes(): void {
-    // With the new API, we get the array of homes directly.
     this.homeService.getAllHomes().pipe(
-      map(homes => homes as Home[])
+      map(homes => homes as Home[]),
+      takeUntilDestroyed(this.destroyRef)
     ).subscribe(homes => this.homes = homes);
   }
 
@@ -137,12 +138,10 @@ export class HomeSetupComponent {
         pin: this.homeService.generatePin()
       };
       this.homeService.createHome(home).then(() => {
-        runInInjectionContext(this.injector, () => {
-          this.homeService.joinHome(home).then(() => {
-            window.location.reload();
-            this.toastService.showSuccess(`${this.createFormGroup.value.createHomeName} erfolgreich erstellt`, 5000);
-          });
-        })
+        this.homeService.joinHome(home).then(() => {
+          window.location.reload();
+          this.toastService.showSuccess(`${this.createFormGroup.value.createHomeName} erfolgreich erstellt`, 5000);
+        });
       });
     }
   }

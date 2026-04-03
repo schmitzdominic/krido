@@ -1,4 +1,5 @@
-import { Component, EventEmitter, inject, Injector, Output, runInInjectionContext } from '@angular/core';
+import { Component, DestroyRef, EventEmitter, inject, Output } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
 import {Account} from "../../../../shared/interfaces/account.model";
 import {AccountService} from "../../../services/account/account.service";
@@ -19,7 +20,7 @@ export class InvoiceSettingsComponent {
   private loadingService = inject(LoadingService);
   private accountService = inject(AccountService);
   private invoiceService = inject(InvoiceService);
-  private injector = inject(Injector);
+  private destroyRef = inject(DestroyRef);
 
 
   @Output() onNext: EventEmitter<InvoiceSettings> = new EventEmitter<InvoiceSettings>();
@@ -54,23 +55,25 @@ export class InvoiceSettingsComponent {
   private loadSettings(): void {
     this.loadingService.setLoading = true;
     this.invoiceService.getInvoiceSettings().pipe(
-      map(settings => settings as InvoiceSettings | null)
-    ).subscribe(invoiceSettings => runInInjectionContext(this.injector, () => {
+      map(settings => settings as InvoiceSettings | null),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(invoiceSettings => {
       if (invoiceSettings) {
         this.invoiceSettings = invoiceSettings;
         this.fillFormWithSettings(invoiceSettings);
       }
       this.loadingService.setLoading = false;
-    }));
+    });
   }
 
   private loadAccounts(): void {
     this.accountService.getAllAccountsFilteredByAccountType(AccountType.giro).pipe(
-      map(accounts => accounts as (Account & { id: string })[])
-    ).subscribe(accounts => runInInjectionContext(this.injector, () => {
+      map(accounts => accounts as (Account & { id: string })[]),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(accounts => {
       this.invoiceAccounts = accounts;
       this.loadSettings();
-    }));
+    });
   }
 
   private fillFormWithSettings(invoiceSettings: InvoiceSettings) {

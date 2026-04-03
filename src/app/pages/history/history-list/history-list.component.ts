@@ -1,4 +1,5 @@
-import { Component, inject, Injector, Input, runInInjectionContext, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, DestroyRef, inject, Input, SimpleChanges, ViewChild } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {EntryService} from "../../../services/entry/entry.service";
 import {HelperService} from "../../../services/helper/helper.service";
 import {Entry} from "../../../../shared/interfaces/entry.model";
@@ -30,7 +31,7 @@ export class HistoryListComponent {
   private helperService = inject(HelperService);
   private dateService = inject(DateService);
   private ngbModal = inject(NgbModal);
-  private injector = inject(Injector);
+  private destroyRef = inject(DestroyRef);
 
   /**
    * The search object input from the parent component.
@@ -72,7 +73,8 @@ export class HistoryListComponent {
   search(value: string, account: Account | undefined = undefined) {
     this.title = 'Ergebnisse'
     this.entryService.searchEntriesByName(this.helperService.createSearchName(value)).pipe(
-      map(results => results as (Entry & { id: string })[])
+      map(results => results as (Entry & { id: string })[]),
+      takeUntilDestroyed(this.destroyRef)
     ).subscribe(results => {
       this.entries = results.filter(entry => entry.searchName.includes(this.helperService.createSearchName(value)));
 
@@ -97,14 +99,15 @@ export class HistoryListComponent {
     const lastMonthString: string = this.dateService.getMonthStringFromMonth(-1);
     this.title = `${this.dateService.getMonthName(lastMonthString)} ${this.dateService.getYear(lastMonthString)}`;
     this.entryService.searchEntriesByMonthString(lastMonthString).pipe(
-      map(results => results as (Entry & { id: string })[])
-    ).subscribe(results => runInInjectionContext(this.injector, () => {
+      map(results => results as (Entry & { id: string })[]),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(results => {
       this.entries = results.filter(entry => entry.monthString.includes(lastMonthString));
 
       if (account) {
         this.filterEntriesByAccount(account);
       }
-    }));
+    });
   }
 
   filterEntriesByAccount(account: Account) {

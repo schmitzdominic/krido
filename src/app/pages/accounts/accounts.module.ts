@@ -21,7 +21,7 @@ import { ViewAccountContentComponent } from './account-list/view-account-content
   ],
   imports: [
     CommonModule,
-    RouterModule,
+    RouterModule.forChild([{ path: '', component: AccountsComponent }]),
     ReactiveFormsModule,
     FormsModule,
     NgbModule,

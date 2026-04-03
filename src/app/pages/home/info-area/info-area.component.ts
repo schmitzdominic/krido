@@ -1,4 +1,5 @@
-import { Component, inject, Injector, runInInjectionContext, ViewChild } from '@angular/core';
+import { Component, DestroyRef, inject, ViewChild } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {AccountService} from "../../../services/account/account.service";
 import {AccountType} from "../../../../shared/enums/account-type.enum";
 import {Account} from "../../../../shared/interfaces/account.model";
@@ -17,7 +18,7 @@ export class InfoAreaComponent {
   private accountService = inject(AccountService);
   private ngbModal = inject(NgbModal);
   private userService = inject(UserService);
-  private injector = inject(Injector);
+  private destroyRef = inject(DestroyRef);
 
 
   @ViewChild('updateAccountValueModal') updateAccountValueModal: NgbModalRef | undefined;
@@ -34,15 +35,15 @@ export class InfoAreaComponent {
 
   loadGiroAccounts() {
     this.accountService.getAllAccountsFilteredByAccountType(AccountType.giro).pipe(
-      map(accounts => accounts as (Account & { id: string })[])
-    ).subscribe(accounts => runInInjectionContext(this.injector, () => {
+      map(accounts => accounts as (Account & { id: string })[]),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(accounts => {
       if (this.userService.mainAccount) {
-        // Filter the accounts to only include the main account
         this.accounts = accounts.filter(
           account => account.id === (this.userService.mainAccount as any)?.id
         );
       }
-    }));
+    });
   }
 
   openUpdateAccountValueModal(): void {

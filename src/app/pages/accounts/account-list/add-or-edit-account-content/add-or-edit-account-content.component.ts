@@ -1,4 +1,5 @@
-import { Component, EventEmitter, inject, Injector, Input, Output, runInInjectionContext } from '@angular/core';
+import { Component, DestroyRef, EventEmitter, inject, Input, Output } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {AccountType} from "../../../../../shared/enums/account-type.enum";
 import {Account} from "../../../../../shared/interfaces/account.model";
@@ -26,7 +27,7 @@ export class AddOrEditAccountContentComponent {
   private helperService = inject(HelperService);
   private userService = inject(UserService);
   private dbService = inject(DbService);
-  private injector = inject(Injector);
+  private destroyRef = inject(DestroyRef);
 
 
   @Input() account: (Account & { id: string }) | undefined;
@@ -116,27 +117,28 @@ export class AddOrEditAccountContentComponent {
 
   private loadOwners() {
     this.userService.getAllUsers().pipe(
-      map(users => users as (User & { id: string })[])
-    ).subscribe(users => runInInjectionContext(this.injector, () => {
+      map(users => users as (User & { id: string })[]),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(users => {
       const home = this.userService.home;
-      // Filter out already selected owners
       this.owners = users.filter(user => user.home === home && !this.selectedOwners.some(so => so.id === user.id));
       
       if (this.owners.length > 0) {
         this.addOrEditAccountFormGroup.controls['owners'].setValue(this.owners[0].id);
       }
-    }));
+    });
   }
 
   private loadAccounts() {
     this.accountService.getAllAccounts().pipe(
-      map(accounts => accounts as (Account & { id: string })[])
-    ).subscribe(accounts => runInInjectionContext(this.injector, () => {
+      map(accounts => accounts as (Account & { id: string })[]),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(accounts => {
       this.referenceAccounts = accounts;
       if (!this.account && accounts.length > 0) {
         this.addOrEditAccountFormGroup.controls['referenceAccount'].setValue(accounts[0].id);
       }
-    }));
+    });
   }
 
   onSubmit() {
