@@ -155,6 +155,12 @@ export class AddOrEditEntryComponent {
       this.isValueInvalid = value <= 0;
       this.isEdited = true;
     });
+    this.addOrEditEntryFormGroup.controls['account'].valueChanges.subscribe(() => {
+      this.isEdited = true;
+    });
+    this.addOrEditEntryFormGroup.controls['budget'].valueChanges.subscribe(() => {
+      this.isEdited = true;
+    });
   }
 
   /**
@@ -188,7 +194,7 @@ export class AddOrEditEntryComponent {
         next: ([monthlyBudgets, allTimeBudgets]) => {
           const activeBudgets = [...monthlyBudgets, ...allTimeBudgets].filter(budget => !budget.isArchived);
           this.budgets = [
-            { ...this.noBudgetValue, id: this.noBudgetKey },
+            { ...this.noBudgetValue, id: this.noBudgetKey, key: this.noBudgetKey },
             ...activeBudgets
           ];
     

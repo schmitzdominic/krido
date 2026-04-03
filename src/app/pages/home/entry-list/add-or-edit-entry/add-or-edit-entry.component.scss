@@ -151,6 +151,35 @@
     color: #5a6070;
     flex-shrink: 0;
   }
+
+  &__select-native {
+    width: 100%;
+    background: #161920;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    padding: 11px 14px;
+    font-size: 15px;
+    color: #e2e8f0;
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    outline: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%235a6070' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 40px;
+    transition: border-color 0.15s;
+
+    &:focus {
+      border-color: rgba(59, 130, 246, 0.5);
+      box-shadow: none;
+    }
+
+    option {
+      background: #1e2028;
+      color: #e2e8f0;
+    }
+  }
 }
 
 // ── Dropdown Menu ─────────────────────────────────────
