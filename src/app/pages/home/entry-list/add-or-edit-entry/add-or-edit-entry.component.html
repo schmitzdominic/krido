@@ -95,6 +95,6 @@
   <button
     type="button"
     class="btn btn-light"
-    [disabled]="isNameInvalid || isValueInvalid"
+    [disabled]="isNameInvalid || isValueInvalid || !isEdited"
   (click)="onSubmit()">{{ submitButtonText }}</button>
 </div>

@@ -51,6 +51,7 @@ export class AddOrEditEntryComponent {
 
   isNameInvalid: boolean = true;
   isValueInvalid: boolean = true;
+  isEdited: boolean = false;
 
   addOrEditEntryFormGroup: FormGroup = new FormGroup({
     entryType: new FormControl(''),
@@ -79,6 +80,9 @@ export class AddOrEditEntryComponent {
     this.loadAccounts();
     this.loadBudgets();
     this.fillFormIfEntryIsAvailable();
+    if (!this.entry?.id) {
+      this.isEdited = true;
+    }
   }
 
   /**
@@ -145,9 +149,11 @@ export class AddOrEditEntryComponent {
     });
     this.addOrEditEntryFormGroup.controls['name'].valueChanges.subscribe((name: string) => {
       this.isNameInvalid = name.length <= 0;
+      this.isEdited = true;
     });
     this.addOrEditEntryFormGroup.controls['value'].valueChanges.subscribe(value => {
       this.isValueInvalid = value <= 0;
+      this.isEdited = true;
     });
   }
 
@@ -200,6 +206,7 @@ export class AddOrEditEntryComponent {
    */
   public selectEntryType(entryType: EntryTypeInterface): void {
     this.addOrEditEntryFormGroup.controls['entryType'].setValue(entryType.value);
+    this.isEdited = true;
   }
 
   /**
@@ -208,6 +215,7 @@ export class AddOrEditEntryComponent {
    */
   public selectAccount(account: Account & { id: string }): void {
     this.addOrEditEntryFormGroup.controls['account'].setValue(account.id);
+    this.isEdited = true;
   }
 
   /**
@@ -216,6 +224,7 @@ export class AddOrEditEntryComponent {
    */
   public selectBudget(budget: Budget & { id: string }): void {
     this.addOrEditEntryFormGroup.controls['budget'].setValue(budget.key);
+    this.isEdited = true;
   }
 
   /**
@@ -224,13 +233,14 @@ export class AddOrEditEntryComponent {
    */
   public onDateSelected(ngbDate: NgbDate): void {
     this.selectedDateTimestamp = this.dateService.getTimestampFromNgbDate(ngbDate);
+    this.isEdited = true;
   }
 
   /**
    * Handles the delete button click. Deletes the current entry and closes the modal.
    */
   public onButtonDelete(): void {
-    this.entryService.deleteEntry(this.entry!.id).then(() => this.onClose.emit()).catch(err => console.error("Error deleting entry:", err));
+    this.entryService.deleteEntry(this.entry!.id).then(() => this.closeModal()).catch(err => console.error("Error deleting entry:", err));
   }
 
   /**
@@ -257,14 +267,14 @@ export class AddOrEditEntryComponent {
       (entryData as any).budget = deleteField();
     }
 
-    this.entryService.updateEntry(entryData, this.entry!.id).then(() => this.onClose.emit()).catch(err => console.error("Error updating entry:", err));
+    this.entryService.updateEntry(entryData, this.entry!.id).then(() => this.closeModal()).catch(err => console.error("Error updating entry:", err));
   }
 
   /**
    * Handles the logic for adding a new entry.
    */
   private onAdd(): void {
-    this.entryService.addEntry(this.getEntryObject()).then(() => this.onClose.emit()).catch(err => console.error("Error adding entry:", err));
+    this.entryService.addEntry(this.getEntryObject()).then(() => this.closeModal()).catch(err => console.error("Error adding entry:", err));
   }
 
   /**
@@ -295,6 +305,11 @@ export class AddOrEditEntryComponent {
    * Handles the cancel button click. Emits the onClose event to close the modal.
    */
   public onButtonCancel(): void {
+    this.closeModal();
+  }
+
+  private closeModal(): void {
+    (document.activeElement as HTMLElement)?.blur();
     this.onClose.emit();
   }
 
