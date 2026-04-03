@@ -1,6 +1,5 @@
 import {Component, EventEmitter, inject, Input, Output} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
-import {deleteField} from "@angular/fire/firestore";
 import {EntryType} from "../../../../../shared/enums/entry-type.enum";
 import {AccountService} from "../../../../services/account/account.service";
 import {Account} from "../../../../../shared/interfaces/account.model";
@@ -173,7 +172,7 @@ export class AddOrEditEntryComponent {
         next: (accounts) => {
           this.accounts = accounts as (Account & { id: string })[];
           if (!this.entry && this.accounts.length > 0) {
-            this.addOrEditEntryFormGroup.controls['account'].setValue(this.accounts[0].id);
+            this.addOrEditEntryFormGroup.controls['account'].setValue(this.accounts[0].id, { emitEvent: false });
           }
         },
         error: (err) => console.error('Fehler beim Laden der Konten', err)
@@ -192,14 +191,16 @@ export class AddOrEditEntryComponent {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: ([monthlyBudgets, allTimeBudgets]) => {
-          const activeBudgets = [...monthlyBudgets, ...allTimeBudgets].filter(budget => !budget.isArchived);
+          const activeBudgets = [...monthlyBudgets, ...allTimeBudgets]
+            .filter(budget => !budget.isArchived)
+            .map(budget => ({ ...budget, key: budget.key ?? budget.id }));
           this.budgets = [
             { ...this.noBudgetValue, id: this.noBudgetKey, key: this.noBudgetKey },
             ...activeBudgets
           ];
     
           if (!this.entry?.budget) {
-            this.addOrEditEntryFormGroup.controls['budget'].setValue(this.noBudgetKey);
+            this.addOrEditEntryFormGroup.controls['budget'].setValue(this.noBudgetKey, { emitEvent: false });
           }
         },
         error: (err) => console.error('Fehler beim Laden der Budgets', err)
@@ -229,7 +230,7 @@ export class AddOrEditEntryComponent {
    * @param budget The selected budget object.
    */
   public selectBudget(budget: Budget & { id: string }): void {
-    this.addOrEditEntryFormGroup.controls['budget'].setValue(budget.key);
+    this.addOrEditEntryFormGroup.controls['budget'].setValue(budget.key ?? budget.id);
     this.isEdited = true;
   }
 
@@ -267,10 +268,10 @@ export class AddOrEditEntryComponent {
   private onEdit(): void {
     const entryData = this.getEntryObject();
 
-    // If you chose "no budget", the actual budget must be deleted
+    // If "no budget" was chosen, delete the budget fields from the RTDB entry
     if (!this.selectedBudget && this.entry?.budget) {
-      (entryData as any).budgetKey = deleteField();
-      (entryData as any).budget = deleteField();
+      (entryData as any).budgetKey = null;
+      (entryData as any).budget = null;
     }
 
     this.entryService.updateEntry(entryData, this.entry!.id).then(() => this.closeModal()).catch(err => console.error("Error updating entry:", err));
@@ -331,8 +332,8 @@ export class AddOrEditEntryComponent {
    * Getter for the currently selected budget object.
    */
   public get selectedBudget(): (Budget & { id: string }) | undefined {
-    const budget = this.budgets.find(b => b.key === this.addOrEditEntryFormGroup.value.budget);
-    if (budget?.key === this.noBudgetKey) {
+    const budget = this.budgets.find(b => (b.key ?? b.id) === this.addOrEditEntryFormGroup.value.budget);
+    if (!budget || budget.key === this.noBudgetKey) {
       return undefined;
     }
     return budget;

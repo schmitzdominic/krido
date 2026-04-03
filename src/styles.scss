@@ -47,6 +47,35 @@ hr {
   font-size: 1em;
 }
 
+// ── Entry form dropdown (rendered via container="body") ──────────────
+.dropdown-menu.sheet-dropdown {
+  background: #1e2028 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 12px !important;
+  padding: 4px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5) !important;
+  min-width: 0 !important;
+  width: max-content !important;
+
+  .dropdown-item {
+    color: #cbd5e1;
+    border-radius: 8px;
+    font-size: 14px;
+    padding: 9px 12px;
+    transition: background 0.1s;
+
+    &:hover, &:focus {
+      background: rgba(255, 255, 255, 0.08) !important;
+      color: #fff !important;
+    }
+
+    &:active {
+      background: rgba(59, 130, 246, 0.18) !important;
+      color: #fff !important;
+    }
+  }
+}
+
 .badge.large {
   font-size: 2em;
 }

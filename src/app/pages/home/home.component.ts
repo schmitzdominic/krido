@@ -6,7 +6,8 @@ import {Budget} from "../../../shared/interfaces/budget.model";
 import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {PredictService} from "../../services/predict/predict.service";
-import { forkJoin, map, Subject, take, takeUntil } from 'rxjs';
+import { combineLatest, Subject, takeUntil } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 /**
  * HomeComponent displays the main dashboard, showing budgets for the current month and all-time budgets.
@@ -72,17 +73,16 @@ export class HomeComponent implements OnInit, OnDestroy {
    */
   private loadAllBudgets(): void {
     const allTimeBudgets$ = this.budgetService.getAllNoTimeLimitBudgets();
-    const monthlyBudgets$ = this.budgetService.getAllMonthBudgetsByMonthString(this.dateService.getActualMonthString());
+    const monthlyBudgets$ = this.budgetService.getAllMonthlyBudgets();
+    const currentMonth = this.dateService.getActualMonthString();
 
-    forkJoin([
-      allTimeBudgets$.pipe(take(1)),
-      monthlyBudgets$.pipe(take(1))
-    ]).pipe(
+    combineLatest([allTimeBudgets$, monthlyBudgets$]).pipe(
       map(([allTime, monthly]) => {
-        // Filter out archived budgets and combine them into a single array
         return [
-          ...(allTime as (Budget & { id: string })[]).filter(budget => !budget.isArchived),
-          ...(monthly as (Budget & { id: string })[]).filter(budget => !budget.isArchived)
+          ...(allTime as (Budget & { id: string })[]).filter(b => !b.isArchived),
+          ...(monthly as (Budget & { id: string })[]).filter(
+            b => !b.isArchived && String(b.validityPeriod) === currentMonth
+          )
         ];
       }),
       takeUntil(this.destroy$)

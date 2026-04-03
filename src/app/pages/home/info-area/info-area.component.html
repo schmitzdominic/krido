@@ -6,13 +6,20 @@
 </ng-template>
 @if (accounts().length > 0) {
   <section class="accounts-section">
-    <h2 class="section-label">Konten</h2>
-    <div class="account-cards">
-      @for (account of accounts(); track account.id) {
-        <div class="account-card" (click)="onAccountClick(account)">
-          <app-info-list-entry [account]="account"></app-info-list-entry>
-        </div>
-      }
+    <div class="accounts-section__header">
+      <h2 class="section-label">Konten</h2>
+      <button type="button" class="btn-icon" (click)="toggleAccountsSection()">
+        <i class="bi" [ngClass]="isAccountsExpanded ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
+      </button>
     </div>
+    @if (isAccountsExpanded) {
+      <div class="account-cards">
+        @for (account of accounts(); track account.id) {
+          <div class="account-card" (click)="onAccountClick(account)">
+            <app-info-list-entry [account]="account"></app-info-list-entry>
+          </div>
+        }
+      </div>
+    }
   </section>
 }

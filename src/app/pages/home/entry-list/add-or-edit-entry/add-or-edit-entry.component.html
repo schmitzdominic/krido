@@ -46,6 +46,7 @@
           formControlName="date"
           ngbDatepicker
           container="body"
+          placement="bottom-end"
           [showWeekNumbers]="true"
           [startDate]="selectedDate"
           (dateSelect)="onDateSelected($event)"
@@ -60,21 +61,33 @@
     <!-- Konto -->
     <div class="form-field mb-3">
       <label class="form-field__label">Konto</label>
-      <select class="form-field__select-native" formControlName="account">
-        @for (account of accounts; track account.id) {
-          <option [value]="account.id">{{ account.name }}</option>
-        }
-      </select>
+      <div ngbDropdown container="body" placement="bottom-end">
+        <button class="form-field__select" type="button" ngbDropdownToggle>
+          {{ selectedAccount.name }}
+          <i class="bi bi-chevron-down form-field__chevron"></i>
+        </button>
+        <div ngbDropdownMenu class="sheet-dropdown">
+          @for (account of accounts; track account.id) {
+            <button ngbDropdownItem (click)="selectAccount(account)">{{ account.name }}</button>
+          }
+        </div>
+      </div>
     </div>
 
     <!-- Budget -->
     <div class="form-field mb-1">
       <label class="form-field__label">Budget</label>
-      <select class="form-field__select-native" formControlName="budget">
-        @for (budget of budgets; track budget.id) {
-          <option [value]="budget.key">{{ budget.name }}</option>
-        }
-      </select>
+      <div ngbDropdown container="body" placement="bottom-end">
+        <button class="form-field__select" type="button" ngbDropdownToggle>
+          {{ selectedBudget?.name || noBudgetValue.name }}
+          <i class="bi bi-chevron-down form-field__chevron"></i>
+        </button>
+        <div ngbDropdownMenu class="sheet-dropdown">
+          @for (budget of budgets; track budget.id) {
+            <button ngbDropdownItem (click)="selectBudget(budget)">{{ budget.name }}</button>
+          }
+        </div>
+      </div>
     </div>
 
   </form>

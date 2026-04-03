@@ -9,5 +9,8 @@
     [value]="usedLimit"
     [max]="budget.limit!"
     type="{{progressBarService.getProgressBarType(usedLimit, budget.limit!)}}"
-  >{{ getProgressBarText() }}</ngb-progressbar>
+  ></ngb-progressbar>
+  @if (getProgressBarText()) {
+    <div class="progress-label">{{ getProgressBarText() }}</div>
+  }
 }

@@ -23,6 +23,12 @@ export class InfoAreaComponent {
 
   selectedAccount: Account | undefined;
   updateAccountValueModalRef: NgbModalRef | undefined;
+  isAccountsExpanded: boolean = localStorage.getItem('accounts-expanded') !== 'false';
+
+  toggleAccountsSection(): void {
+    this.isAccountsExpanded = !this.isAccountsExpanded;
+    localStorage.setItem('accounts-expanded', String(this.isAccountsExpanded));
+  }
 
   private readonly allGiroAccounts = toSignal(
     this.accountService.getAllAccountsFilteredByAccountType(AccountType.giro).pipe(
