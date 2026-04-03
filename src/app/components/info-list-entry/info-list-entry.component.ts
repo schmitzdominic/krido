@@ -8,7 +8,8 @@ import {Entry} from "../../../shared/interfaces/entry.model";
 import {EntryType} from "../../../shared/enums/entry-type.enum";
 import {BudgetService} from "../../services/budget/budget.service";
 import {Budget} from "../../../shared/interfaces/budget.model";
-import {forkJoin, map} from "rxjs";
+import {combineLatest, map} from "rxjs";
+import {take} from "rxjs/operators";
 
 @Component({
     selector: 'app-info-list-entry',
@@ -62,7 +63,7 @@ export class InfoListEntryComponent implements OnChanges {
         map(entries => entries as Entry[])
       );
 
-      forkJoin([budgets$, entries$]).subscribe(([budgets, entries]) => runInInjectionContext(this.injector, () => {
+      combineLatest([budgets$, entries$]).pipe(take(1)).subscribe(([budgets, entries]) => runInInjectionContext(this.injector, () => {
         // Process Budgets
         this.overallValueLeftBudgets = budgets
           .filter(budget => !budget.isArchived)
