@@ -1,5 +1,4 @@
-import { Component, DestroyRef, inject } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Component, inject } from '@angular/core';
 import {MenuTitleService} from "../../../shared/behavior/menu-title/menu-title.service";
 import {Router} from "@angular/router";
 
@@ -10,35 +9,8 @@ import {Router} from "@angular/router";
     standalone: false
 })
 export class MainMenuComponent {
-  private destroyRef = inject(DestroyRef);
+  protected menuTitleService = inject(MenuTitleService);
   private router = inject(Router);
-  private menuTitleService = inject(MenuTitleService);
-
-
-  title?: string;
-  activeId: number = 1;
-
-  /** Inserted by Angular inject() migration for backwards compatibility */
-  constructor(...args: unknown[]);
-
-  constructor() {
-  }
-
-  ngOnInit(): void {
-    this.subscribeBehaviors();
-  }
-
-  /**
-   * Subscribe all behaviors
-   */
-  subscribeBehaviors(): void {
-    this.menuTitleService.title.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(newTitle => {
-      this.title = newTitle;
-    });
-    this.menuTitleService.activeId.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(newActiveId => {
-      this.activeId = newActiveId;
-    });
-  }
 
   navigateToAccounts(): void {
     this.router.navigate(['/accounts']);

@@ -1,5 +1,5 @@
-import { Component, DestroyRef, inject, ViewChild } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Component, computed, inject, ViewChild } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import {AccountService} from "../../../services/account/account.service";
 import {AccountType} from "../../../../shared/enums/account-type.enum";
 import {Account} from "../../../../shared/interfaces/account.model";
@@ -18,33 +18,24 @@ export class InfoAreaComponent {
   private accountService = inject(AccountService);
   private ngbModal = inject(NgbModal);
   private userService = inject(UserService);
-  private destroyRef = inject(DestroyRef);
-
 
   @ViewChild('updateAccountValueModal') updateAccountValueModal: NgbModalRef | undefined;
 
   selectedAccount: Account | undefined;
-
   updateAccountValueModalRef: NgbModalRef | undefined;
 
-  accounts: (Account & { id: string })[] = [];
-
-  ngOnInit() {
-    this.loadGiroAccounts();
-  }
-
-  loadGiroAccounts() {
+  private readonly allGiroAccounts = toSignal(
     this.accountService.getAllAccountsFilteredByAccountType(AccountType.giro).pipe(
-      map(accounts => accounts as (Account & { id: string })[]),
-      takeUntilDestroyed(this.destroyRef)
-    ).subscribe(accounts => {
-      if (this.userService.mainAccount) {
-        this.accounts = accounts.filter(
-          account => account.id === (this.userService.mainAccount as any)?.id
-        );
-      }
-    });
-  }
+      map(accounts => accounts as (Account & { id: string })[])
+    ),
+    { initialValue: [] as (Account & { id: string })[] }
+  );
+
+  readonly accounts = computed(() =>
+    this.allGiroAccounts().filter(
+      account => account.id === (this.userService.mainAccount as any)?.id
+    )
+  );
 
   openUpdateAccountValueModal(): void {
     this.updateAccountValueModalRef = this.ngbModal.open(

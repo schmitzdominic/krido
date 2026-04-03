@@ -7,13 +7,13 @@
 <ul class="list-group list-group-flush pt-4 pb-3">
   <div class="row">
     <div class="col-8">
-      <h1>{{ title }}</h1>
+      <h1>{{ title() }}</h1>
     </div>
   </div>
-  @for (entry of entries; track entry.id) {
+  @for (entry of entries(); track entry.id) {
     <li class="list-group-item" id="entry-list-actual-month" (click)="onEntryClick(entry)">
       <app-entry-list-entry
-        [withMonth]="historySearchObject!.isLastMonth"
+        [withMonth]="historySearchObject()?.isLastMonth ?? false"
         [entry]="entry">
       </app-entry-list-entry>
     </li>

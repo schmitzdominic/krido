@@ -1,4 +1,4 @@
-import { Component, ViewChild, inject } from '@angular/core';
+import { Component, effect, signal, ViewChild, inject } from '@angular/core';
 import {UserService} from "./services/user/user.service";
 import {Router} from "@angular/router";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
@@ -19,23 +19,27 @@ export class AppComponent {
   private modalService = inject(NgbModal);
   private loadingService = inject(LoadingService);
 
-
   @ViewChild('loadingModal') loadingModal: NgbModalRef | undefined;
 
   modalRef: NgbModalRef | undefined;
 
-  title:    string = 'krido';
-  mainPage: string = 'home';
+  readonly mainPage: string = 'home';
 
-  showLogin:      boolean = true;
-  showHomeSetup:  boolean = false;
-  showMain:       boolean = false;
+  readonly showLogin    = signal(true);
+  readonly showHomeSetup = signal(false);
+  readonly showMain     = signal(false);
 
   constructor() {
+    effect(() => {
+      if (this.loadingService.isLoading()) {
+        this.openLoading();
+      } else {
+        this.closeLoading();
+      }
+    });
   }
 
   ngOnInit() {
-    this.subscribeLoadingService();
     this.checkIfUserLoggedIn();
     if (this.userService.isLoggedIn) {
       this.onLoginStateChanged(true);
@@ -45,19 +49,9 @@ export class AppComponent {
   private setPageState(showLogin: boolean,
                        showMain: boolean,
                        showHomeSetup: boolean): void {
-    this.showLogin = showLogin;
-    this.showMain = showMain;
-    this.showHomeSetup = showHomeSetup;
-  }
-
-  private subscribeLoadingService() {
-    this.loadingService.isLoading.subscribe(isLoading => {
-      if (isLoading) {
-        this.openLoading();
-      } else {
-        this.closeLoading();
-      }
-    });
+    this.showLogin.set(showLogin);
+    this.showMain.set(showMain);
+    this.showHomeSetup.set(showHomeSetup);
   }
 
   private checkIfUserLoggedIn() {
@@ -104,6 +98,7 @@ export class AppComponent {
   }
 
   openLoading() {
+    if (!this.loadingModal) return;
     this.modalRef = this.modalService.open(
       this.loadingModal,
       {

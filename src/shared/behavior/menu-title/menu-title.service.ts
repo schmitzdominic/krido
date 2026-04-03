@@ -1,31 +1,18 @@
-import { Injectable } from '@angular/core';
-import {BehaviorSubject} from "rxjs";
+import { Injectable, signal } from '@angular/core';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MenuTitleService {
 
-  title: BehaviorSubject<string> = new BehaviorSubject('');
-  activeId: BehaviorSubject<number> = new BehaviorSubject(0);
+  readonly title = signal('');
+  readonly activeId = signal(0);
 
-  constructor() { }
-
-  /**
-   * Set new Title.
-   *
-   * @param newTitle to set
-   */
   setTitle(newTitle: string): void {
-    queueMicrotask(() => this.title.next(newTitle));
+    queueMicrotask(() => this.title.set(newTitle));
   }
 
-  /**
-   * Set new ActiveId
-   *
-   * @param {number} newActiveId to set
-   */
   setActiveId(newActiveId: number): void {
-    queueMicrotask(() => this.activeId.next(newActiveId));
+    queueMicrotask(() => this.activeId.set(newActiveId));
   }
 }

@@ -1,5 +1,6 @@
-import { Component, DestroyRef, inject } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Component, inject } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { map } from 'rxjs/operators';
 import {UserService} from "../../../services/user/user.service";
 
 @Component({
@@ -10,23 +11,10 @@ import {UserService} from "../../../services/user/user.service";
 })
 export class SettingsHomeComponent {
   userService = inject(UserService);
-  private destroyRef = inject(DestroyRef);
 
-
-  home: string = '';
-  pin: string = '';
-
-  ngOnInit() {
-    this.home = this.userService.home;
-    this.setPin();
-  }
-
-  setPin() {
-    this.userService.getHomePin.pipe(
-      takeUntilDestroyed(this.destroyRef)
-    ).subscribe(pinReference => {
-      this.pin = pinReference ? String(pinReference) : '';
-    });
-  }
-
+  readonly home: string = this.userService.home;
+  readonly pin = toSignal(
+    this.userService.getHomePin.pipe(map(p => p ? String(p) : '')),
+    { initialValue: '' }
+  );
 }

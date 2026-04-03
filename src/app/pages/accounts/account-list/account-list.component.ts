@@ -1,5 +1,5 @@
-import { Component, DestroyRef, inject, ViewChild } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Component, computed, effect, inject, ViewChild } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {Account} from "../../../../shared/interfaces/account.model";
@@ -19,7 +19,6 @@ export class AccountListComponent {
   private ngbModal = inject(NgbModal);
   private accountService = inject(AccountService);
   private loadingService = inject(LoadingService);
-  private destroyRef = inject(DestroyRef);
   priceService = inject(PriceService);
 
 
@@ -33,23 +32,20 @@ export class AccountListComponent {
   addOrEditAccountModalRef: NgbModalRef | undefined;
   viewAccountModalRef: NgbModalRef | undefined;
 
-  isInitialized: boolean = false;
-
-  accounts: (Account & { id: string })[] = [];
-
-  ngOnInit() {
-    this.loadAccounts();
-  }
-
-  loadAccounts() {
-    this.loadingService.setLoading = true;
+  readonly accounts = toSignal(
     this.accountService.getAllAccounts().pipe(
-      map(accountsFromService => accountsFromService as (Account & { id: string })[]),
-      takeUntilDestroyed(this.destroyRef)
-    ).subscribe(accountsFromService => {
-      this.accounts = accountsFromService;
-      this.loadingService.setLoading = false;
-      this.isInitialized = true;
+      map(accounts => accounts as (Account & { id: string })[])
+    )
+  );
+
+  readonly isInitialized = computed(() => this.accounts() !== undefined);
+
+  constructor() {
+    this.loadingService.setLoading = true;
+    effect(() => {
+      if (this.accounts() !== undefined) {
+        this.loadingService.setLoading = false;
+      }
     });
   }
 

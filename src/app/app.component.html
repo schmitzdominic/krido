@@ -11,17 +11,17 @@
 </ng-template>
 
 <!-- Content -->
-@if (showLogin) {
+@if (showLogin()) {
   <div>
     <app-login></app-login>
   </div>
 }
-@if (showHomeSetup) {
+@if (showHomeSetup()) {
   <div>
     <app-home-setup></app-home-setup>
   </div>
 }
-@if (showMain) {
+@if (showMain()) {
   <div>
     <app-main-menu></app-main-menu>
   </div>

@@ -14,7 +14,7 @@
           <label for="account-list" class="form-label pt-2">Hauptkonto</label>
           <div class="mb-3">
             <select class="form-select" id="account-list" aria-label="Select Main Account" formControlName="mainAccount">
-              @for (account of accounts; track $index) {
+              @for (account of accounts(); track $index) {
                 <option value="{{ account.id }}">{{ account.name }}</option>
               }
             </select>

@@ -13,7 +13,7 @@
 <div class="container">
   <div class="row">
     <ul class="list-group list-group-flush">
-      @for (account of accounts; track account.id) {
+      @for (account of (accounts() ?? []); track account.id) {
         <li class="list-group-item" id="list-accounts" (click)="onClickAccount(account)">
           <div class="custom-list-item">
             @if (account.accountType === AccountType.giro) {
@@ -30,13 +30,13 @@
     </ul>
   </div>
   <!-- Add Button -->
-  @if (accounts.length > 0) {
+  @if ((accounts()?.length ?? 0) > 0) {
     <div class="position-fixed end-0 bottom-0 me-4 mb-4">
       <button type="button" class="btn btn-primary" (click)="onButtonAddClick()"><i class="bi bi-plus-lg"></i></button>
     </div>
   }
 </div>
-@if (accounts.length == 0 && isInitialized) {
+@if (accounts()?.length === 0 && isInitialized()) {
   <div class="row">
     <div class="card">
       <div class="m-2 mt-3">

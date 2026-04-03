@@ -1,5 +1,5 @@
-import { Component, DestroyRef, inject } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Component, inject } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {HomeService} from "../../services/home/home.service";
 import {Home} from "../../../shared/interfaces/home.model";
@@ -18,7 +18,6 @@ export class HomeSetupComponent {
   private homeService = inject(HomeService);
   private helperService = inject(HelperService);
   private toastService = inject(ToastService);
-  private destroyRef = inject(DestroyRef);
 
 
   joinFormGroup: FormGroup = new FormGroup({
@@ -35,11 +34,15 @@ export class HomeSetupComponent {
   isButtonVisible:  boolean = true;
   isButtonDisabled: boolean = true;
 
-  homes: Home[] = [];
+  readonly homes = toSignal(
+    this.homeService.getAllHomes().pipe(
+      map(homes => homes as Home[])
+    ),
+    { initialValue: [] as Home[] }
+  );
 
   ngOnInit(): void {
     this.createFormGroups();
-    this.subscribeAllHomes();
   }
 
   createFormGroups(): void {
@@ -56,13 +59,6 @@ export class HomeSetupComponent {
         createHomeName: ['', Validators.required]
       }
     );
-  }
-
-  subscribeAllHomes(): void {
-    this.homeService.getAllHomes().pipe(
-      map(homes => homes as Home[]),
-      takeUntilDestroyed(this.destroyRef)
-    ).subscribe(homes => this.homes = homes);
   }
 
   onShow(event: string): void {
@@ -102,7 +98,7 @@ export class HomeSetupComponent {
 
     const searchName: string = this.helperService.createSearchName(this.joinFormGroup.value.joinHomeName);
     const pin: number = this.joinFormGroup.value.joinHomePin;
-    const isHomeExisting: Home | undefined = this.homes.find(home => home.searchName === searchName);
+    const isHomeExisting: Home | undefined = this.homes().find(home => home.searchName === searchName);
 
     if (isHomeExisting) {
       if (isHomeExisting.pin === Number(pin)) {
@@ -128,7 +124,7 @@ export class HomeSetupComponent {
 
     const searchName: string = this.helperService.createSearchName(this.createFormGroup.value.createHomeName);
 
-    if (this.homes.find(home => home.searchName === searchName)) {
+    if (this.homes().find(home => home.searchName === searchName)) {
       this.toastService.showDanger(`${this.createFormGroup.value.createHomeName} existiert bereits`)
     } else {
       // if not exist, create and join!
