@@ -44,6 +44,7 @@ export class InfoAreaComponent {
   );
 
   openUpdateAccountValueModal(): void {
+    (document.activeElement as HTMLElement)?.blur();
     this.updateAccountValueModalRef = this.ngbModal.open(
       this.updateAccountValueModal,
       {

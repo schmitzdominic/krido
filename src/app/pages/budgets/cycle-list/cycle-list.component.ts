@@ -73,6 +73,7 @@ export class CycleListComponent implements OnInit {
    * Opens the modal instance.
    */
   public openAddOrEditCycleModal(): void {
+    (document.activeElement as HTMLElement)?.blur();
     this.addCycleModalRef = this.ngbModal.open(
       this.addCycleModal,
       {

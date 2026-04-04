@@ -96,6 +96,7 @@ export class EntryListComponent implements OnInit, OnDestroy {
   }
 
   openAddOrEditEntryModal(): void {
+    (document.activeElement as HTMLElement)?.blur();
     this.addOrEditEntryModalRef = this.ngbModal.open(
       this.addOrEditEntryModal,
       {

@@ -104,6 +104,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       return;
     }
     this.clickedBudget = budget;
+    (document.activeElement as HTMLElement)?.blur();
     this.activeModalRef = this.ngbModal.open(
       this.viewBudgetModalTemplate,
       {
@@ -124,6 +125,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.onCloseViewBudgetModal();
     this.selectedEntry = entry;
     if (this.editEntryModalTemplate) {
+      (document.activeElement as HTMLElement)?.blur();
       this.editEntryModalRef = this.ngbModal.open(this.editEntryModalTemplate, { size: 'md' });
     }
   }

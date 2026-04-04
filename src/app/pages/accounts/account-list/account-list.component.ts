@@ -55,6 +55,7 @@ export class AccountListComponent {
   }
 
   openAddOrEditAccountModal(): void {
+    (document.activeElement as HTMLElement)?.blur();
     this.addOrEditAccountModalRef = this.ngbModal.open(
       this.addOrEditAccountModal,
       {
@@ -63,6 +64,7 @@ export class AccountListComponent {
   }
 
   openViewAccountModal(): void {
+    (document.activeElement as HTMLElement)?.blur();
     this.viewAccountModalRef = this.ngbModal.open(
       this.viewAccountModal,
       {

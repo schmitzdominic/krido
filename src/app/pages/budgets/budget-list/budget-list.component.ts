@@ -71,6 +71,7 @@ export class BudgetListComponent implements OnInit {
    * Opens the modal to add a new budget.
    */
   public openAddBudgetModal(): void {
+    (document.activeElement as HTMLElement)?.blur();
     this.addBudgetModalRef = this.ngbModal.open(
       this.addBudgetModal,
       {
@@ -84,6 +85,7 @@ export class BudgetListComponent implements OnInit {
    */
   public openEditBudgetModal(budget: Budget & { id: string }): void {
     this.clickedBudget = budget;
+    (document.activeElement as HTMLElement)?.blur();
     this.editBudgetModalRef = this.ngbModal.open(
       this.editBudgetModal,
       {

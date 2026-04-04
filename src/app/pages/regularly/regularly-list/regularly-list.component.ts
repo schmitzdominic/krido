@@ -95,6 +95,7 @@ export class RegularlyListComponent {
   }
 
   openAddOrEditRegularlyModal(): void {
+    (document.activeElement as HTMLElement)?.blur();
     this.addOrEditRegularlyModalRef = this.ngbModal.open(
       this.addOrEditRegularlyModal,
       {

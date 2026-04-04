@@ -92,6 +92,7 @@ export class HistoryListComponent {
   });
 
   openAddOrEditEntryModal(): void {
+    (document.activeElement as HTMLElement)?.blur();
     this.addOrEditEntryModalRef = this.ngbModal.open(
       this.addOrEditEntryModal,
       { size: 'md' });

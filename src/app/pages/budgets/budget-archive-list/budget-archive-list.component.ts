@@ -126,6 +126,7 @@ export class BudgetArchiveListComponent implements OnInit {
    */
   public openEditBudgetModal(budget: Budget & { id: string }): void {
     this.clickedBudget = budget;
+    (document.activeElement as HTMLElement)?.blur();
     this.editBudgetModalRef = this.ngbModal.open(
       this.editBudgetModal,
       {
