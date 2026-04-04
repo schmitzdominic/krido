@@ -8,7 +8,7 @@ import {HelperService} from "../../../../services/helper/helper.service";
 import {User} from "../../../../../shared/interfaces/user.model";
 import {UserService} from "../../../../services/user/user.service";
 import {DbService} from "../../../../services/db.service";
-import { map } from 'rxjs/operators';
+import { map, take } from 'rxjs/operators';
 
 interface AccountTypeInterface {
   value: AccountType,
@@ -132,13 +132,19 @@ export class AddOrEditAccountContentComponent {
   private loadAccounts() {
     this.accountService.getAllAccounts().pipe(
       map(accounts => accounts as (Account & { id: string })[]),
-      takeUntilDestroyed(this.destroyRef)
+      take(1)
     ).subscribe(accounts => {
       this.referenceAccounts = accounts;
       if (this.account?.referenceAccount) {
-        // Editing: nested referenceAccount object has no id field in Firebase,
-        // so match by searchName to find the correct id.
-        const match = accounts.find(a => a.searchName === this.account!.referenceAccount!.searchName);
+        // Try id first (stored for accounts saved with current code), then searchName, then name
+        const refId = (this.account.referenceAccount as any)?.id as string | undefined;
+        let match = refId ? accounts.find(a => a.id === refId) : undefined;
+        if (!match && this.account.referenceAccount.searchName) {
+          match = accounts.find(a => a.searchName === this.account!.referenceAccount!.searchName);
+        }
+        if (!match && this.account.referenceAccount.name) {
+          match = accounts.find(a => a.name === this.account!.referenceAccount!.name);
+        }
         if (match) {
           this.addOrEditAccountFormGroup.controls['referenceAccount'].setValue(match.id);
         }
