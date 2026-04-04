@@ -89,8 +89,10 @@ export class InfoListEntryComponent implements OnChanges {
   }
 
   getValueLeftByBudget(budget: Budget): number {
-    const restBudget: number = budget.limit! - budget.usedLimit!;
-    if (budget.limit! < 0 || restBudget > 0) {
+    const limit = budget.limit ?? 0;
+    const usedLimit = budget.usedLimit ?? 0;
+    const restBudget: number = limit - usedLimit;
+    if (limit < 0 || restBudget > 0) {
       return restBudget;
     }
     return 0;
