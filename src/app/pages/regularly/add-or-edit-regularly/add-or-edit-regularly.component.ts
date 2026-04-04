@@ -342,9 +342,9 @@ export class AddOrEditRegularlyComponent {
         return date;
       }
       case RegularlyCycleType.year: {
-        const d: Date = this.dateService.getDateFromTimestamp(this.selectedDateTimestamp);
-        d.setFullYear(new Date().getFullYear());
-        return d;
+        const date: Date = this.dateService.getDateFromTimestamp(this.selectedDateTimestamp);
+        date.setFullYear(new Date().getFullYear());
+        return date;
       }
       default: return new Date();
     }

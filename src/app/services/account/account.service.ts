@@ -74,4 +74,8 @@ export class AccountService {
   public setValue(date: number, value: number, key: string) {
     return this.dbService.update(`${this.rootPath}/${key}`,{updatedDate: date, value: value});
   }
+
+  public getAccountById(id: string) {
+    return this.dbService.read<Account & { id: string }>(`${this.rootPath}/${id}`);
+  }
 }
