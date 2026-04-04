@@ -15,24 +15,35 @@
     <!-- Kontotyp -->
     <div class="form-field mb-3">
       <label class="form-field__label">Kontotyp</label>
-      <select class="form-field__select-native" formControlName="accountType"
-        id="add-account-type" aria-label="Kontotyp auswählen">
-        @for (accountType of accountTypes; track accountType) {
-          <option value="{{ accountType.value }}">{{ accountType.label }}</option>
+      <div class="segment-control">
+        @for (accountType of accountTypes; track accountType.value) {
+          <button type="button" class="segment-control__btn"
+            [class.segment-control__btn--active]="selectedAccountType.value === accountType.value"
+            (click)="addOrEditAccountFormGroup.controls['accountType'].setValue(accountType.value)">
+            {{ accountType.label }}
+          </button>
         }
-      </select>
+      </div>
     </div>
 
     <!-- Referenzkonto (Kreditkarte) -->
     @if (selectedType === AccountType.creditCard) {
       <div class="form-field mb-3">
         <label class="form-field__label">Referenzkonto</label>
-        <select class="form-field__select-native" formControlName="referenceAccount"
-          id="add-account-credit-card-reference-account" aria-label="Referenzkonto auswählen">
-          @for (referenceAccount of referenceAccounts; track referenceAccount) {
-            <option value="{{ referenceAccount.id }}">{{ referenceAccount.name }}</option>
-          }
-        </select>
+        <div ngbDropdown container="body" placement="bottom-end">
+          <button class="form-field__select" type="button" ngbDropdownToggle>
+            {{ selectedReferenceAccount.name }}
+            <i class="bi bi-chevron-down form-field__chevron"></i>
+          </button>
+          <div ngbDropdownMenu class="sheet-dropdown">
+            @for (referenceAccount of referenceAccounts; track referenceAccount.id) {
+              <button ngbDropdownItem
+                (click)="addOrEditAccountFormGroup.controls['referenceAccount'].setValue(referenceAccount.id)">
+                {{ referenceAccount.name }}
+              </button>
+            }
+          </div>
+        </div>
       </div>
     }
 
@@ -61,16 +72,19 @@
     @if (owners.length > 0) {
       <div class="form-field mb-3">
         <label class="form-field__label">Besitzer hinzufügen</label>
-        <div class="add-row">
-          <select class="form-field__select-native" formControlName="owners"
-            id="add-account-owner" aria-label="Besitzer auswählen">
-            @for (owner of owners; track owner) {
-              <option value="{{ owner.id }}">{{ owner.email }}</option>
-            }
-          </select>
-          <button type="button" class="btn-add" (click)="onAddOwnerButtonClick()">
-            <i class="bi bi-plus-lg"></i>
+        <div ngbDropdown container="body" placement="bottom-end">
+          <button class="form-field__select" type="button" ngbDropdownToggle>
+            Benutzer auswählen
+            <i class="bi bi-chevron-down form-field__chevron"></i>
           </button>
+          <div ngbDropdownMenu class="sheet-dropdown">
+            @for (owner of owners; track owner.id) {
+              <button ngbDropdownItem
+                (click)="addOrEditAccountFormGroup.controls['owners'].setValue(owner.id); onAddOwnerButtonClick()">
+                {{ owner.email }}
+              </button>
+            }
+          </div>
         </div>
       </div>
     }

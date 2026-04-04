@@ -11,23 +11,31 @@
     <!-- Typ -->
     <div class="form-field mb-4">
       <label class="form-field__label">Typ</label>
-      <select class="form-field__select-native" formControlName="entryType"
-        id="add-regularly-entry-type" aria-label="Typ auswählen">
+      <div class="segment-control">
         @for (entryType of entryTypes; track entryType.value) {
-          <option value="{{ entryType.value }}">{{ entryType.label }}</option>
+          <button type="button" class="segment-control__btn"
+            [class.segment-control__btn--active]="selectedEntryType.value === entryType.value"
+            [class.segment-control__btn--income]="entryType.value === incomeEntryType.value && selectedEntryType.value === entryType.value"
+            [class.segment-control__btn--outcome]="entryType.value === expenditureEntryType.value && selectedEntryType.value === entryType.value"
+            (click)="addOrEditRegularlyFormGroup.controls['entryType'].setValue(entryType.value)">
+            {{ entryType.label }}
+          </button>
         }
-      </select>
+      </div>
     </div>
 
     <!-- Zyklus -->
     <div class="form-field mb-3">
       <label class="form-field__label">Zyklus</label>
-      <select class="form-field__select-native" formControlName="cycleType"
-        id="add-regularly-cycle-type" aria-label="Zyklus auswählen">
+      <div class="segment-control">
         @for (cycleType of cycleTypes; track cycleType.value) {
-          <option value="{{ cycleType.value }}">{{ cycleType.label }}</option>
+          <button type="button" class="segment-control__btn"
+            [class.segment-control__btn--active]="selectedCycleType.value === cycleType.value"
+            (click)="addOrEditRegularlyFormGroup.controls['cycleType'].setValue(cycleType.value)">
+            {{ cycleType.label }}
+          </button>
         }
-      </select>
+      </div>
     </div>
 
     <!-- Kurzbeschreibung -->
@@ -52,12 +60,20 @@
     <!-- Konto -->
     <div class="form-field mb-3">
       <label class="form-field__label">Konto</label>
-      <select class="form-field__select-native" formControlName="account"
-        id="add-regularly-account" aria-label="Konto auswählen">
-        @for (account of accounts; track account.id) {
-          <option value="{{ account.id }}">{{ account.name }}</option>
-        }
-      </select>
+      <div ngbDropdown container="body" placement="bottom-end">
+        <button class="form-field__select" type="button" ngbDropdownToggle>
+          {{ selectedAccount.name }}
+          <i class="bi bi-chevron-down form-field__chevron"></i>
+        </button>
+        <div ngbDropdownMenu class="sheet-dropdown">
+          @for (account of accounts; track account.id) {
+            <button ngbDropdownItem
+              (click)="addOrEditRegularlyFormGroup.controls['account'].setValue(account.id)">
+              {{ account.name }}
+            </button>
+          }
+        </div>
+      </div>
     </div>
 
     <!-- Datum (nur bei jährlich) -->
