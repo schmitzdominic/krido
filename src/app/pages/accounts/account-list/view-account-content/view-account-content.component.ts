@@ -3,6 +3,8 @@ import {Account} from "../../../../../shared/interfaces/account.model";
 import {AccountType} from "../../../../../shared/enums/account-type.enum";
 import {PriceService} from "../../../../services/price/price.service";
 
+export type AccountViewMode = 'view' | 'edit' | 'updateBalance';
+
 @Component({
     selector: 'app-view-account-content',
     templateUrl: './view-account-content.component.html',
@@ -18,15 +20,25 @@ export class ViewAccountContentComponent {
 
   @Output() onClose: EventEmitter<any> = new EventEmitter<any>();
 
-  isContentReadOnly: boolean = true;
-  isEditButtonShown: boolean = true;
+  mode: AccountViewMode = 'view';
+
+  get isContentReadOnly(): boolean { return this.mode === 'view'; }
+  get isEditButtonShown(): boolean { return this.mode === 'view'; }
 
   onButtonEdit() {
-    this.isContentReadOnly = !this.isContentReadOnly;
+    this.mode = 'edit';
+  }
+
+  onButtonUpdateBalance() {
+    this.mode = 'updateBalance';
   }
 
   onButtonCancel() {
-    this.onClose.emit();
+    if (this.mode !== 'view') {
+      this.mode = 'view';
+    } else {
+      this.onClose.emit();
+    }
   }
 
   protected readonly AccountType = AccountType;

@@ -11,6 +11,7 @@ import { AccountsComponent } from './accounts.component';
 import { AccountListComponent } from './account-list/account-list.component';
 import { AddOrEditAccountContentComponent } from './account-list/add-or-edit-account-content/add-or-edit-account-content.component';
 import { ViewAccountContentComponent } from './account-list/view-account-content/view-account-content.component';
+import { HomeModule } from '../home/home.module';
 
 @NgModule({
   declarations: [
@@ -28,6 +29,7 @@ import { ViewAccountContentComponent } from './account-list/view-account-content
     MatIconModule,
     MatButtonModule,
     CurrencyMaskModule,
+    HomeModule,
   ],
   exports: [
     AccountsComponent,

@@ -4,24 +4,32 @@
   </button>
 }
 
-@if (!isContentReadOnly) {
+@if (mode === 'edit') {
   <app-add-or-edit-account-content
     [account]="account"
     (onClose)="onButtonCancel()">
   </app-add-or-edit-account-content>
 }
 
-@if (isContentReadOnly) {
+@if (mode === 'updateBalance') {
+  <app-update-account-value
+    [account]="account"
+    (onClose)="onButtonCancel()">
+  </app-update-account-value>
+}
+
+@if (mode === 'view') {
   <div class="modal-body sheet-body">
     <div class="view-header">
       <span class="account-title">{{ account?.name }}</span>
     </div>
 
-    <div class="stats-row">
+    <div class="stats-row" role="button" (click)="onButtonUpdateBalance()">
       <div class="stat-item">
         <span class="stat-label">Kontostand</span>
         <span class="stat-value">{{ priceService.convertNumberToEuro(account!.value) }}</span>
       </div>
+      <i class="bi bi-pencil stat-edit-icon"></i>
     </div>
 
     @if (account?.accountType === AccountType.creditCard) {

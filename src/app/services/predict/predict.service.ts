@@ -226,8 +226,8 @@ export class PredictService {
     return {
       name: account.name,
       searchName: account.searchName,
-      type: value < 0 ? EntryType.outcome : EntryType.income,
-      value: value,
+      type: EntryType.outcome,
+      value: Math.abs(value),
       account: referenceAccount,
       date: date,
       monthString: monthString
