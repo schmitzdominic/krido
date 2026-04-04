@@ -42,6 +42,7 @@ import { BudgetsModule } from "../budgets/budgets.module";
     InfoAreaComponent,
     UpdateAccountValueComponent,
     InfoListEntryComponent,
+    BudgetsModule,
   ],
   schemas: [NO_ERRORS_SCHEMA],
 })
