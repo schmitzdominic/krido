@@ -97,6 +97,21 @@ export class EntryService {
   }
 
   /**
+   * Finds the credit card invoice entry for a given credit card account's searchName and monthString.
+   * @param creditCardSearchName The searchName of the credit card account.
+   * @param monthString The month in YYYYMM format.
+   */
+  public getCreditCardInvoiceEntry(creditCardSearchName: string, monthString: string): Observable<(Entry & { id: string }) | undefined> {
+    return this.dbService.readFilteredList<Entry & { id: string }>(
+      this.rootPath,
+      orderByChild('searchName'),
+      equalTo(creditCardSearchName)
+    ).pipe(
+      map(entries => entries.find(e => e.monthString === monthString))
+    );
+  }
+
+  /**
    * Sucht nach Einträgen, deren Name mit dem angegebenen Suchbegriff beginnt.
    * @param name Der Suchbegriff für den Namen des Eintrags.
    * @returns Ein Observable, das eine Liste von passenden Einträgen mit ihrer ID enthält.

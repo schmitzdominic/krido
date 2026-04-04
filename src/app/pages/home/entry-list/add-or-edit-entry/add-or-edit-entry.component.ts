@@ -1,6 +1,7 @@
 import {Component, EventEmitter, inject, Input, Output} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {EntryType} from "../../../../../shared/enums/entry-type.enum";
+import {AccountType} from "../../../../../shared/enums/account-type.enum";
 import {AccountService} from "../../../../services/account/account.service";
 import {Account} from "../../../../../shared/interfaces/account.model";
 import {Budget} from "../../../../../shared/interfaces/budget.model";
@@ -247,7 +248,14 @@ export class AddOrEditEntryComponent {
    * Handles the delete button click. Deletes the current entry and closes the modal.
    */
   public onButtonDelete(): void {
-    this.entryService.deleteEntry(this.entry!.id).then(() => this.closeModal()).catch(err => console.error("Error deleting entry:", err));
+    const account = this.entry!.account;
+    this.entryService.deleteEntry(this.entry!.id).then(() => {
+      if (account.accountType === AccountType.creditCard) {
+        const delta = -this.getCCDelta(this.entry!.value, this.entry!.type);
+        this.updateCreditCardInvoiceEntry(account, this.entry!.monthString, delta);
+      }
+      this.closeModal();
+    }).catch(err => console.error("Error deleting entry:", err));
   }
 
   /**
@@ -274,14 +282,37 @@ export class AddOrEditEntryComponent {
       (entryData as any).budget = null;
     }
 
-    this.entryService.updateEntry(entryData, this.entry!.id).then(() => this.closeModal()).catch(err => console.error("Error updating entry:", err));
+    const oldAccount = this.entry!.account;
+    const newAccount = this.selectedAccount;
+
+    this.entryService.updateEntry(entryData, this.entry!.id).then(() => {
+      // Reverse old CC contribution
+      if (oldAccount.accountType === AccountType.creditCard) {
+        const reverseDelta = -this.getCCDelta(this.entry!.value, this.entry!.type);
+        this.updateCreditCardInvoiceEntry(oldAccount, this.entry!.monthString, reverseDelta);
+      }
+      // Apply new CC contribution
+      if (newAccount.accountType === AccountType.creditCard) {
+        const forwardDelta = this.getCCDelta(entryData.value, entryData.type);
+        this.updateCreditCardInvoiceEntry(newAccount, entryData.monthString, forwardDelta);
+      }
+      this.closeModal();
+    }).catch(err => console.error("Error updating entry:", err));
   }
 
   /**
    * Handles the logic for adding a new entry.
    */
   private onAdd(): void {
-    this.entryService.addEntry(this.getEntryObject()).then(() => this.closeModal()).catch(err => console.error("Error adding entry:", err));
+    const entryObject = this.getEntryObject();
+    const account = this.selectedAccount;
+    this.entryService.addEntry(entryObject).then(() => {
+      if (account.accountType === AccountType.creditCard) {
+        const delta = this.getCCDelta(entryObject.value, entryObject.type);
+        this.updateCreditCardInvoiceEntry(account, entryObject.monthString, delta);
+      }
+      this.closeModal();
+    }).catch(err => console.error("Error adding entry:", err));
   }
 
   /**
@@ -318,6 +349,23 @@ export class AddOrEditEntryComponent {
   private closeModal(): void {
     (document.activeElement as HTMLElement)?.blur();
     this.onClose.emit();
+  }
+
+  /** Returns the signed delta that a given entry contributes to the CC invoice total. */
+  private getCCDelta(value: number, type: EntryType): number {
+    return type === EntryType.outcome ? value : -value;
+  }
+
+  /** Finds the CC invoice entry for the given account + month and adjusts its value by valueDelta. */
+  private updateCreditCardInvoiceEntry(account: Account, monthString: string, valueDelta: number): void {
+    if (!valueDelta) return;
+    this.entryService.getCreditCardInvoiceEntry(account.searchName, monthString)
+      .pipe(take(1))
+      .subscribe(invoiceEntry => {
+        if (invoiceEntry) {
+          this.entryService.updateEntry({ value: invoiceEntry.value + valueDelta }, invoiceEntry.id!);
+        }
+      });
   }
 
   /**
