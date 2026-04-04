@@ -55,7 +55,7 @@ export class UpdateAccountValueComponent {
 
   createListener() {
     this.updateAccountValueFormGroup.controls['value'].valueChanges.subscribe((value: number) => {
-        return this.isValueInvalid = !value;
+        return this.isValueInvalid = value === null || value === undefined;
     });
   }
 
