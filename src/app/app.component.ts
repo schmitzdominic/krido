@@ -90,7 +90,7 @@ export class AppComponent {
 
   private showMainPage(): void {
     this.setPageState(false, true, false);
-    this.router.navigate([this.mainPage]);
+    this.router.navigate([this.mainPage], { replaceUrl: true });
   }
 
   private showHomeSetupPage(): void {
