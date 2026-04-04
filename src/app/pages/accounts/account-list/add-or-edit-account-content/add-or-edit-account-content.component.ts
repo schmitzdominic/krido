@@ -1,4 +1,4 @@
-import { Component, DestroyRef, EventEmitter, inject, Input, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, DestroyRef, EventEmitter, inject, Input, Output } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {AccountType} from "../../../../../shared/enums/account-type.enum";
@@ -28,6 +28,7 @@ export class AddOrEditAccountContentComponent {
   private userService = inject(UserService);
   private dbService = inject(DbService);
   private destroyRef = inject(DestroyRef);
+  private cdr = inject(ChangeDetectorRef);
 
 
   @Input() account: (Account & { id: string }) | undefined;
@@ -151,6 +152,7 @@ export class AddOrEditAccountContentComponent {
       } else if (!this.account && accounts.length > 0) {
         this.addOrEditAccountFormGroup.controls['referenceAccount'].setValue(accounts[0].id);
       }
+      this.cdr.detectChanges();
     });
   }
 
