@@ -6,7 +6,8 @@ import {Account} from "../../../../shared/interfaces/account.model";
 import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {UserService} from "../../../services/user/user.service";
-import { map } from 'rxjs/operators';
+import { map, observeOn } from 'rxjs/operators';
+import { asapScheduler } from 'rxjs';
 
 @Component({
     selector: 'app-info-area',
@@ -32,7 +33,8 @@ export class InfoAreaComponent {
 
   private readonly allGiroAccounts = toSignal(
     this.accountService.getAllAccountsFilteredByAccountType(AccountType.giro).pipe(
-      map(accounts => accounts as (Account & { id: string })[])
+      map(accounts => accounts as (Account & { id: string })[]),
+      observeOn(asapScheduler)
     ),
     { initialValue: [] as (Account & { id: string })[] }
   );

@@ -3,8 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
+
 import { CurrencyMaskModule } from 'ng2-currency-mask';
 
 import { HistoryComponent } from './history.component';
@@ -22,8 +21,6 @@ import { HomeModule } from "../home/home.module";
     ReactiveFormsModule,
     FormsModule,
     NgbModule,
-    MatIconModule,
-    MatButtonModule,
     CurrencyMaskModule,
     HomeModule
 ],

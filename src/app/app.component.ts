@@ -1,4 +1,4 @@
-import { Component, effect, signal, ViewChild, inject } from '@angular/core';
+import { Component, effect, signal, ViewChild, inject, Injector, runInInjectionContext } from '@angular/core';
 import {UserService} from "./services/user/user.service";
 import {Router} from "@angular/router";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
@@ -18,6 +18,7 @@ export class AppComponent {
   private auth: Auth = inject(Auth);
   private modalService = inject(NgbModal);
   private loadingService = inject(LoadingService);
+  private injector = inject(Injector);
 
   @ViewChild('loadingModal') loadingModal: NgbModalRef | undefined;
 
@@ -57,13 +58,15 @@ export class AppComponent {
   private checkIfUserLoggedIn() {
     onAuthStateChanged(this.auth, (firebaseUser) => {
       if (firebaseUser) {
-        this.userService.getUserObservable(firebaseUser).subscribe(user => {
-          if (!this.userService.isLoggedIn) {
-            this.userService.setLocalStorageUser(user, firebaseUser);
-            this.onLoginStateChanged(true);
-          } else {
-            this.userService.setLocalStorageUser(user, firebaseUser);
-          }
+        runInInjectionContext(this.injector, () => {
+          this.userService.getUserObservable(firebaseUser).subscribe(user => {
+            if (!this.userService.isLoggedIn) {
+              this.userService.setLocalStorageUser(user, firebaseUser);
+              this.onLoginStateChanged(true);
+            } else {
+              this.userService.setLocalStorageUser(user, firebaseUser);
+            }
+          });
         });
       } else {
         this.showLoginPage();

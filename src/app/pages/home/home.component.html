@@ -18,11 +18,11 @@
   <!-- Info area -->
   <app-info-area></app-info-area>
 
-  @if (allBudgets.length > 0) {
+  @if (allBudgets().length > 0) {
     <section class="home-section">
       <h2 class="section-label">Budgets</h2>
       <div class="budget-cards">
-        @for (budget of allBudgets; track budget.id) {
+        @for (budget of allBudgets(); track budget.id) {
           <div class="budget-card" (click)="openViewBudgetModal(budget)">
             <app-budget-list-entry [budget]="budget" class="w-100"></app-budget-list-entry>
           </div>

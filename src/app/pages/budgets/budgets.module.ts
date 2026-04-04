@@ -3,8 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
+
 import { CurrencyMaskModule } from 'ng2-currency-mask';
 
 import { BudgetsComponent } from './budgets.component';
@@ -35,8 +34,6 @@ import { EntryListEntryComponent } from '../../components/entry-list-entry/entry
     ReactiveFormsModule,
     FormsModule,
     NgbModule,
-    MatIconModule,
-    MatButtonModule,
     CurrencyMaskModule,
   ],
   exports: [

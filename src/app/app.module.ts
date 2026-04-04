@@ -8,8 +8,7 @@ import {NgbDateParserFormatter, NgbModule} from "@ng-bootstrap/ng-bootstrap";
 import { MainMenuComponent } from './components/main-menu/main-menu.component';
 import { environment } from '../environments/environment';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import {MatIconModule} from "@angular/material/icon";
-import {MatButtonModule} from '@angular/material/button';
+
 import { LoginComponent } from './components/login/login.component';
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import { HomeSetupComponent } from './components/home-setup/home-setup.component';
@@ -36,8 +35,6 @@ import { getAuth, provideAuth } from '@angular/fire/auth';
     NgbModule,
     AppRoutingModule,
     BrowserAnimationsModule,
-    MatIconModule,
-    MatButtonModule,
     ReactiveFormsModule,
     FormsModule,
     ServiceWorkerModule.register('ngsw-worker.js', {

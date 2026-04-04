@@ -5,8 +5,7 @@ import {AccountService} from "../../../services/account/account.service";
 import {EntryService} from "../../../services/entry/entry.service";
 import {DateService} from "../../../services/date/date.service";
 import {Entry} from "../../../../shared/interfaces/entry.model";
-import {LoadingService} from "../../../services/loading/loading.service";
-import { combineLatest, forkJoin, map, Subject, take, takeUntil } from 'rxjs';
+import { combineLatest, forkJoin, asapScheduler, map, observeOn, Subject, take, takeUntil } from 'rxjs';
 import { Account } from '../../../../shared/interfaces/account.model';
 
 @Component({
@@ -20,9 +19,6 @@ export class EntryListComponent implements OnInit, OnDestroy {
   private accountService = inject(AccountService);
   private entryService = inject(EntryService);
   private dateService = inject(DateService);
-  private loadingService = inject(LoadingService);
-
-
   @ViewChild('addOrEditEntryModal') addOrEditEntryModal: NgbModalRef | undefined;
 
   selectedEntry: (Entry & { id: string }) | undefined;
@@ -53,11 +49,11 @@ export class EntryListComponent implements OnInit, OnDestroy {
   }
 
   loadEntries() {
-    this.loadingService.setLoading = true;
     const actualMonth$ = this.entryService.getAllEntriesByMonthString(this.dateService.getActualMonthString());
     const nextMonth$ = this.entryService.getAllEntriesByMonthString(this.dateService.getMonthStringFromMonth(1));
 
     combineLatest([actualMonth$, nextMonth$]).pipe(
+      observeOn(asapScheduler),
       takeUntil(this.destroy$)).
       subscribe(([actualEntries, nextEntries]) => {
 
@@ -66,8 +62,6 @@ export class EntryListComponent implements OnInit, OnDestroy {
       this.totalActualMonthEntries = actualEntries.length;
       this.totalNextMonthEntries = nextEntries.length;
       this.filterAndSortEntries();
-
-      this.loadingService.setLoading = false;
       });
   }
 

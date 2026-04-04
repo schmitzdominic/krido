@@ -1,4 +1,5 @@
-import { Component, inject, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { Component, computed, inject, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import {DateService} from "../../services/date/date.service";
 import {MenuTitleService} from "../../../shared/behavior/menu-title/menu-title.service";
 import {BudgetService} from "../../services/budget/budget.service";
@@ -7,7 +8,7 @@ import {Entry} from "../../../shared/interfaces/entry.model";
 import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {PredictService} from "../../services/predict/predict.service";
-import { combineLatest, Subject, takeUntil } from 'rxjs';
+import { combineLatest } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 /**
@@ -39,9 +40,27 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   public clickedBudget: Budget & { id: string } | undefined;
   public selectedEntry: (Entry & { id: string }) | undefined;
-  public allBudgets: (Budget & { id: string })[] = [];
 
-  private destroy$ = new Subject<void>();
+  private readonly allTimeBudgets = toSignal(
+    this.budgetService.getAllNoTimeLimitBudgets().pipe(
+      map(budgets => (budgets as (Budget & { id: string })[]).filter(b => !b.isArchived))
+    ),
+    { initialValue: [] as (Budget & { id: string })[] }
+  );
+
+  private readonly monthlyBudgets = toSignal(
+    this.budgetService.getAllMonthlyBudgets().pipe(
+      map(budgets => {
+        const currentMonth = this.dateService.getActualMonthString();
+        return (budgets as (Budget & { id: string })[]).filter(
+          b => !b.isArchived && String(b.validityPeriod) === currentMonth
+        );
+      })
+    ),
+    { initialValue: [] as (Budget & { id: string })[] }
+  );
+
+  readonly allBudgets = computed(() => [...this.allTimeBudgets(), ...this.monthlyBudgets()]);
 
   /**
    * Angular lifecycle hook that runs on component initialization.
@@ -49,7 +68,6 @@ export class HomeComponent implements OnInit, OnDestroy {
   public ngOnInit(): void {
     this.predictService.createEntries();
     this.setInitialValues();
-    this.loadAllBudgets();
   }
 
   /**
@@ -59,8 +77,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     if (this.activeModalRef) {
       this.activeModalRef.close();
     }
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 
   /**
@@ -70,29 +86,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     const actualDate: Date = this.dateService.getActualDate();
     this.menuTitleService.setTitle(this.dateService.getDayShortName(actualDate.getDay()) + ' ' + actualDate.getDate() + '. ' + this.actualMonth + ' ' + this.actualYear);
     this.menuTitleService.setActiveId(1);
-  }
-
-  /**
-   * Loads all-time and monthly budgets concurrently and merges them.
-   */
-  private loadAllBudgets(): void {
-    const allTimeBudgets$ = this.budgetService.getAllNoTimeLimitBudgets();
-    const monthlyBudgets$ = this.budgetService.getAllMonthlyBudgets();
-    const currentMonth = this.dateService.getActualMonthString();
-
-    combineLatest([allTimeBudgets$, monthlyBudgets$]).pipe(
-      map(([allTime, monthly]) => {
-        return [
-          ...(allTime as (Budget & { id: string })[]).filter(b => !b.isArchived),
-          ...(monthly as (Budget & { id: string })[]).filter(
-            b => !b.isArchived && String(b.validityPeriod) === currentMonth
-          )
-        ];
-      }),
-      takeUntil(this.destroy$)
-    ).subscribe(combinedBudgets => {
-      this.allBudgets = combinedBudgets;
-    });
   }
 
   /**
