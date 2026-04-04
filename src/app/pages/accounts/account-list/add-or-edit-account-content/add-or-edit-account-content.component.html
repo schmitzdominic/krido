@@ -1,101 +1,99 @@
-<div>
-  <h1 class="d-flex align-items-center justify-content-center pt-4">{{ title }}</h1>
-</div>
-<div class="modal-body">
-  <form class="needs-validation" [formGroup]="addOrEditAccountFormGroup" (ngSubmit)="onSubmit()" novalidate>
-    <div class="col-md-12 mb-3">
-      <label for="add-account-name" class="form-label">Name</label>
-      <div class="input-group has-validation">
-        <input formControlName="name" type="text" class="form-control" id="add-account-name" aria-describedby="inputGroupPrepend" required>
-        <div class="invalid-feedback">
-          Name fehlt!
-        </div>
-      </div>
+<div class="modal-body sheet-body">
+  <div class="sheet-header">
+    <span class="sheet-header__title">{{ title }}</span>
+  </div>
+
+  <form [formGroup]="addOrEditAccountFormGroup" novalidate>
+
+    <!-- Name -->
+    <div class="form-field mb-3">
+      <label class="form-field__label">Name</label>
+      <input formControlName="name" type="text" class="form-field__input"
+        placeholder="z. B. Sparkasse" autocomplete="off">
     </div>
-    <div class="row">
-      <label for="add-account-type" class="form-label">Kontotyp</label>
-      <div class="mb-3">
-        <select class="form-select" id="add-account-type" aria-label="Select Owner" formControlName="accountType">
-          @for (accountType of accountTypes; track accountType) {
-            <option value="{{ accountType.value }}">{{ accountType.label }}</option>
+
+    <!-- Kontotyp -->
+    <div class="form-field mb-3">
+      <label class="form-field__label">Kontotyp</label>
+      <select class="form-field__select-native" formControlName="accountType"
+        id="add-account-type" aria-label="Kontotyp auswählen">
+        @for (accountType of accountTypes; track accountType) {
+          <option value="{{ accountType.value }}">{{ accountType.label }}</option>
+        }
+      </select>
+    </div>
+
+    <!-- Referenzkonto (Kreditkarte) -->
+    @if (selectedType === AccountType.creditCard) {
+      <div class="form-field mb-3">
+        <label class="form-field__label">Referenzkonto</label>
+        <select class="form-field__select-native" formControlName="referenceAccount"
+          id="add-account-credit-card-reference-account" aria-label="Referenzkonto auswählen">
+          @for (referenceAccount of referenceAccounts; track referenceAccount) {
+            <option value="{{ referenceAccount.id }}">{{ referenceAccount.name }}</option>
           }
         </select>
       </div>
-    </div>
-    @if (selectedType === AccountType.creditCard) {
-      <div class="row">
-        <label for="add-account-credit-card-reference-account" class="form-label">Referenzkonto</label>
-        <div class="col-12 mb-3">
-          <select class="form-select" id="add-account-credit-card-reference-account" aria-label="Select Owner" formControlName="referenceAccount">
-            @for (referenceAccount of referenceAccounts; track referenceAccount) {
-              <option value="{{ referenceAccount.id }}">{{ referenceAccount.name }}</option>
-            }
-          </select>
-        </div>
-      </div>
     }
+
+    <!-- Abbuchungstag -->
     @if (selectedType === AccountType.creditCard && !isLastDay) {
-      <div class="col-md-12 mb-3">
-        <label for="add-account-credit-card-day-number" class="form-label">Tag der Abbuchung</label>
-        <div class="input-group has-validation">
-          <input
-            currencyMask
-            class="form-control"
-            id="add-account-credit-card-day-number"
-            formControlName="creditDay"
-            aria-describedby="inputGroupPrepend"
-            [max]="28"
-            maxlength="2"
-            [options]="{ prefix: '', allowNegative: false, precision: 0 }"
-            inputmode="numeric"
-            pattern="">
-        </div>
+      <div class="form-field mb-3">
+        <label class="form-field__label">Tag der Abbuchung</label>
+        <input currencyMask class="form-field__input"
+          formControlName="creditDay"
+          [max]="28" maxlength="2"
+          [options]="{ prefix: '', allowNegative: false, precision: 0 }"
+          inputmode="numeric">
       </div>
     }
+
+    <!-- Letzter Tag -->
     @if (selectedType === AccountType.creditCard) {
-      <div class="col-12 mb-3">
-        <div class="form-check">
-          <input formControlName="creditLastDay" class="form-check-input" type="checkbox" value="" id="add-account-credit-card-last-day">
-          <label class="form-check-label ps-1" for="add-account-credit-card-last-day">
-            Letzter Tag im Monat
-          </label>
-        </div>
+      <div class="toggle-row mb-3">
+        <label class="toggle-row__label" for="add-account-credit-card-last-day">Letzter Tag im Monat</label>
+        <input formControlName="creditLastDay" class="toggle-row__check" type="checkbox"
+          id="add-account-credit-card-last-day">
       </div>
     }
+
+    <!-- Besitzer -->
     @if (owners.length > 0) {
-      <div class="row">
-        <label for="add-account-owner" class="form-label">Besitzer</label>
-        <div class="col-10 mb-3">
-          <select class="form-select" id="add-account-owner" aria-label="Select Owner" formControlName="owners">
+      <div class="form-field mb-3">
+        <label class="form-field__label">Besitzer hinzufügen</label>
+        <div class="add-row">
+          <select class="form-field__select-native" formControlName="owners"
+            id="add-account-owner" aria-label="Besitzer auswählen">
             @for (owner of owners; track owner) {
               <option value="{{ owner.id }}">{{ owner.email }}</option>
             }
           </select>
-        </div>
-        <div class="col-2 mb-3">
-          <button type="button" class="btn btn-outline-light" (click)="onAddOwnerButtonClick()"><i class="bi bi-plus-lg"></i></button>
+          <button type="button" class="btn-add" (click)="onAddOwnerButtonClick()">
+            <i class="bi bi-plus-lg"></i>
+          </button>
         </div>
       </div>
     }
+
     @if (selectedOwners.length > 0) {
-      <div class="row">
-        <ul class="list-group list-group-flush p-3">
-          <label for="add-account-selected-owner" class="form-label">Ausgewählte Besitzer</label>
-          @for (owner of selectedOwners; track owner) {
-            <li class="list-group-item position-relative" id="add-account-selected-owner">{{ owner.email }}
-              <button type="button" class="btn btn-sm btn-outline-danger position-absolute end-0 top-0" (click)="onRemoveOwnerButtonClick(owner)"><i class="bi bi-trash"></i></button>
-            </li>
-          }
-        </ul>
+      <div class="beneficiary-list mb-3">
+        @for (owner of selectedOwners; track owner) {
+          <div class="beneficiary-item">
+            <span class="beneficiary-name">{{ owner.email }}</span>
+            <button type="button" class="btn-remove" (click)="onRemoveOwnerButtonClick(owner)">
+              <i class="bi bi-trash"></i>
+            </button>
+          </div>
+        }
       </div>
     }
+
   </form>
 </div>
-<div class="modal-footer">
-  <button type="button" class="btn btn-dark" (click)="onButtonCancel()">Abbrechen</button>
-  <button
-    type="button"
-    class="btn btn-light"
+
+<div class="sheet-footer">
+  <button type="button" class="btn-sheet btn-sheet--ghost" (click)="onButtonCancel()">Abbrechen</button>
+  <button type="button" class="btn-sheet btn-sheet--primary"
     [disabled]="addOrEditAccountFormGroup.invalid || selectedOwners.length == 0 || isMonthDayInvalid || (selectedType === AccountType.creditCard && !addOrEditAccountFormGroup.value.referenceAccount)"
-  (click)="onSubmit()">{{ submitButtonText }}</button>
+    (click)="onSubmit()">{{ submitButtonText }}</button>
 </div>

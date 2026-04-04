@@ -1,121 +1,118 @@
-<div>
-  <h1 class="d-flex align-items-center justify-content-center pt-4" [ngClass]="{
-            'text-success' : selectedEntryType.value === incomeEntryType.value,
-            'text-danger' : selectedEntryType.value === expenditureEntryType.value
-         }">{{ title }}</h1>
-</div>
-<div class="modal-body">
-  <form class="needs-validation" [formGroup]="addOrEditRegularlyFormGroup" (ngSubmit)="onSubmit()" novalidate>
-    <div class="mb-4">
-      <select class="form-select" id="add-regularly-entry-type" aria-label="Select entry type" formControlName="entryType">
+<div class="modal-body sheet-body">
+  <div class="sheet-header" [ngClass]="{
+    'sheet-header--income':  selectedEntryType.value === incomeEntryType.value,
+    'sheet-header--outcome': selectedEntryType.value === expenditureEntryType.value
+  }">
+    <span class="sheet-header__title">{{ title }}</span>
+  </div>
+
+  <form [formGroup]="addOrEditRegularlyFormGroup" novalidate>
+
+    <!-- Typ -->
+    <div class="form-field mb-4">
+      <label class="form-field__label">Typ</label>
+      <select class="form-field__select-native" formControlName="entryType"
+        id="add-regularly-entry-type" aria-label="Typ auswählen">
         @for (entryType of entryTypes; track entryType.value) {
           <option value="{{ entryType.value }}">{{ entryType.label }}</option>
         }
       </select>
     </div>
-    <div class="mb-4">
-      <select class="form-select" id="add-regularly-cycle-type" aria-label="Select cycle type" formControlName="cycleType">
+
+    <!-- Zyklus -->
+    <div class="form-field mb-3">
+      <label class="form-field__label">Zyklus</label>
+      <select class="form-field__select-native" formControlName="cycleType"
+        id="add-regularly-cycle-type" aria-label="Zyklus auswählen">
         @for (cycleType of cycleTypes; track cycleType.value) {
           <option value="{{ cycleType.value }}">{{ cycleType.label }}</option>
         }
       </select>
     </div>
-    <div class="col-md-12 mb-3">
-      <label for="add-regularly-name" class="form-label bs-success-text-emphasis">Kurzbeschreibung</label>
-      <div class="input-group has-validation">
-        <input formControlName="name" type="text" class="form-control" id="add-regularly-name" aria-describedby="inputGroupPrepend" required>
-        <div class="invalid-feedback">
-          Kurzbeschreibung fehlt!
-        </div>
-      </div>
+
+    <!-- Kurzbeschreibung -->
+    <div class="form-field mb-3">
+      <label class="form-field__label">Kurzbeschreibung</label>
+      <input formControlName="name" type="text" class="form-field__input"
+        placeholder="z. B. Spotify" autocomplete="off">
     </div>
-    <div class="col-md-12 mb-3">
-      <label for="add-regularly-value" class="form-label">Betrag</label>
-      <div class="input-group has-validation">
-        <input
-          currencyMask
-          class="form-control"
-          id="add-regularly-value"
+
+    <!-- Betrag -->
+    <div class="form-field mb-3">
+      <label class="form-field__label">Betrag</label>
+      <div class="form-field__amount-wrap">
+        <input currencyMask class="form-field__input form-field__input--amount"
           formControlName="value"
-          aria-describedby="inputGroupPrepend"
-          [options]="{ prefix: '', thousands: '', decimal: ',' }"
-          inputmode="numeric">
-        <span class="input-group-text" id="add-regularly-value-symbol">€</span>
-        <div class="invalid-feedback">
-          Betrag fehlt!
-        </div>
+          [options]="{ prefix: '', thousands: '.', decimal: ',' }"
+          inputmode="decimal" placeholder="0,00">
+        <span class="form-field__currency">€</span>
       </div>
     </div>
-    <div class="col-md-12 mb-3">
-      <label for="add-entry-account" class="form-label">Konto</label>
-      <select class="form-select" id="add-entry-account" aria-label="Select entry type" formControlName="account">
+
+    <!-- Konto -->
+    <div class="form-field mb-3">
+      <label class="form-field__label">Konto</label>
+      <select class="form-field__select-native" formControlName="account"
+        id="add-regularly-account" aria-label="Konto auswählen">
         @for (account of accounts; track account.id) {
           <option value="{{ account.id }}">{{ account.name }}</option>
         }
       </select>
     </div>
+
+    <!-- Datum (nur bei jährlich) -->
     @if (selectedCycleType === yearCycleType) {
-      <div class="col-md-12 mb-3">
-        <label for="add-entry-date" class="form-label">Datum</label>
-        <div class="input-group">
-          <input
-            id="add-entry-date"
-            class="form-control"
+      <div class="form-field mb-3">
+        <label class="form-field__label">Datum</label>
+        <div class="form-field__date-wrap">
+          <input id="add-entry-date" class="form-field__input"
             placeholder="{{ selectedDateTimestamp | date: 'dd.MM'}}"
-            name="date"
-            formControlName="date"
-            ngbDatepicker
-            value="{{ selectedDateTimestamp | date: 'dd.MM'}}"
+            name="date" formControlName="date"
+            ngbDatepicker container="body"
             [showWeekNumbers]="true"
             (dateSelect)="onDateSelected($event)"
-            #date="ngbDatepicker"
-            />
-          <button class="btn btn-outline-secondary bi bi-calendar3" (click)="date.toggle()" type="button"></button>
+            #date="ngbDatepicker" readonly />
+          <button class="form-field__date-btn" (click)="date.toggle()" type="button">
+            <i class="bi bi-calendar3"></i>
+          </button>
         </div>
       </div>
     }
+
+    <!-- Tag im Monat -->
     @if (!isLastDay && isMonthDayNeeded) {
-      <div class="col-md-12 mb-3">
-        <label for="add-regularly-month-day-number" class="form-label">Tag im Monat</label>
-        <div class="input-group has-validation">
-          <input
-            currencyMask
-            class="form-control"
-            id="add-regularly-month-day-number"
-            formControlName="monthDay"
-            aria-describedby="inputGroupPrepend"
-            [max]="28"
-            maxlength="2"
-            [options]="{ prefix: '', allowNegative: false, precision: 0 }"
-            inputmode="numeric"
-            pattern="">
-        </div>
+      <div class="form-field mb-3">
+        <label class="form-field__label">Tag im Monat</label>
+        <input currencyMask class="form-field__input"
+          formControlName="monthDay"
+          [max]="28" maxlength="2"
+          [options]="{ prefix: '', allowNegative: false, precision: 0 }"
+          inputmode="numeric">
       </div>
     }
+
+    <!-- Letzter Tag -->
     @if (isMonthDayNeeded) {
-      <div class="col-12 mb-3">
-        <div class="form-check">
-          <input formControlName="lastDay" class="form-check-input" type="checkbox" value="" id="add-regularly-month-last-day">
-          <label class="form-check-label ps-1" for="add-regularly-month-last-day">
-            Letzter Tag im Monat
-          </label>
-        </div>
+      <div class="toggle-row mb-3">
+        <label class="toggle-row__label" for="add-regularly-month-last-day">Letzter Tag im Monat</label>
+        <input formControlName="lastDay" class="toggle-row__check" type="checkbox"
+          id="add-regularly-month-last-day">
       </div>
     }
+
   </form>
-  <div class="pt-2">
-    @if (regularly) {
-      <button type="button" class="btn btn-danger" (click)="onButtonDelete()"><i class="bi bi-trash pe-2"></i>Löschen</button>
-    }
-  </div>
 </div>
-<div class="modal-footer">
-  <button type="button" class="btn btn-dark" (click)="onButtonCancel()">Abbrechen</button>
-  <button
-    type="button"
-    class="btn btn-light"
+
+<div class="sheet-footer">
+  @if (regularly) {
+    <button type="button" class="btn-sheet btn-sheet--danger" (click)="onButtonDelete()">
+      <i class="bi bi-trash"></i>
+    </button>
+  }
+  <button type="button" class="btn-sheet btn-sheet--ghost" (click)="onButtonCancel()">Abbrechen</button>
+  <button type="button" class="btn-sheet btn-sheet--primary"
     [disabled]="isNameInvalid || isValueInvalid || isMonthDayInvalid"
-  (click)="onSubmit()">{{ submitButtonText }}</button>
+    (click)="onSubmit()">{{ submitButtonText }}</button>
 </div>
 
 

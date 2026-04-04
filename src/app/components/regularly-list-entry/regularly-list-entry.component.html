@@ -1,46 +1,17 @@
-<div class="container">
-  <div class="row">
-    <div class="col-1 list-icon">
-      <div class="position-absolute start-0 top-0 ps-3 pt-3">
-        @if (regularly?.cycle === RegularlyCycleType.month) {
-          <i class="bi bi-calendar4-range"></i>
-        }
-        @if (regularly?.cycle === RegularlyCycleType.quarter) {
-          <i class="bi bi-calendar2-week"></i>
-        }
-        @if (regularly?.cycle === RegularlyCycleType.year) {
-          <i class="bi bi-calendar4-event"></i>
-        }
-      </div>
+<div class="reg-item"
+     [class.reg-item--income]="regularly!.entryType === EntryType.income"
+     [class.reg-item--outcome]="regularly!.entryType === EntryType.outcome">
+  <div class="reg-item__body">
+    <div class="reg-item__row">
+      <span class="reg-item__name">{{ regularly!.name }}</span>
+      <span class="reg-item__value" [ngClass]="{
+        'text-success': regularly!.entryType === EntryType.income,
+        'reg-item__value--outcome': regularly!.entryType === EntryType.outcome
+      }">{{ getPrice(regularly!) }}</span>
     </div>
-    <div class="col-11">
-      <div class="container">
-        <!-- upside -->
-        <div class="row upside">
-          <div class="col-9 name">
-            {{ regularly!.name }}
-          </div>
-          <div class="col-3">
-            <div class="position-absolute end-0" [ngClass]="{
-            'text-success' : regularly!.entryType === EntryType.income,
-            'text-danger' : regularly!.entryType === EntryType.outcome
-         }">
-              {{ getPrice(regularly!) }}
-            </div>
-          </div>
-        </div>
-        <!-- downside -->
-        <div class="row downside text-white-50">
-          <div class="col-9 name">
-            {{ regularly!.account.name }}
-          </div>
-          <div class="col-3">
-            <div class="position-absolute end-0">
-              {{ regularly?.cycle === RegularlyCycleType.year ? getDateFromTimestamp(regularly!.date!) : dayOfMonth }}
-            </div>
-          </div>
-        </div>
-      </div>
+    <div class="reg-item__row reg-item__row--sub">
+      <span>{{ regularly!.account.name }}</span>
+      <span>{{ regularly?.cycle === RegularlyCycleType.year ? getDateFromTimestamp(regularly!.date!) : dayOfMonth }}</span>
     </div>
   </div>
 </div>

@@ -10,47 +10,39 @@
     (onClose)="onCloseAddOrEditAccountModal()">
   </app-add-or-edit-account-content>
 </ng-template>
-<div class="container">
-  <div class="row">
-    <ul class="list-group list-group-flush">
+
+<div class="accounts-page">
+  @if ((accounts() ?? []).length > 0) {
+    <div class="entries-card-group">
       @for (account of (accounts() ?? []); track account.id) {
-        <li class="list-group-item" id="list-accounts" (click)="onClickAccount(account)">
-          <div class="custom-list-item">
+        <div class="account-row" (click)="onClickAccount(account)">
+          <div class="account-row__icon">
             @if (account.accountType === AccountType.giro) {
-              <i class="bi bi-bank icon"></i>
+              <i class="bi bi-bank"></i>
             }
             @if (account.accountType === AccountType.creditCard) {
-              <i class="bi bi-credit-card-2-front icon"></i>
+              <i class="bi bi-credit-card-2-front"></i>
             }
-            <span class="name ps-2 pt-1"> {{ account.name }} </span>
-            <span class="limit position-absolute top-0 end-0 pt-3 pe-3 value">{{ priceService.convertNumberToEuro(account.value) }}</span>
           </div>
-        </li>
+          <span class="account-row__name">{{ account.name }}</span>
+          <span class="account-row__value">{{ priceService.convertNumberToEuro(account.value) }}</span>
+        </div>
       }
-    </ul>
-  </div>
-  <!-- Add Button -->
-  @if ((accounts()?.length ?? 0) > 0) {
-    <div class="position-fixed end-0 bottom-0 me-4 mb-4">
-      <button type="button" class="btn btn-primary" (click)="onButtonAddClick()"><i class="bi bi-plus-lg"></i></button>
+    </div>
+  }
+
+  @if (accounts()?.length === 0 && isInitialized()) {
+    <div class="empty-state">
+      <img src="assets/img/no-credit-card.gif" class="empty-state__img" alt="keine Konten">
+      <h2 class="empty-state__title">Keine Konten</h2>
+      <p class="empty-state__text">Du hast noch keine Konten. Ein Konto wird für Abrechnungen benötigt.</p>
+      <button type="button" class="btn-cta" (click)="onButtonAddClick()">Anlegen</button>
     </div>
   }
 </div>
-@if (accounts()?.length === 0 && isInitialized()) {
-  <div class="row">
-    <div class="card">
-      <div class="m-2 mt-3">
-        <img src="assets/img/no-credit-card.gif" class="card-img-top" alt="welcome" style="border-radius: 6px;">
-      </div>
-      <div class="card-body">
-        <h1 class="card-title">Keine Konten</h1>
-        <div class="welcome-card-content">
-          <p class="card-text">Du hast noch keine Konten. Um Abrechnungen erstellen zu können, wird ein Konto benötigt.</p>
-        </div>
-        <div class="position-absolute end-0 bottom-0 me-4 mb-4">
-          <button type="button" class="btn btn-primary" (click)="onButtonAddClick()">Anlegen</button>
-        </div>
-      </div>
-    </div>
-  </div>
+
+@if ((accounts()?.length ?? 0) > 0) {
+  <button type="button" class="fab" (click)="onButtonAddClick()">
+    <i class="bi bi-plus-lg"></i>
+  </button>
 }

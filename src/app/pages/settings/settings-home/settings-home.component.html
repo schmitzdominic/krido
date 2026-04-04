@@ -1,21 +1,15 @@
-<div class="card">
-  <div class="card-body">
-    <h1 class="card-title"><i class="bi bi-house pe-3"></i>Zuhause</h1>
-    <ul class="list-group list-group-flush">
-      <li class="list-group-item" id="setting-home-name">
-        <div class="custom-list-item">
-          <i class="bi bi-house"></i>
-          <span class="name ps-2">Aktuell</span>
-          <span class="limit position-absolute top-0 end-0 pe-3 pt-2">{{ home }}</span>
-        </div>
-      </li>
-      <li class="list-group-item" id="setting-pin">
-        <div class="pt-2 custom-list-item">
-          <i class="bi bi-lock"></i>
-          <span class="name ps-2">PIN</span>
-          <span class="limit position-absolute top-0 end-0 pe-3 pt-3">{{ pin() }}</span>
-        </div>
-      </li>
-    </ul>
+<div class="settings-card">
+  <h2 class="settings-card__title">
+    <i class="bi bi-house me-2"></i>Zuhause
+  </h2>
+  <div class="settings-list">
+    <div class="settings-row">
+      <span class="settings-row__label">Aktuell</span>
+      <span class="settings-row__value">{{ home }}</span>
+    </div>
+    <div class="settings-row">
+      <span class="settings-row__label">PIN</span>
+      <span class="settings-row__value">{{ pin() }}</span>
+    </div>
   </div>
 </div>

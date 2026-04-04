@@ -11,66 +11,45 @@
     (onClose)="onCloseEditBudgetModal()">
   </app-view-budget-content>
 </ng-template>
-<div class="container">
+
+<div class="budget-page">
   @if (noTimeLimitBudgets.length > 0) {
-    <div class="row">
-      <!-- No Time Limit -->
-      <table class="table table-striped">
-        <tbody>
-          @for (budget of noTimeLimitBudgets; track budget.id) {
-            <div class="card p-1 m-2" (click)="onCardClick(budget)">
-              <div class="card-body">
-                <app-budget-list-entry
-                  [budget]="budget">
-                </app-budget-list-entry>
-              </div>
-            </div>
-          }
-        </tbody>
-      </table>
-    </div>
-  }
-  @if (monthlyBudgets.length > 0) {
-    <div class="row">
-      <h2 class="pt-2">Diesen Monat</h2>
-      <!-- Monthly -->
-      <table class="table table-striped">
-        <tbody>
-          @for (budget of monthlyBudgets; track budget.id) {
-            <div class="card p-1 m-2" (click)="onCardClick(budget)">
-              <div class="card-body">
-                <app-budget-list-entry
-                  [budget]="budget">
-                </app-budget-list-entry>
-              </div>
-            </div>
-          }
-        </tbody>
-      </table>
-    </div>
-  }
-  @if (noTimeLimitBudgets.length == 0 && monthlyBudgets.length == 0) {
-    <div class="row">
-      <div class="card">
-        <div class="m-2 mt-3">
-          <img src="assets/img/no-budget.gif" class="card-img-top" alt="no budget" style="border-radius: 6px;">
-        </div>
-        <div class="card-body">
-          <h1 class="card-title">Keine Budgets</h1>
-          <div class="no-budget-card-content">
-            <p class="card-text">Du hast noch keine Budgets angelegt. Lege jetzt direkt eins an oder erstelle einen Zyklus, der für dich bequem Budgets automatisch anlegt.</p>
+    <section>
+      <div class="budget-cards">
+        @for (budget of noTimeLimitBudgets; track budget.id) {
+          <div class="budget-card" (click)="onCardClick(budget)">
+            <app-budget-list-entry [budget]="budget" class="w-100"></app-budget-list-entry>
           </div>
-          <div class="position-absolute end-0 bottom-0 me-4 mb-4">
-            <button type="button" class="btn btn-primary" (click)="onAddClick()">Anlegen</button>
-          </div>
-        </div>
+        }
       </div>
-    </div>
+    </section>
   }
-  <!-- Add Button -->
-  @if (noTimeLimitBudgets.length > 0 || monthlyBudgets.length > 0) {
-    <div class="position-fixed end-0 bottom-0 me-4 mb-4">
-      <button type="button" class="btn btn-primary" (click)="onAddClick()"><i class="bi bi-plus-lg"></i></button>
+
+  @if (monthlyBudgets.length > 0) {
+    <section>
+      <h2 class="section-label">Diesen Monat</h2>
+      <div class="budget-cards">
+        @for (budget of monthlyBudgets; track budget.id) {
+          <div class="budget-card" (click)="onCardClick(budget)">
+            <app-budget-list-entry [budget]="budget" class="w-100"></app-budget-list-entry>
+          </div>
+        }
+      </div>
+    </section>
+  }
+
+  @if (noTimeLimitBudgets.length === 0 && monthlyBudgets.length === 0) {
+    <div class="empty-state">
+      <img src="assets/img/no-budget.gif" class="empty-state__img" alt="keine Budgets">
+      <h2 class="empty-state__title">Keine Budgets</h2>
+      <p class="empty-state__text">Noch keine Budgets angelegt. Lege jetzt eins an oder erstelle einen Zyklus.</p>
+      <button type="button" class="btn-cta" (click)="onAddClick()">Anlegen</button>
     </div>
   }
 </div>
+
+@if (noTimeLimitBudgets.length > 0 || monthlyBudgets.length > 0) {
+  <button type="button" class="fab" (click)="onAddClick()">
+    <i class="bi bi-plus-lg"></i>
+  </button>
+}

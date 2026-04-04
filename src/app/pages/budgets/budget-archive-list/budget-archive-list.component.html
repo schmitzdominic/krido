@@ -5,41 +5,27 @@
     (onClose)="onCloseEditBudgetModal()">
   </app-view-budget-content>
 </ng-template>
-<!-- List of Budgets -->
-<div class="container-fluid">
-  <div class="row">
-    <table class="table">
-      <tbody>
-        @for (budget of noTimeLimitBudgets; track budget.id) {
-          <div class="card p-1 m-2" (click)="onCardClick(budget)">
-            <div class="card-body">
-              <app-budget-list-entry
-                [budget]="budget">
-              </app-budget-list-entry>
-            </div>
+
+<div class="archive-page">
+  @if (noTimeLimitBudgets.length > 0) {
+    <div class="budget-cards">
+      @for (budget of noTimeLimitBudgets; track budget.id) {
+        <div class="budget-card" (click)="onCardClick(budget)">
+          <app-budget-list-entry [budget]="budget" class="w-100"></app-budget-list-entry>
+        </div>
+      }
+    </div>
+  }
+  @for (monthBudget of monthBudgets; track monthBudget.name) {
+    <section>
+      <h2 class="section-label">{{ monthBudget.name }}</h2>
+      <div class="budget-cards">
+        @for (budget of monthBudget.budgets; track budget.id) {
+          <div class="budget-card" (click)="onCardClick(budget)">
+            <app-budget-list-entry [budget]="budget" class="w-100"></app-budget-list-entry>
           </div>
         }
-      </tbody>
-    </table>
-  </div>
-  <div class="row">
-    <table class="table">
-      <tbody>
-        @for (monthBudget of monthBudgets; track monthBudget.name) {
-          <div>
-            <h1>{{ monthBudget.name }}</h1>
-            @for (budget of monthBudget.budgets; track budget.id) {
-              <div class="card p-1 m-2" (click)="onCardClick(budget)">
-                <div class="card-body">
-                  <app-budget-list-entry
-                    [budget]="budget">
-                  </app-budget-list-entry>
-                </div>
-              </div>
-            }
-          </div>
-        }
-      </tbody>
-    </table>
-  </div>
+      </div>
+    </section>
+  }
 </div>

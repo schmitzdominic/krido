@@ -5,41 +5,34 @@
     (onClose)="onCloseAddOrEditCycleModal()">
   </app-add-or-edit-cycle-content>
 </ng-template>
-<div class="container">
-  <div class="row">
-    <ul class="list-group list-group-flush">
+
+<div class="cycle-page">
+  @if (cycles.length > 0) {
+    <div class="entries-card-group">
       @for (cycle of cycles; track cycle.id) {
-        <li class="list-group-item" id="list-cycles" (click)="onCardClick(cycle)">
-          <div class="custom-list-item d-flex justify-content-between align-items-center">
-            <span class="name ps-2"> {{ cycle.name }} </span>
-            <span class="limit pe-3 value">{{ cycle.limit ? priceService.convertNumberToEuro(cycle.limit!) : 'Kein Limit gesetzt' }}</span>
+        <div class="cycle-row" (click)="onCardClick(cycle)">
+          <div class="cycle-row__icon">
+            <i class="bi bi-arrow-repeat"></i>
           </div>
-        </li>
+          <span class="cycle-row__name">{{ cycle.name }}</span>
+          <span class="cycle-row__value">{{ cycle.limit ? priceService.convertNumberToEuro(cycle.limit!) : '–' }}</span>
+        </div>
       }
-    </ul>
-  </div>
-</div>
-@if (cycles.length == 0 && isInitialized) {
-  <div class="row">
-    <div class="card">
-      <div class="m-2 mt-3">
-        <img src="assets/img/no-cycle.gif" class="card-img-top" alt="no cycle" style="border-radius: 6px;">
-      </div>
-      <div class="card-body">
-        <h1 class="card-title">Keine Zyklen</h1>
-        <div class="no-cycle-card-content">
-          <p class="card-text">Du hast noch keinen Zyklus angelegt. Ein Zyklus legt für dich bequem budgets an.</p>
-        </div>
-        <div class="position-absolute end-0 bottom-0 me-4 mb-4">
-          <button type="button" class="btn btn-primary" (click)="onAddClick()">Anlegen</button>
-        </div>
-      </div>
     </div>
-  </div>
-}
-<!-- Add Button -->
+  }
+
+  @if (cycles.length === 0 && isInitialized) {
+    <div class="empty-state">
+      <img src="assets/img/no-cycle.gif" class="empty-state__img" alt="keine Zyklen">
+      <h2 class="empty-state__title">Keine Zyklen</h2>
+      <p class="empty-state__text">Noch keine Zyklen angelegt. Zyklen legen automatisch Budgets für dich an.</p>
+      <button type="button" class="btn-cta" (click)="onAddClick()">Anlegen</button>
+    </div>
+  }
+</div>
+
 @if (cycles.length > 0) {
-  <div class="position-fixed end-0 bottom-0 me-4 mb-4">
-    <button type="button" class="btn btn-primary" (click)="onAddClick()"><i class="bi bi-plus-lg"></i></button>
-  </div>
+  <button type="button" class="fab" (click)="onAddClick()">
+    <i class="bi bi-plus-lg"></i>
+  </button>
 }

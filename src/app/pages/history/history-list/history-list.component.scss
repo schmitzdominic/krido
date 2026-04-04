@@ -1,0 +1,27 @@
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.entries-card-group {
+  background: var(--app-card-bg);
+  border-radius: var(--app-radius);
+  border: 1px solid var(--app-border);
+  overflow: hidden;
+}
+
+.entry-row {
+  cursor: pointer;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  transition: background 0.1s ease;
+  &:last-child { border-bottom: none; }
+  &:active { background: rgba(255, 255, 255, 0.03); }
+}
+
+.empty-hint {
+  color: var(--app-text-muted);
+  font-size: 14px;
+  text-align: center;
+  margin-top: 24px;
+}

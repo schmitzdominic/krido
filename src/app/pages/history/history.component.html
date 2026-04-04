@@ -1,28 +1,30 @@
-<form class="needs-validation" [formGroup]="searchFormGroup" novalidate>
-  <div class="col-md-12 mb-3">
-    <div class="input-group has-validation">
-      <input formControlName="search" type="text" placeholder="Suche" class="form-control" id="invoice-input-search" aria-describedby="inputGroupPrepend" required>
-      <span class="input-group-text" id="inputGroupPrepend"><i class="bi bi-search"></i></span>
-      <div class="invalid-feedback">
+<div class="history-page">
+  <form [formGroup]="searchFormGroup" novalidate>
+    <div class="form-field mb-3">
+      <div class="search-wrap">
+        <i class="bi bi-search search-wrap__icon"></i>
+        <input formControlName="search" type="text" placeholder="Suche..."
+          class="form-field__input search-wrap__input"
+          id="history-search" autocomplete="off">
       </div>
     </div>
-  </div>
-  <div class="col-md-12 mb-3">
-    <select class="form-select" id="user" aria-label="Select user" formControlName="accounts">
-      <option value="">Alle Konten</option>
-      @for (account of accounts; track account.id) {
-        <option value="{{ account.id }}">{{ account.name }}</option>
-      }
-    </select>
-  </div>
-</form>
-@if (!historySearchObject.isLastMonth) {
-  <div class="row">
-    <div class="col-2">
-      <span class="badge bg-light-subtle" style="font-size: 16px; cursor: pointer;" (click)="onClickLastMonth()">Letzter Monat</span>
+    <div class="form-field mb-3">
+      <select class="form-field__select-native" formControlName="accounts"
+        id="history-accounts" aria-label="Konto auswählen">
+        <option value="">Alle Konten</option>
+        @for (account of accounts; track account.id) {
+          <option value="{{ account.id }}">{{ account.name }}</option>
+        }
+      </select>
     </div>
-  </div>
-}
-<app-history-list
-  [historySearchObject]="historySearchObject">
-</app-history-list>
+  </form>
+
+  <button type="button"
+    class="chip-btn mb-3"
+    [class.chip-btn--active]="historySearchObject.isLastMonth"
+    (click)="onClickLastMonth()">
+    <i class="bi bi-clock-history"></i>Letzter Monat
+  </button>
+
+  <app-history-list [historySearchObject]="historySearchObject"></app-history-list>
+</div>
