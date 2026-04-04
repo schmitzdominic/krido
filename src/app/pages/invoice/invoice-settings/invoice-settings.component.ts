@@ -126,6 +126,11 @@ export class InvoiceSettingsComponent {
     return this.invoiceSettingsFormGroup.value.invoiceAccounts;
   }
 
+  public get selectedInvoiceAccountName(): string {
+    const account = this.invoiceAccounts.find(a => a.id === this.selectedInvoiceAccountKey);
+    return account ? account.name : 'Konto auswählen';
+  }
+
   private get selectedBeneficiaryAccountKey(): string {
     return this.invoiceSettingsFormGroup.value.beneficiaryAccounts;
   }

@@ -9,13 +9,24 @@
       </div>
     </div>
     <div class="form-field mb-3">
-      <select class="form-field__select-native" formControlName="accounts"
-        id="history-accounts" aria-label="Konto auswählen">
-        <option value="">Alle Konten</option>
-        @for (account of accounts; track account.id) {
-          <option value="{{ account.id }}">{{ account.name }}</option>
-        }
-      </select>
+      <div ngbDropdown container="body" placement="bottom-end">
+        <button class="form-field__select" type="button" ngbDropdownToggle>
+          {{ selectedAccountName }}
+          <i class="bi bi-chevron-down form-field__chevron"></i>
+        </button>
+        <div ngbDropdownMenu class="sheet-dropdown">
+          <button ngbDropdownItem
+            (click)="searchFormGroup.controls['accounts'].setValue('')">
+            Alle Konten
+          </button>
+          @for (account of accounts; track account.id) {
+            <button ngbDropdownItem
+              (click)="searchFormGroup.controls['accounts'].setValue(account.id)">
+              {{ account.name }}
+            </button>
+          }
+        </div>
+      </div>
     </div>
   </form>
 

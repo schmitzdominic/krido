@@ -4,12 +4,20 @@
     @if (invoiceAccounts.length > 0) {
       <div class="form-field mb-4">
         <label class="form-field__label">Abrechnungskonto</label>
-        <select class="form-field__select-native" formControlName="invoiceAccounts"
-          id="invoice-settings-invoice-accounts" aria-label="Abrechnungskonto auswählen">
-          @for (invoiceAccount of invoiceAccounts; track invoiceAccount.id) {
-            <option value="{{ invoiceAccount.id }}">{{ invoiceAccount.name }}</option>
-          }
-        </select>
+        <div ngbDropdown container="body" placement="bottom-end">
+          <button class="form-field__select" type="button" ngbDropdownToggle>
+            {{ selectedInvoiceAccountName }}
+            <i class="bi bi-chevron-down form-field__chevron"></i>
+          </button>
+          <div ngbDropdownMenu class="sheet-dropdown">
+            @for (invoiceAccount of invoiceAccounts; track invoiceAccount.id) {
+              <button ngbDropdownItem
+                (click)="invoiceSettingsFormGroup.controls['invoiceAccounts'].setValue(invoiceAccount.id)">
+                {{ invoiceAccount.name }}
+              </button>
+            }
+          </div>
+        </div>
       </div>
     }
 
@@ -17,16 +25,19 @@
       <div class="form-field mb-3">
         <label class="form-field__label">Verrechnungskonten</label>
         @if (beneficiaryAccounts.length > 0) {
-          <div class="add-row">
-            <select class="form-field__select-native" formControlName="beneficiaryAccounts"
-              id="invoice-settings-beneficiary-accounts-select" aria-label="Verrechnungskonto auswählen">
-              @for (beneficiaryAccount of beneficiaryAccounts; track beneficiaryAccount.id) {
-                <option value="{{ beneficiaryAccount.id }}">{{ beneficiaryAccount.name }}</option>
-              }
-            </select>
-            <button type="button" class="btn-add" (click)="addSelectedBeneficiaryAccount()">
-              <i class="bi bi-plus-lg"></i>
+          <div ngbDropdown container="body" placement="bottom-end">
+            <button class="form-field__select" type="button" ngbDropdownToggle>
+              Konto hinzufügen
+              <i class="bi bi-chevron-down form-field__chevron"></i>
             </button>
+            <div ngbDropdownMenu class="sheet-dropdown">
+              @for (beneficiaryAccount of beneficiaryAccounts; track beneficiaryAccount.id) {
+                <button ngbDropdownItem
+                  (click)="invoiceSettingsFormGroup.controls['beneficiaryAccounts'].setValue(beneficiaryAccount.id); addSelectedBeneficiaryAccount()">
+                  {{ beneficiaryAccount.name }}
+                </button>
+              }
+            </div>
           </div>
         }
       </div>

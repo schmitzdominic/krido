@@ -8,15 +8,21 @@
       <span class="settings-row__value">{{ userService.user.email }}</span>
     </div>
     <div class="settings-row settings-row--select">
-      <label class="settings-row__label" for="account-list">Hauptkonto</label>
-      <form [formGroup]="settingsUserFormGroup" class="w-100">
-        <select class="settings-select" id="account-list"
-          aria-label="Hauptkonto auswählen" formControlName="mainAccount">
+      <label class="settings-row__label">Hauptkonto</label>
+      <div ngbDropdown container="body" placement="bottom-end" class="w-100">
+        <button class="settings-select" type="button" ngbDropdownToggle>
+          {{ mainAccount?.name || 'Konto auswählen' }}
+          <i class="bi bi-chevron-down settings-chevron"></i>
+        </button>
+        <div ngbDropdownMenu class="sheet-dropdown">
           @for (account of accounts(); track $index) {
-            <option value="{{ account.id }}">{{ account.name }}</option>
+            <button ngbDropdownItem
+              (click)="settingsUserFormGroup.controls['mainAccount'].setValue((account)['id'])">
+              {{ account.name }}
+            </button>
           }
-        </select>
-      </form>
+        </div>
+      </div>
     </div>
   </div>
 </div>

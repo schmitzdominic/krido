@@ -57,6 +57,30 @@
   option { background: #1e2028; color: #e2e8f0; }
 }
 
+.settings-select {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 14px;
+  color: #e2e8f0;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  text-align: left;
+  transition: border-color 0.15s;
+  &.dropdown-toggle::after { display: none; }
+  &:focus, &:active, &.show { border-color: rgba(59, 130, 246, 0.5); outline: none; box-shadow: none; }
+}
+
+.settings-chevron {
+  font-size: 12px;
+  color: #5a6070;
+  flex-shrink: 0;
+}
+
 .logout-btn {
   width: 100%;
   background: rgba(255, 255, 255, 0.04);

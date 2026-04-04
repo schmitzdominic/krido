@@ -50,6 +50,13 @@ export class HistoryComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
+  get selectedAccountName(): string {
+    const id = this.searchFormGroup.value.accounts;
+    if (!id) return 'Alle Konten';
+    const account = this.accounts.find(a => a.id === id);
+    return account ? account.name : 'Alle Konten';
+  }
+
   /** Handles the click event for the "Last Month" button. */
   onClickLastMonth(): void {
     this.historySearchObject = this.getHistorySearchObject('', this.historySearchObject.account, !this.historySearchObject.isLastMonth);
