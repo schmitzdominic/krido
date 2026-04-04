@@ -199,7 +199,10 @@ export class PredictService {
     if (regularly.date) {
       const dateFromTimestamp: Date = this.dateService.getDateFromTimestamp(regularly.date);
       if (this.dateService.getNextMonthNumber() == dateFromTimestamp.getMonth()) {
-        const entry: Entry = this.createEntryObjectFromRegularly(regularly, this.dateService.getAvailableWeekdayAsTimestampFromTimestamp(regularly.date), this.nextMonthString);
+        // Update the year to the current year so the entry isn't placed in the past
+        const currentYear: number = this.dateService.getYear(this.nextMonthString);
+        const correctedDate: Date = new Date(currentYear, dateFromTimestamp.getMonth(), dateFromTimestamp.getDate());
+        const entry: Entry = this.createEntryObjectFromRegularly(regularly, this.dateService.getAvailableWeekdayAsTimestampFromTimestamp(correctedDate.getTime()), this.nextMonthString);
         this.entryService.addEntry(entry);
       }
     }
