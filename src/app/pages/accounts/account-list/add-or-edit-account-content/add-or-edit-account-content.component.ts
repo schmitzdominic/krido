@@ -135,7 +135,14 @@ export class AddOrEditAccountContentComponent {
       takeUntilDestroyed(this.destroyRef)
     ).subscribe(accounts => {
       this.referenceAccounts = accounts;
-      if (!this.account && accounts.length > 0) {
+      if (this.account?.referenceAccount) {
+        // Editing: nested referenceAccount object has no id field in Firebase,
+        // so match by searchName to find the correct id.
+        const match = accounts.find(a => a.searchName === this.account!.referenceAccount!.searchName);
+        if (match) {
+          this.addOrEditAccountFormGroup.controls['referenceAccount'].setValue(match.id);
+        }
+      } else if (!this.account && accounts.length > 0) {
         this.addOrEditAccountFormGroup.controls['referenceAccount'].setValue(accounts[0].id);
       }
     });
