@@ -53,8 +53,11 @@ export class InfoListEntryComponent implements OnChanges {
     if (this.account?.updatedDate) {
       const monthString = this.dateService.getActualMonthString();
 
-      // Budgets
-      const budgets$ = this.budgetService.getAllMonthBudgetsByMonthString(monthString).pipe(
+      // Budgets (month + no-time-limit)
+      const monthBudgets$ = this.budgetService.getAllMonthBudgetsByMonthString(monthString).pipe(
+        map(budgets => budgets as Budget[])
+      );
+      const allTimeBudgets$ = this.budgetService.getAllNoTimeLimitBudgets().pipe(
         map(budgets => budgets as Budget[])
       );
 
@@ -63,9 +66,11 @@ export class InfoListEntryComponent implements OnChanges {
         map(entries => entries as Entry[])
       );
 
-      combineLatest([budgets$, entries$]).pipe(take(1)).subscribe(([budgets, entries]) => runInInjectionContext(this.injector, () => {
+      combineLatest([monthBudgets$, allTimeBudgets$, entries$]).pipe(take(1)).subscribe(([monthBudgets, allTimeBudgets, entries]) => runInInjectionContext(this.injector, () => {
+        const allBudgets = [...monthBudgets, ...allTimeBudgets];
+
         // Process Budgets
-        this.overallValueLeftBudgets = budgets
+        this.overallValueLeftBudgets = allBudgets
           .filter(budget => !budget.isArchived)
           .reduce((acc, budget) => acc + this.getValueLeftByBudget(budget), 0);
 
