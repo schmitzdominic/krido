@@ -26,7 +26,7 @@ export class UpdateAccountValueComponent {
   selectedDate: NgbDate = this.ngbCalendar.getToday();
   selectedDateTimestamp: number = this.dateService.getTimestampFromNgbDate(this.selectedDate);
 
-  isValueInvalid: boolean = true;
+  isValueInvalid: boolean = false;
 
   updateAccountValueFormGroup: FormGroup = new FormGroup({
     date: new FormControl(''),
