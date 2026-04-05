@@ -73,10 +73,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.setInitialValues();
   }
 
-  public regenerateNextMonth(): void {
-    this.predictService.forceCreateNextMonth();
-  }
-
   /**
    * Angular lifecycle hook that runs when the component is destroyed.
    */
