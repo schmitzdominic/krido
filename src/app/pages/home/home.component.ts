@@ -8,6 +8,7 @@ import {Entry} from "../../../shared/interfaces/entry.model";
 import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {PredictService} from "../../services/predict/predict.service";
+import { HomeUIService } from '../../services/home/home-ui.service';
 import { combineLatest } from 'rxjs';
 import { map } from 'rxjs/operators';
 
@@ -26,6 +27,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   private budgetService = inject(BudgetService);
   private ngbModal = inject(NgbModal);
   private predictService = inject(PredictService);
+  protected homeUIService = inject(HomeUIService);
 
   // Reference to the <ng-template> in the HTML
   @ViewChild('viewBudgetModal') private viewBudgetModalTemplate: TemplateRef<any> | undefined;
