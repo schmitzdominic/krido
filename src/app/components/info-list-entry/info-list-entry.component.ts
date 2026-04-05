@@ -58,17 +58,35 @@ export class InfoListEntryComponent implements OnChanges {
     ).subscribe(({ monthBudgets, allTimeBudgets, entries, account }) => {
       const allBudgets = [...monthBudgets, ...allTimeBudgets];
 
+      // Compute usedLimit dynamically from current month entries (stale Firebase field ignored)
+      const budgetUsedLimitMap = new Map<string, number>();
+      for (const entry of entries) {
+        const budgetId = entry.budgetKey ?? (entry as any).budget?.id ?? (entry as any).budget?.key;
+        if (budgetId) {
+          const cur = budgetUsedLimitMap.get(budgetId) ?? 0;
+          const delta = entry.type === EntryType.income ? -entry.value : entry.value;
+          budgetUsedLimitMap.set(budgetId, cur + delta);
+        }
+      }
+
+      // Remaining planned budget (limit minus what's already been spent this month)
       this.overallValueLeftBudgets = allBudgets
         .filter(budget => !budget.isArchived)
-        .reduce((acc, budget) => acc + this.getValueLeftByBudget(budget), 0);
+        .reduce((acc, budget) => {
+          const limit = budget.limit ?? 0;
+          const usedLimit = budgetUsedLimitMap.get((budget as any).id) ?? 0;
+          const restBudget = limit - usedLimit;
+          return acc + (limit < 0 || restBudget > 0 ? restBudget : 0);
+        }, 0);
 
+      // ALL entries for this account after updatedDate (budget-assigned included, they shift
+      // from "planned" to "actual" and reduce the remaining budget above accordingly)
       this.overallValueEntries = entries
         .filter(entry => {
           const entryAccountId = (entry.account as any)?.id ?? (entry.account as any)?.key;
           const currentAccountId = (account as any)?.id ?? (account as any)?.key;
           return entryAccountId && currentAccountId && entryAccountId === currentAccountId
-            && entry.date >= account.updatedDate!
-            && !entry.budgetKey && !(entry as any).budget?.id;  // Budget-Einträge werden über overallValueLeftBudgets berechnet
+            && entry.date >= account.updatedDate!;
         })
         .reduce((acc, entry) => acc + this.getValueLeftByEntry(entry), 0);
 
@@ -93,16 +111,6 @@ export class InfoListEntryComponent implements OnChanges {
 
   getValueLeftByEntry(entry: Entry): number {
     return entry.type === EntryType.income ? -entry.value : entry.value;
-  }
-
-  getValueLeftByBudget(budget: Budget): number {
-    const limit = budget.limit ?? 0;
-    const usedLimit = budget.usedLimit ?? 0;
-    const restBudget: number = limit - usedLimit;
-    if (limit < 0 || restBudget > 0) {
-      return restBudget;
-    }
-    return 0;
   }
 
   calculateOverallRest(): number {
