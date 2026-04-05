@@ -12,6 +12,7 @@ import { AddOrEditEntryComponent } from './entry-list/add-or-edit-entry/add-or-e
 import { InfoAreaComponent } from './info-area/info-area.component';
 import { UpdateAccountValueComponent } from './info-area/update-account-value/update-account-value.component';
 import { InfoListEntryComponent } from '../../components/info-list-entry/info-list-entry.component';
+import { NextMonthCalculatorComponent } from './entry-list/next-month-calculator/next-month-calculator.component';
 import { BudgetsModule } from "../budgets/budgets.module";
 
 @NgModule({
@@ -22,6 +23,7 @@ import { BudgetsModule } from "../budgets/budgets.module";
     InfoAreaComponent,
     UpdateAccountValueComponent,
     InfoListEntryComponent,
+    NextMonthCalculatorComponent,
   ],
   imports: [
     CommonModule,
@@ -39,6 +41,7 @@ import { BudgetsModule } from "../budgets/budgets.module";
     InfoAreaComponent,
     UpdateAccountValueComponent,
     InfoListEntryComponent,
+    NextMonthCalculatorComponent,
     BudgetsModule,
   ],
   schemas: [NO_ERRORS_SCHEMA],

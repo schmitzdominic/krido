@@ -21,10 +21,12 @@ export class EntryListComponent implements OnInit, OnDestroy {
   private entryService = inject(EntryService);
   private dateService = inject(DateService);
   @ViewChild('addOrEditEntryModal') addOrEditEntryModal: NgbModalRef | undefined;
+  @ViewChild('nextMonthCalculatorModal') nextMonthCalculatorModal: NgbModalRef | undefined;
 
   selectedEntry: (Entry & { id: string }) | undefined;
 
   addOrEditEntryModalRef: NgbModalRef | undefined;
+  calculatorModalRef: NgbModalRef | undefined;
 
   actualMonthName: string = this.dateService.getActualMonthName();
   nextMonthName: string = this.dateService.getMonthName(this.dateService.getMonthStringFromMonth(1));
@@ -32,8 +34,8 @@ export class EntryListComponent implements OnInit, OnDestroy {
   actualMonthEntries: (Entry & { id: string })[] = [];
   nextMonthEntries: (Entry & { id: string })[] = [];
 
-  private allActualMonthEntries: (Entry & { id: string })[] = [];
-  private allNextMonthEntries: (Entry & { id: string })[] = [];
+  allActualMonthEntries: (Entry & { id: string })[] = [];
+  allNextMonthEntries: (Entry & { id: string })[] = [];
 
   totalActualMonthEntries: number = -1;
   totalNextMonthEntries: number = -1;
@@ -106,6 +108,20 @@ export class EntryListComponent implements OnInit, OnDestroy {
     if (this.addOrEditEntryModalRef) {
       this.addOrEditEntryModalRef.close();
       this.selectedEntry = undefined;
+    }
+  }
+
+  openCalculatorModal(): void {
+    (document.activeElement as HTMLElement)?.blur();
+    this.calculatorModalRef = this.ngbModal.open(
+      this.nextMonthCalculatorModal,
+      { size: 'md' }
+    );
+  }
+
+  onCloseCalculatorModal(): void {
+    if (this.calculatorModalRef) {
+      this.calculatorModalRef.close();
     }
   }
 

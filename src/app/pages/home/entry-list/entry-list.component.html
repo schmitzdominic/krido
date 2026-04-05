@@ -5,6 +5,14 @@
   </app-add-or-edit-entry>
 </ng-template>
 
+<ng-template #nextMonthCalculatorModal let-modal>
+  <app-next-month-calculator
+    [entries]="allNextMonthEntries"
+    [monthName]="nextMonthName"
+    (onClose)="onCloseCalculatorModal()">
+  </app-next-month-calculator>
+</ng-template>
+
 <!-- SEARCH RESULTS VIEW -->
 @if (homeUIService.searchQuery().trim()) {
   <section class="entry-section">
@@ -76,6 +84,9 @@
     <section class="entry-section">
       <div class="entry-section__header">
         <h2 class="section-label">{{ nextMonthName }}</h2>
+        <button type="button" class="btn-icon" (click)="openCalculatorModal()">
+          <i class="bi bi-calculator"></i>
+        </button>
       </div>
       <div class="entry-card-group">
         @for (entry of nextMonthEntries; track entry.id) {
