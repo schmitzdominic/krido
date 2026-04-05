@@ -117,7 +117,7 @@ export class DateService {
    * @returns {string} The month string.
    */
   public getMonthStringFromDate(date: Date): string {
-    const month = date.getMonth() + 1; // Adjust for 0-based month
+    const month = date.getMonth();
     const year = date.getFullYear();
     return `${year}${month < 10 ? '0' : ''}${month}`;
   }
@@ -143,13 +143,21 @@ export class DateService {
   }
 
   /**
+   * Gets the 0-based month index from a month string ('YYYYMM').
+   * @param {string} monthString The month string (e.g., '202604').
+   * @returns {number} The 0-based month index (0=January, 3=April, etc.).
+   */
+  public getMonthIndex(monthString: string): number {
+    return Number(String(monthString).slice(-2));
+  }
+
+  /**
    * Gets the month name from a month string (e.g., '202201' -> 'Januar').
    * @param {string} monthString The month string in 'YYYYMM' format.
    * @returns {string} The full name of the month.
    */
   public getMonthName(monthString: string): string {
-    // YYYYMM -> MM is 1-based, array is 0-based.
-    const monthIndex: number = Number(String(monthString).slice(-2)) - 1;
+    const monthIndex: number = Number(String(monthString).slice(-2));
     return this.monthNames[monthIndex];
   }
 

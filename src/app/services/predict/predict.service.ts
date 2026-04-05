@@ -68,6 +68,14 @@ export class PredictService {
     this.toastService.showSuccess('Nächster Monat wurde angelegt', 3000);
   }
 
+  public forceCreateNextMonth(): void {
+    this.lastMonthString = this.dateService.getActualMonthString();
+    this.nextMonthString = this.dateService.getMonthStringFromMonth(1);
+    this.createRegularEntries();
+    this.createCreditCardEntries();
+    this.toastService.showSuccess('Nächster Monat wurde generiert', 3000);
+  }
+
   private createBudgets() {
     const currentMonth = this.dateService.getActualMonthString();
 
@@ -186,7 +194,7 @@ export class PredictService {
 
     // Calculate Time for monthly regular entry
     const year: number = this.dateService.getYear(this.nextMonthString);
-    const month: number = this.dateService.getNextMonthNumber();
+    const month: number = this.dateService.getMonthIndex(this.nextMonthString);
     const day: number = regularly.isEndOfMonth ? this.dateService.getLastDayOfMonth(new Date(year, month)) : regularly.monthDay;
 
     const date: Date = new Date(year, month, day);
@@ -198,7 +206,7 @@ export class PredictService {
   private checkRegularYear(regularly: Regularly) {
     if (regularly.date) {
       const dateFromTimestamp: Date = this.dateService.getDateFromTimestamp(regularly.date);
-      if (this.dateService.getNextMonthNumber() == dateFromTimestamp.getMonth()) {
+      if (this.dateService.getMonthIndex(this.nextMonthString) == dateFromTimestamp.getMonth()) {
         // Update the year to the current year so the entry isn't placed in the past
         const currentYear: number = this.dateService.getYear(this.nextMonthString);
         const correctedDate: Date = new Date(currentYear, dateFromTimestamp.getMonth(), dateFromTimestamp.getDate());
@@ -246,7 +254,7 @@ export class PredictService {
   private checkAccountAndCreateEntry(account: Account) {
     // Calculate Time for monthly regular entry
     const year: number = this.dateService.getYear(this.nextMonthString);
-    const month: number = this.dateService.getNextMonthNumber();
+    const month: number = this.dateService.getMonthIndex(this.nextMonthString);
     const day: number = account.creditLastDay ? this.dateService.getLastDayOfMonth(new Date(year, month)) : (account.creditDay ?? 1);
 
     const date: Date = new Date(year, month, day);

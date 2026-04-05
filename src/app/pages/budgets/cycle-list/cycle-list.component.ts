@@ -43,9 +43,12 @@ export class CycleListComponent implements OnInit {
     this.budgetService.getAllCycles().pipe(
       map(cycles => cycles as (Cycle & { id: string })[]),
       takeUntilDestroyed(this.destroyRef)
-    ).subscribe(cycles => {
-      this.cycles = cycles;
-      this.isInitialized = true;
+    ).subscribe({
+      next: cycles => {
+        this.cycles = cycles;
+        this.isInitialized = true;
+      },
+      error: () => { this.isInitialized = true; }
     });
   }
 

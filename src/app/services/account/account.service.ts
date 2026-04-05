@@ -15,7 +15,7 @@ export class AccountService {
   private dbService = inject(DbService);
   private userService = inject(UserService);
 
-  private rootPath: string =  `homes/${this.dbService.home}/accounts`;
+  private get rootPath(): string { return `homes/${this.dbService.home}/accounts`; }
 
   noAccountValue: Account = {
     id: 'id',

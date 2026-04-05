@@ -1,17 +1,15 @@
 import {Injectable, inject} from '@angular/core';
 import {DbService} from "../db.service";
 import {User} from "../../../shared/interfaces/user.model";
-import {Router} from "@angular/router";
 import {Account} from "../../../shared/interfaces/account.model";
 import {Auth, getAuth, signOut} from "firebase/auth";
-import {equalTo, orderByChild, startAt} from "firebase/database";
+import {equalTo, orderByChild} from "firebase/database";
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
   private dbService = inject(DbService);
-  private router = inject(Router);
   private auth: Auth = getAuth();
 
   constructor() { }
@@ -83,10 +81,8 @@ export class UserService {
   }
 
   async signOut() {
-    await signOut(this.auth);
     localStorage.removeItem('user');
-    await this.router.navigate(['/login']);
-    window.location.reload();
+    await signOut(this.auth);
   }
 }
 

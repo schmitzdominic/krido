@@ -9,7 +9,7 @@ export class InvoiceService {
   private dbService = inject(DbService);
 
 
-  private rootPath: string =  `homes/${this.dbService.home}/invoice`;
+  private get rootPath(): string { return `homes/${this.dbService.home}/invoice`; }
 
   /** Inserted by Angular inject() migration for backwards compatibility */
   constructor(...args: unknown[]);

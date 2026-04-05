@@ -48,9 +48,13 @@ export class BudgetsComponent implements OnInit {
       .subscribe(([noTimeLimitBudgets, monthlyBudgets]) => {
         const hasArchivedNoTimeLimit = (noTimeLimitBudgets as Budget[]).some(b => b.isArchived);
         const hasArchivedMonthly = (monthlyBudgets as Budget[]).some(b => b.isArchived);
-        this.isArchiveShown = hasArchivedNoTimeLimit || hasArchivedMonthly;
+        const newArchiveShown = hasArchivedNoTimeLimit || hasArchivedMonthly;
 
-        if (!this.isArchiveShown) {
+        if (newArchiveShown !== this.isArchiveShown) {
+          this.isArchiveShown = newArchiveShown;
+        }
+
+        if (!this.isArchiveShown && this.active === 'archive') {
           this.active = 'budgets';
         }
     });

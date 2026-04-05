@@ -27,7 +27,6 @@ import {catchError} from "rxjs/operators";
 export class DbService {
   private db = getDatabase();
   private ngZone = inject(NgZone);
-  private _home: string | null = null;
 
   private objectVal<T>(dbRef: DatabaseReference | Query): Observable<T | null> {
     return new Observable<T | null>((subscriber) => {
@@ -67,16 +66,14 @@ export class DbService {
    * @returns The home ID string, or an empty string if not found or not yet read.
    */
   get home(): string {
-    if (this._home) return this._home;
     const userItem = localStorage.getItem('user');
     if (!userItem) return '';
     try {
       const home = (JSON.parse(userItem) as User).home;
-      this._home = home ? home : '';
+      return home ? home : '';
     } catch {
-      this._home = '';
+      return '';
     }
-    return this._home;
   }
 
   /**

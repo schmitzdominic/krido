@@ -10,7 +10,7 @@ import {equalTo, orderByChild} from "firebase/database";
 export class RegularlyService {
   private dbService = inject(DbService);
 
-  private rootPath: string = `homes/${this.dbService.home}/regular`;
+  private get rootPath(): string { return `homes/${this.dbService.home}/regular`; }
 
   constructor() { }
 

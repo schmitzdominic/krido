@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, Injector, Input, OnChanges, runInInjectionContext, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {Account} from "../../../shared/interfaces/account.model";
 import {AccountType} from "../../../shared/enums/account-type.enum";
 import {PriceService} from "../../services/price/price.service";
@@ -8,8 +9,7 @@ import {Entry} from "../../../shared/interfaces/entry.model";
 import {EntryType} from "../../../shared/enums/entry-type.enum";
 import {BudgetService} from "../../services/budget/budget.service";
 import {Budget} from "../../../shared/interfaces/budget.model";
-import {combineLatest, map} from "rxjs";
-import {take} from "rxjs/operators";
+import {combineLatest, map, Subject, switchMap} from "rxjs";
 
 @Component({
     selector: 'app-info-list-entry',
@@ -23,9 +23,8 @@ export class InfoListEntryComponent implements OnChanges {
   private dateService = inject(DateService);
   private entryService = inject(EntryService);
   private budgetService = inject(BudgetService);
-  private injector = inject(Injector);
   private cdr = inject(ChangeDetectorRef);
-
+  private destroyRef = inject(DestroyRef);
 
   @Input() account: Account | undefined;
 
@@ -34,9 +33,51 @@ export class InfoListEntryComponent implements OnChanges {
   overallValueLeftBudgets: number = 0;
   overallValueEntries: number = 0;
 
+  private accountChange$ = new Subject<Account>();
+
+  constructor() {
+    this.accountChange$.pipe(
+      switchMap(account => {
+        const monthString = this.dateService.getActualMonthString();
+
+        const monthBudgets$ = this.budgetService.getAllMonthBudgetsByMonthString(monthString).pipe(
+          map(budgets => budgets as Budget[])
+        );
+        const allTimeBudgets$ = this.budgetService.getAllNoTimeLimitBudgets().pipe(
+          map(budgets => budgets as Budget[])
+        );
+        const entries$ = this.entryService.getAllEntriesByMonthString(monthString).pipe(
+          map(entries => entries as Entry[])
+        );
+
+        return combineLatest([monthBudgets$, allTimeBudgets$, entries$]).pipe(
+          map(([monthBudgets, allTimeBudgets, entries]) => ({ monthBudgets, allTimeBudgets, entries, account }))
+        );
+      }),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(({ monthBudgets, allTimeBudgets, entries, account }) => {
+      const allBudgets = [...monthBudgets, ...allTimeBudgets];
+
+      this.overallValueLeftBudgets = allBudgets
+        .filter(budget => !budget.isArchived)
+        .reduce((acc, budget) => acc + this.getValueLeftByBudget(budget), 0);
+
+      this.overallValueEntries = entries
+        .filter(entry => {
+          const entryAccountId = (entry.account as any)?.id ?? (entry.account as any)?.key;
+          const currentAccountId = (account as any)?.id ?? (account as any)?.key;
+          return entryAccountId && currentAccountId && entryAccountId === currentAccountId
+            && entry.date >= account.updatedDate!;
+        })
+        .reduce((acc, entry) => acc + this.getValueLeftByEntry(entry), 0);
+
+      this.cdr.markForCheck();
+    });
+  }
+
   ngOnChanges(changes: SimpleChanges) {
     if (changes['account'] && changes['account'].currentValue) {
-      this.calculateRest();
+      this.accountChange$.next(changes['account'].currentValue);
     }
   }
 
@@ -47,41 +88,6 @@ export class InfoListEntryComponent implements OnChanges {
   getDate() {
     const date: Date = this.dateService.getDateFromTimestamp(this.account?.updatedDate!);
     return `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`;
-  }
-
-  calculateRest() {
-    if (this.account?.updatedDate) {
-      const monthString = this.dateService.getActualMonthString();
-
-      // Budgets (month + no-time-limit)
-      const monthBudgets$ = this.budgetService.getAllMonthBudgetsByMonthString(monthString).pipe(
-        map(budgets => budgets as Budget[])
-      );
-      const allTimeBudgets$ = this.budgetService.getAllNoTimeLimitBudgets().pipe(
-        map(budgets => budgets as Budget[])
-      );
-
-      // Entries
-      const entries$ = this.entryService.getAllEntriesByMonthString(monthString).pipe(
-        map(entries => entries as Entry[])
-      );
-
-      combineLatest([monthBudgets$, allTimeBudgets$, entries$]).pipe(take(1)).subscribe(([monthBudgets, allTimeBudgets, entries]) => runInInjectionContext(this.injector, () => {
-        const allBudgets = [...monthBudgets, ...allTimeBudgets];
-
-        // Process Budgets
-        this.overallValueLeftBudgets = allBudgets
-          .filter(budget => !budget.isArchived)
-          .reduce((acc, budget) => acc + this.getValueLeftByBudget(budget), 0);
-
-        // Process Entries
-        this.overallValueEntries = entries
-          .filter(entry => (entry.account as any)?.id === (this.account as any)?.id && entry.date >= this.account!.updatedDate!)
-          .reduce((acc, entry) => acc + this.getValueLeftByEntry(entry), 0);
-
-        this.cdr.markForCheck();
-      }));
-    }
   }
 
   getValueLeftByEntry(entry: Entry): number {

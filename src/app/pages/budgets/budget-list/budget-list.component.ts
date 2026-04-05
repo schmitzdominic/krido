@@ -116,9 +116,12 @@ export class BudgetListComponent implements OnInit {
     this.budgetService.getAllNoTimeLimitBudgets().pipe(
         map(budgets => budgets as (Budget & { id: string })[]),
         takeUntilDestroyed(this.destroyRef)
-    ).subscribe(budgets => {
-      this.noTimeLimitBudgets = this.processBudgets(budgets);
-      this.isNoTimeLimitInitialized = true;
+    ).subscribe({
+      next: budgets => {
+        this.noTimeLimitBudgets = this.processBudgets(budgets);
+        this.isNoTimeLimitInitialized = true;
+      },
+      error: () => { this.isNoTimeLimitInitialized = true; }
     });
   }
 
@@ -129,9 +132,12 @@ export class BudgetListComponent implements OnInit {
     this.budgetService.getAllMonthlyBudgets().pipe(
         map(budgets => budgets as (Budget & { id: string })[]),
         takeUntilDestroyed(this.destroyRef)
-    ).subscribe(budgets => {
-      this.monthlyBudgets = this.processBudgets(budgets);
-      this.isMonthlyInitialized = true;
+    ).subscribe({
+      next: budgets => {
+        this.monthlyBudgets = this.processBudgets(budgets);
+        this.isMonthlyInitialized = true;
+      },
+      error: () => { this.isMonthlyInitialized = true; }
     });
   }
 

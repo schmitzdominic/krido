@@ -6,10 +6,8 @@
   }
 </div>
 
-@if (active === 'budgets') {
-  <app-budget-list></app-budget-list>
-} @else if (active === 'cycles') {
-  <app-cycle-list></app-cycle-list>
-} @else if (active === 'archive') {
-  <app-budget-archive-list></app-budget-archive-list>
+<app-budget-list [hidden]="active !== 'budgets'"></app-budget-list>
+<app-cycle-list [hidden]="active !== 'cycles'"></app-cycle-list>
+@if (isArchiveShown) {
+  <app-budget-archive-list [hidden]="active !== 'archive'"></app-budget-archive-list>
 }
