@@ -19,7 +19,7 @@
     <section>
       <h2 class="section-label">Monatlich</h2>
       <div class="entries-card-group">
-        @for (regularly of monthRegularities(); track regularly.key) {
+        @for (regularly of monthRegularities(); track regularly.id) {
           <div class="entry-row" (click)="onRegularlyClicked(regularly)">
             <app-regularly-list-entry [regularly]="regularly"></app-regularly-list-entry>
           </div>
@@ -31,7 +31,7 @@
     <section>
       <h2 class="section-label">Quartal</h2>
       <div class="entries-card-group">
-        @for (regularly of quarterRegularities(); track regularly.key) {
+        @for (regularly of quarterRegularities(); track regularly.id) {
           <div class="entry-row" (click)="onRegularlyClicked(regularly)">
             <app-regularly-list-entry [regularly]="regularly"></app-regularly-list-entry>
           </div>
@@ -43,7 +43,7 @@
     <section>
       <h2 class="section-label">Jährlich</h2>
       <div class="entries-card-group">
-        @for (regularly of yearRegularities(); track regularly.key) {
+        @for (regularly of yearRegularities(); track regularly.id) {
           <div class="entry-row" (click)="onRegularlyClicked(regularly)">
             <app-regularly-list-entry [regularly]="regularly"></app-regularly-list-entry>
           </div>
