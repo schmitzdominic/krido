@@ -19,7 +19,7 @@
           <i class="bi" [ngClass]="homeUIService.isSearchActive() ? 'bi-x-lg' : 'bi-search'"></i>
         </button>
         @if (!homeUIService.isSearchActive() && !homeUIService.isAccountsExpanded()) {
-          <div ngbDropdown placement="bottom-end">
+          <div ngbDropdown placement="bottom-end" container="body">
             <button type="button" class="btn btn-icon-nav no-caret" ngbDropdownToggle>
               <i class="bi bi-three-dots-vertical"></i>
             </button>

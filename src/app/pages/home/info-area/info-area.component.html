@@ -8,6 +8,9 @@
   <section class="accounts-section">
     <div class="accounts-section__header">
       <h2 class="section-label">Konten</h2>
+      <button type="button" class="btn-icon" (click)="homeUIService.hideAccounts()">
+        <i class="bi bi-eye-slash"></i>
+      </button>
     </div>
     <div class="account-cards">
       @for (account of accounts(); track account.id) {

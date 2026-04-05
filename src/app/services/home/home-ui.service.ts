@@ -22,6 +22,11 @@ export class HomeUIService {
     localStorage.setItem(this.STORAGE_KEY, this.dateService.getActualMonthString());
   }
 
+  hideAccounts(): void {
+    this.isAccountsExpanded.set(false);
+    localStorage.removeItem(this.STORAGE_KEY);
+  }
+
   toggleSearch(): void {
     const next = !this.isSearchActive();
     this.isSearchActive.set(next);
