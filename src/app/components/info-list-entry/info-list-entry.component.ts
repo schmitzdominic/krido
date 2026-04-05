@@ -58,9 +58,20 @@ export class InfoListEntryComponent implements OnChanges {
     ).subscribe(({ monthBudgets, allTimeBudgets, entries, account }) => {
       const allBudgets = [...monthBudgets, ...allTimeBudgets];
 
-      // Compute usedLimit dynamically from current month entries (stale Firebase field ignored)
+      // Only entries for THIS account after updatedDate — same set for both calculations.
+      // Entries before updatedDate are already baked into account.value; entries from other
+      // accounts don't affect this account's balance.
+      const relevantEntries = entries.filter(entry => {
+        const entryAccountId = (entry.account as any)?.id ?? (entry.account as any)?.key;
+        const currentAccountId = (account as any)?.id ?? (account as any)?.key;
+        return entryAccountId && currentAccountId && entryAccountId === currentAccountId
+          && entry.date >= account.updatedDate!;
+      });
+
+      // Compute how much of each budget has been spent via the relevant entries.
+      // This way pre-updatedDate or other-account entries don't distort the remaining budget.
       const budgetUsedLimitMap = new Map<string, number>();
-      for (const entry of entries) {
+      for (const entry of relevantEntries) {
         const budgetId = entry.budgetKey ?? (entry as any).budget?.id ?? (entry as any).budget?.key;
         if (budgetId) {
           const cur = budgetUsedLimitMap.get(budgetId) ?? 0;
@@ -69,7 +80,7 @@ export class InfoListEntryComponent implements OnChanges {
         }
       }
 
-      // Remaining planned budget (limit minus what's already been spent this month)
+      // Remaining planned budget (future spending still to come this month)
       this.overallValueLeftBudgets = allBudgets
         .filter(budget => !budget.isArchived)
         .reduce((acc, budget) => {
@@ -79,15 +90,9 @@ export class InfoListEntryComponent implements OnChanges {
           return acc + (limit < 0 || restBudget > 0 ? restBudget : 0);
         }, 0);
 
-      // ALL entries for this account after updatedDate (budget-assigned included, they shift
-      // from "planned" to "actual" and reduce the remaining budget above accordingly)
-      this.overallValueEntries = entries
-        .filter(entry => {
-          const entryAccountId = (entry.account as any)?.id ?? (entry.account as any)?.key;
-          const currentAccountId = (account as any)?.id ?? (account as any)?.key;
-          return entryAccountId && currentAccountId && entryAccountId === currentAccountId
-            && entry.date >= account.updatedDate!;
-        })
+      // Sum all relevant entries (budget-assigned ones cancel out against overallValueLeftBudgets,
+      // so their net effect on rest is 0 — only non-budget entries move the needle)
+      this.overallValueEntries = relevantEntries
         .reduce((acc, entry) => acc + this.getValueLeftByEntry(entry), 0);
 
       this.cdr.markForCheck();
