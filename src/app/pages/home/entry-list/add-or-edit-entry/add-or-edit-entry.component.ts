@@ -108,7 +108,7 @@ export class AddOrEditEntryComponent {
         name: [this.entry ? this.entry.name : '', Validators.required],
         value: [this.entry ? this.entry.value : ''],
         account: [this.entry ? ((this.entry.account as any)?.id ?? (this.entry.account as any)?.key ?? '') : ''],
-        budget: [this.entry ? (this.entry.budget as any)?.key : ''],
+        budget: [this.entry ? (this.entry.budgetKey ?? (this.entry.budget as any)?.id ?? (this.entry.budget as any)?.key ?? '') : ''],
         date: [this.entry ? this.entry.date : this.selectedDate]
       }
     );
@@ -213,7 +213,17 @@ export class AddOrEditEntryComponent {
             ...activeBudgets
           ];
     
-          if (!this.entry?.budget) {
+          // Resolve the budget id from either budgetKey (new entries) or budget.id/key (old entries)
+          const entryBudgetId = this.entry
+            ? (this.entry.budgetKey ?? (this.entry.budget as any)?.id ?? (this.entry.budget as any)?.key ?? null)
+            : null;
+          if (entryBudgetId) {
+            const matched = this.budgets.find(b => b.id === entryBudgetId || b.key === entryBudgetId);
+            this.addOrEditEntryFormGroup.controls['budget'].setValue(
+              matched ? (matched.key ?? matched.id) : this.noBudgetKey,
+              { emitEvent: false }
+            );
+          } else {
             this.addOrEditEntryFormGroup.controls['budget'].setValue(this.noBudgetKey, { emitEvent: false });
           }
         },
