@@ -1,4 +1,5 @@
 import {Component, EventEmitter, inject, Input, Output} from '@angular/core';
+import {UserService} from '../../../../services/user/user.service';
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {EntryType} from "../../../../../shared/enums/entry-type.enum";
 import {AccountType} from "../../../../../shared/enums/account-type.enum";
@@ -31,6 +32,7 @@ export class AddOrEditEntryComponent {
   private helperService = inject(HelperService);
   private ngbCalendar = inject(NgbCalendar);
   private entryService = inject(EntryService);
+  private userService = inject(UserService);
 
   private destroy$ = new Subject<void>();
 
@@ -105,7 +107,7 @@ export class AddOrEditEntryComponent {
         entryType: [this.entry ? this.entry.type : this.selectedEntryType.value],
         name: [this.entry ? this.entry.name : '', Validators.required],
         value: [this.entry ? this.entry.value : ''],
-        account: [this.entry ? (this.entry.account as any)?.id : ''],
+        account: [this.entry ? ((this.entry.account as any)?.id ?? (this.entry.account as any)?.key ?? '') : ''],
         budget: [this.entry ? (this.entry.budget as any)?.key : ''],
         date: [this.entry ? this.entry.date : this.selectedDate]
       }
@@ -172,8 +174,19 @@ export class AddOrEditEntryComponent {
       .subscribe({
         next: (accounts) => {
           this.accounts = accounts as (Account & { id: string })[];
-          if (!this.entry && this.accounts.length > 0) {
-            this.addOrEditEntryFormGroup.controls['account'].setValue(this.accounts[0].id, { emitEvent: false });
+          if (this.entry) {
+            // Editing: resolve account by id OR key (old entries may use key)
+            const entryAccId = (this.entry.account as any)?.id ?? (this.entry.account as any)?.key;
+            const matched = this.accounts.find(a => a.id === entryAccId);
+            if (matched) {
+              this.addOrEditEntryFormGroup.controls['account'].setValue(matched.id, { emitEvent: false });
+            }
+          } else if (this.accounts.length > 0) {
+            // New entry: prefer main account, fallback to first account
+            const mainId = (this.userService.mainAccount as any)?.id ?? (this.userService.mainAccount as any)?.key;
+            const mainAccount = mainId ? this.accounts.find(a => a.id === mainId) : null;
+            const defaultAcc = mainAccount ?? this.accounts[0];
+            this.addOrEditEntryFormGroup.controls['account'].setValue(defaultAcc.id, { emitEvent: false });
           }
         },
         error: (err) => console.error('Fehler beim Laden der Konten', err)
