@@ -17,11 +17,6 @@
           "destination": "/index.html"
         }
       ]
-    },
-    {
-      "target": "krido",
-      "source": ".",
-      "frameworksBackend": {}
     }
   ]
 }

@@ -10,7 +10,7 @@
           "baseHref": ""
         },
         "locales": {
-          "en-US": "src/assets/locale/messages.en.xl"
+          "en-US": "src/assets/locale/messages.en.xlf"
         }
       },
       "projectType": "application",
