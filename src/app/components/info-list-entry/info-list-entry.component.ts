@@ -59,16 +59,20 @@ export class InfoListEntryComponent implements OnChanges {
       const allBudgets = [...monthBudgets, ...allTimeBudgets];
       const currentAccountId = (account as any)?.id ?? (account as any)?.key;
 
-      // Only entries for THIS account after updatedDate — same set for both calculations.
-      const relevantEntries = entries.filter(entry => {
+      // All entries after updatedDate (across ALL accounts) — needed for budget usage calculation.
+      const allEntriesAfterUpdate = entries.filter(entry => entry.date >= account.updatedDate!);
+
+      // Only entries for THIS account after updatedDate — for overallValueEntries.
+      const relevantEntries = allEntriesAfterUpdate.filter(entry => {
         const entryAccountId = (entry.account as any)?.id ?? (entry.account as any)?.key;
-        return entryAccountId && currentAccountId && entryAccountId === currentAccountId
-          && entry.date >= account.updatedDate!;
+        return entryAccountId && currentAccountId && entryAccountId === currentAccountId;
       });
 
-      // Compute how much of each budget has been spent via the relevant entries.
+      // Compute how much of each budget has been spent via ALL accounts (e.g. credit card entries
+      // assigned to a budget will later trigger an invoice on this account — so they must reduce
+      // the budget's remaining allowance here to avoid double-counting with the invoice entry).
       const budgetUsedLimitMap = new Map<string, number>();
-      for (const entry of relevantEntries) {
+      for (const entry of allEntriesAfterUpdate) {
         const budgetId = entry.budgetKey ?? (entry as any).budget?.id ?? (entry as any).budget?.key;
         if (budgetId) {
           const cur = budgetUsedLimitMap.get(budgetId) ?? 0;
