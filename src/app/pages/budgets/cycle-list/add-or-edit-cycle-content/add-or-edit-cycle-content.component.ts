@@ -1,4 +1,5 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import { Component, DestroyRef, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {Cycle} from "../../../../../shared/interfaces/cycle.model";
 import {CycleType} from "../../../../../shared/enums/cycle-type.enum";
@@ -7,35 +8,44 @@ import {ToastService} from "../../../../services/toast/toast.service";
 import {Budget} from "../../../../../shared/interfaces/budget.model";
 import {HelperService} from "../../../../services/helper/helper.service";
 import {DateService} from "../../../../services/date/date.service";
+import { map } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-add-or-edit-cycle-content',
-  templateUrl: './add-or-edit-cycle-content.component.html',
-  styleUrls: ['./add-or-edit-cycle-content.component.scss']
+    selector: 'app-add-or-edit-cycle-content',
+    templateUrl: './add-or-edit-cycle-content.component.html',
+    styleUrls: ['./add-or-edit-cycle-content.component.scss'],
+    standalone: false
 })
-export class AddOrEditCycleContentComponent {
+export class AddOrEditCycleContentComponent implements OnInit {
+  private formBuilder = inject(FormBuilder);
+  private toastService = inject(ToastService);
+  private helperService = inject(HelperService);
+  private dateService = inject(DateService);
+  private budgetService = inject(BudgetService);
+  private destroyRef = inject(DestroyRef);
 
-  @Input() cycle: Cycle | undefined;
 
-  @Output() onClose: EventEmitter<any> = new EventEmitter<any>();
+  @Input() public cycle: (Cycle & { id: string }) | undefined;
 
-  title: string = 'Zyklus erstellen';
-  submitButtonText: string = 'Erstellen';
+  @Output() public onClose: EventEmitter<any> = new EventEmitter<any>();
 
-  errorCycleCouldNotBeChanged: string = 'Es tut mir leid, der Zyklus konnte nicht editiert werden!';
-  errorTypeNotImplemented: string = 'Der ausgewählte Cycle Typ ist nicht implementiert!';
-  deleteSuccessMessage: string = '';
+  public title: string = 'Zyklus erstellen';
+  public submitButtonText: string = 'Erstellen';
 
-  isLimitVisible: boolean = false;
-  isCreateNowVisible: boolean = true;
-  isNameInvalid: boolean = true;
-  isLimitInvalid: boolean = false;
+  public errorCycleCouldNotBeChanged: string = 'Es tut mir leid, der Zyklus konnte nicht editiert werden!';
+  public errorTypeNotImplemented: string = 'Der ausgewählte Cycle Typ ist nicht implementiert!';
+  public deleteSuccessMessage: string = '';
 
-  chosenCycleType: CycleType = CycleType.monthly;
+  public isLimitVisible: boolean = false;
+  public isCreateNowVisible: boolean = true;
+  public isNameInvalid: boolean = true;
+  public isLimitInvalid: boolean = false;
 
-  budgets: Budget[] = [];
+  public chosenCycleType: CycleType = CycleType.monthly;
 
-  addCycleFormGroup: FormGroup = new FormGroup({
+  public budgets: (Budget & { id: string })[] = [];
+
+  public addCycleFormGroup: FormGroup = new FormGroup({
     name: new FormControl(''),
     initialLimit: new FormControl(''),
     limit: new FormControl(''),
@@ -43,21 +53,20 @@ export class AddOrEditCycleContentComponent {
     createNow: new FormControl('')
   });
 
-  constructor(private formBuilder: FormBuilder,
-              private toastService: ToastService,
-              private helperService: HelperService,
-              private dateService: DateService,
-              private budgetService: BudgetService) {
-  }
-
-  ngOnInit() {
+  /**
+   * Initializes the component.
+   */
+  public ngOnInit() {
     this.loadBudgets();
     this.createFormGroup();
     this.setValidators();
     this.fillFormIfCycle();
   }
 
-  createFormGroup() {
+  /**
+   * Creates the form group.
+   */
+  private createFormGroup() {
     this.addCycleFormGroup = this.formBuilder.group(
       {
         name: [this.cycle ? this.cycle.name : '', Validators.required],
@@ -69,14 +78,23 @@ export class AddOrEditCycleContentComponent {
     );
   }
 
-  setValidators() {
-    this.addCycleFormGroup.controls['name'].valueChanges.subscribe((name: string) => {
-      this.isNameInvalid = name.length <= 0;
-    });
-    this.addCycleFormGroup.controls['limit'].valueChanges.subscribe((limit: number) => {
-      this.isLimitInvalid = limit <= 0;
-    });
-    this.addCycleFormGroup.controls['initialLimit'].valueChanges.subscribe(initialLimit => {
+  /**
+   * Sets up validators and subscriptions.
+   */
+  private setValidators() {
+    this.addCycleFormGroup.controls['name'].valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((name: string) => {
+        this.isNameInvalid = name.length <= 0;
+      });
+    this.addCycleFormGroup.controls['limit'].valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((limit: number) => {
+        this.isLimitInvalid = limit <= 0;
+      });
+    this.addCycleFormGroup.controls['initialLimit'].valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(initialLimit => {
       if (!this.isLimitVisible && initialLimit) {
         this.addCycleFormGroup.controls['limit'].setValue(0);
       }
@@ -87,7 +105,10 @@ export class AddOrEditCycleContentComponent {
     });
   }
 
-  fillFormIfCycle() {
+  /**
+   * Fills the form if a cycle is present.
+   */
+  private fillFormIfCycle() {
     if (this.cycle) {
       this.title = 'Zyklus editieren';
       this.submitButtonText = 'Ändern'
@@ -103,22 +124,25 @@ export class AddOrEditCycleContentComponent {
     }
   }
 
-  loadBudgets(): void {
+  /**
+   * Loads the budgets for the cycle.
+   */
+  private loadBudgets(): void {
     if (this.cycle) {
-      this.budgetService.getAllBudgetsByCycle(this.cycle.key!).subscribe(budgets => {
-        this.budgets.length = 0;
-        budgets.forEach(budgetRaw => {
-          const budget: Budget = budgetRaw.payload.val() as Budget;
-          budget.key = budgetRaw.key ? budgetRaw.key : '';
-          this.budgets.push(budget);
-        });
+      this.budgetService.getAllBudgetsByCycle(this.cycle.id).pipe(
+        map(budgets => budgets as (Budget & { id: string })[]),
+        takeUntilDestroyed(this.destroyRef)
+      ).subscribe(budgets => {
+        this.budgets = budgets;
       });
     }
   }
 
-  onSubmit() {
-    let cycle = this.createCycleObjectFromInput();
-    this.setInitialLimit(cycle);
+  /**
+   * Handles the submit event.
+   */
+  public onSubmit() {
+    const cycle = this.createCycleObjectFromInput();
     if (this.cycle) {
       // on Change
       this.changeCycle(cycle);
@@ -128,38 +152,45 @@ export class AddOrEditCycleContentComponent {
     }
   }
 
-  onDelete() {
-    if (this.cycle && this.cycle.key) {
-      this.budgetService.deleteCycle(this.cycle.key).then(() => {
+  /**
+   * Deletes the current cycle.
+   */
+  public onDelete() {
+    if (this.cycle && this.cycle.id) {
+      this.budgetService.deleteCycle(this.cycle.id).then(() => {
         this.toastService.showSuccess(this.deleteSuccessMessage);
         this.onClose.emit();
       });
     }
   }
 
-  createCycleObjectFromInput(): Cycle {
-    const name: string = this.addCycleFormGroup.value.name;
+  /**
+   * Creates a cycle object from the input.
+   * @returns {Cycle & { id: string }} The cycle object.
+   */
+  private createCycleObjectFromInput(): Cycle & { id: string } {
+    const formValue = this.addCycleFormGroup.getRawValue();
+    const name: string = formValue.name;
+    const limit = formValue.initialLimit ? Number(formValue.limit) : 0;
+
     return {
+      id: this.cycle?.id ?? '',
       searchName: this.helperService.createSearchName(name),
       name: name,
-      isTransfer: !!this.addCycleFormGroup.value.transfer,
-      type: this.chosenCycleType
+      isTransfer: !!formValue.transfer,
+      type: this.chosenCycleType,
+      limit: limit
     };
   }
 
-  setInitialLimit(cycle: Cycle) {
-    if (this.addCycleFormGroup.value.initialLimit) {
-      cycle.limit = Number(this.addCycleFormGroup.value.limit);
-    } else {
-      cycle.limit = Number(0);
-    }
-  }
-
-  changeCycle(cycle: Cycle) {
-    if (this.cycle && this.cycle.key) {
-      const key: string = this.cycle.key;
-      delete cycle['key'];
-      this.budgetService.updateCycle(cycle, key).then(() => {
+  /**
+   * Updates the cycle.
+   * @param {Cycle & { id: string }} cycle The cycle to update.
+   */
+  private changeCycle(cycle: Cycle & { id: string }) {
+    if (this.cycle && this.cycle.id) {
+      const { id, ...cycleData } = cycle;
+      this.budgetService.updateCycle(cycleData, this.cycle.id).then(() => {
         this.onClose.emit();
       });
     } else {
@@ -168,8 +199,13 @@ export class AddOrEditCycleContentComponent {
     }
   }
 
-  addCycle(cycle: Cycle) {
-    this.budgetService.addCycle(cycle).then(cycleReference => {
+  /**
+   * Adds a new cycle.
+   * @param {Cycle & { id: string }} cycle The cycle to add.
+   */
+  private addCycle(cycle: (Cycle & { id: string })) {
+    const { id, ...cycleData } = cycle;
+    this.budgetService.addCycle(cycleData as any).then((cycleReference => {
       if (this.addCycleFormGroup.value.createNow) {
         if (cycleReference.key) {
           this.createBudgetForThisCycle(cycleReference.key)?.then(() => {
@@ -181,10 +217,15 @@ export class AddOrEditCycleContentComponent {
       } else {
         this.onClose.emit();
       }
-    });
+    }));
   }
 
-  createBudgetForThisCycle(cycleKey: string) {
+  /**
+   * Creates a budget for the cycle.
+   * @param {string} cycleKey The key of the cycle.
+   * @returns {Promise<any> | null} The promise or null.
+   */
+  private createBudgetForThisCycle(cycleKey: string) {
     const name: string = this.addCycleFormGroup.value.name;
     switch(this.chosenCycleType) {
       case CycleType.monthly: {
@@ -205,13 +246,13 @@ export class AddOrEditCycleContentComponent {
     }
   }
 
-  onCancel() {
+  public onCancel() {
     this.onClose.emit();
   }
 
-  get isInitialLimit() {
+  public get isInitialLimit() {
     return this.addCycleFormGroup.value.initialLimit;
   }
 
-  protected readonly CycleType = CycleType;
+  public readonly CycleType = CycleType;
 }

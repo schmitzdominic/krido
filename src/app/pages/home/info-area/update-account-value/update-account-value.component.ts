@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import {Account} from "../../../../../shared/interfaces/account.model";
 import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
 import {NgbCalendar, NgbDate} from "@ng-bootstrap/ng-bootstrap";
@@ -6,11 +6,18 @@ import {DateService} from "../../../../services/date/date.service";
 import {AccountService} from "../../../../services/account/account.service";
 
 @Component({
-  selector: 'app-update-account-value',
-  templateUrl: './update-account-value.component.html',
-  styleUrls: ['./update-account-value.component.scss']
+    selector: 'app-update-account-value',
+    templateUrl: './update-account-value.component.html',
+    styleUrls: ['./update-account-value.component.scss'],
+    standalone: false,
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class UpdateAccountValueComponent {
+  private formBuilder = inject(FormBuilder);
+  private dateService = inject(DateService);
+  private ngbCalendar = inject(NgbCalendar);
+  private accountService = inject(AccountService);
+
 
   @Input() account: Account | undefined;
 
@@ -19,17 +26,17 @@ export class UpdateAccountValueComponent {
   selectedDate: NgbDate = this.ngbCalendar.getToday();
   selectedDateTimestamp: number = this.dateService.getTimestampFromNgbDate(this.selectedDate);
 
-  isValueInvalid: boolean = true;
+  isValueInvalid: boolean = false;
 
   updateAccountValueFormGroup: FormGroup = new FormGroup({
     date: new FormControl(''),
     value: new FormControl(''),
   });
 
-  constructor(private formBuilder: FormBuilder,
-              private dateService: DateService,
-              private ngbCalendar: NgbCalendar,
-              private accountService: AccountService) {
+  /** Inserted by Angular inject() migration for backwards compatibility */
+  constructor(...args: unknown[]);
+
+  constructor() {
   }
 
   ngOnInit() {
@@ -48,7 +55,7 @@ export class UpdateAccountValueComponent {
 
   createListener() {
     this.updateAccountValueFormGroup.controls['value'].valueChanges.subscribe((value: number) => {
-        return this.isValueInvalid = !value;
+        return this.isValueInvalid = value === null || value === undefined;
     });
   }
 
@@ -61,7 +68,7 @@ export class UpdateAccountValueComponent {
   }
 
   onSubmit() {
-    this.accountService.setValue(this.selectedDateTimestamp, this.value, this.account!.key!).then(() => this.onClose.emit());
+    this.accountService.setValue(this.selectedDateTimestamp, this.value, this.account!.id!).then(() => this.onClose.emit());
   }
 
   onButtonCancel() {

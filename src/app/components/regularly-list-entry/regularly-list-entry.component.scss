@@ -1,0 +1,51 @@
+.reg-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  &__indicator {
+    width: 3px;
+    height: 32px;
+    border-radius: 4px;
+    flex-shrink: 0;
+    background: #2a2d35;
+  }
+
+  &--income &__indicator  { background: rgba(34, 197, 94, 0.45); }
+  &--outcome &__indicator { background: rgba(192, 89, 92, 0.65); }
+
+  &__body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    &--sub {
+      font-size: 12px;
+      color: var(--app-text-muted);
+      margin-top: 3px;
+    }
+  }
+
+  &__name {
+    font-size: 14px;
+    font-weight: 500;
+    color: #e2e8f0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 58%;
+  }
+
+  &__value {
+    font-size: 14px;
+    font-weight: 700;
+    color: #e2e8f0;
+    flex-shrink: 0;
+    letter-spacing: -0.2px;
+    &--outcome { color: #c0595c; }
+  }
+}

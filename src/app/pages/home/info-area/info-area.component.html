@@ -4,13 +4,22 @@
     (onClose)="onCloseUpdateAccountValueModal()">
   </app-update-account-value>
 </ng-template>
-<div *ngIf="accounts.length > 0">
-  <h1>Konten</h1>
-  <ul class="list-group list-group-flush pb-3">
-    <li class="list-group-item" id="entry-list-actual-month" *ngFor="let account of accounts" (click)="onAccountClick(account)">
-      <app-info-list-entry
-        [account]="account">
-      </app-info-list-entry>
-    </li>
-  </ul>
-</div>
+@if (accounts().length > 0) {
+  <section class="accounts-section">
+    <div class="accounts-section__header">
+      <h2 class="section-label">Konten</h2>
+      <button type="button" class="btn-icon" (click)="toggleAccountsSection()">
+        <i class="bi" [ngClass]="isAccountsExpanded ? 'bi-eye' : 'bi-eye-slash'"></i>
+      </button>
+    </div>
+    @if (isAccountsExpanded) {
+      <div class="account-cards">
+        @for (account of accounts(); track account.id) {
+          <div class="account-card" (click)="onAccountClick(account)">
+            <app-info-list-entry [account]="account"></app-info-list-entry>
+          </div>
+        }
+      </div>
+    }
+  </section>
+}

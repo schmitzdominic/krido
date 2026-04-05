@@ -4,16 +4,24 @@
     (onClose)="onCloseAddOrEditEntryModal()">
   </app-add-or-edit-entry>
 </ng-template>
-<ul class="list-group list-group-flush pt-4 pb-3">
-  <div class="row">
-    <div class="col-8">
-      <h1>{{ title }}</h1>
+
+<div class="history-list">
+  @if (entries().length > 0) {
+    @if (title()) {
+      <h2 class="section-label">{{ title() }}</h2>
+    }
+    <div class="entries-card-group">
+      @for (entry of entries(); track entry.id) {
+        <div class="entry-row" (click)="onEntryClick(entry)">
+          <app-entry-list-entry
+            [withMonth]="historySearchObject()?.isLastMonth ?? false"
+            [entry]="entry">
+          </app-entry-list-entry>
+        </div>
+      }
     </div>
-  </div>
-  <li class="list-group-item" id="entry-list-actual-month" *ngFor="let entry of entries" (click)="onEntryClick(entry)">
-    <app-entry-list-entry
-      [withMonth]="!historySearchObject!.isLastMonth"
-      [entry]="entry">
-    </app-entry-list-entry>
-  </li>
-</ul>
+  }
+  @if (entries().length === 0) {
+    <p class="empty-hint">Suche nach Einträgen oder wähle "Letzter Monat".</p>
+  }
+</div>

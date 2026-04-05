@@ -1,33 +1,61 @@
-import {Component} from '@angular/core';
+import { Component, computed, effect, inject } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import {UserService} from "../../../services/user/user.service";
 import {AccountService} from "../../../services/account/account.service";
 import {Account} from "../../../../shared/interfaces/account.model";
 import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
 import {AccountType} from "../../../../shared/enums/account-type.enum";
+import { map } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-settings-user',
-  templateUrl: './settings-user.component.html',
-  styleUrls: ['./settings-user.component.scss']
+    selector: 'app-settings-user',
+    templateUrl: './settings-user.component.html',
+    styleUrls: ['./settings-user.component.scss'],
+    standalone: false
 })
 export class SettingsUserComponent {
+  private formBuilder = inject(FormBuilder);
+  private accountService = inject(AccountService);
+  userService = inject(UserService);
 
-  accounts: Account[] = [];
   mainAccount: Account | undefined;
 
   settingsUserFormGroup: FormGroup = new FormGroup({
     mainAccount: new FormControl(''),
   });
 
-  constructor(private formBuilder: FormBuilder,
-              private accountService: AccountService,
-              public userService: UserService,) {
+  private readonly _rawAccounts = toSignal(
+    this.accountService.getAllAccounts().pipe(
+      map(accounts => accounts as (Account & { id: string })[])
+    ),
+    { initialValue: [] as (Account & { id: string })[] }
+  );
+
+  readonly accounts = computed((): Account[] => {
+    const raw = this._rawAccounts();
+    if (raw.length === 0) {
+      return [{
+        name: 'Kein Konto verfügbar',
+        searchName: 'Kein Konto verfügbar',
+        accountType: AccountType.creditCard,
+        owners: [this.userService.user]
+      }];
+    }
+    return raw;
+  });
+
+  constructor() {
+    effect(() => {
+      const raw = this._rawAccounts();
+      if (raw.length > 0) {
+        this.mainAccount = this.userService.mainAccount;
+        this.settingsUserFormGroup.controls['mainAccount'].setValue((this.mainAccount as any)?.id);
+      }
+    });
   }
 
   ngOnInit() {
-    this.mainAccount = this.userService.mainAccount;
     this.createFormGroup();
-    this.loadAccounts();
     this.createListeners();
   }
 
@@ -39,45 +67,11 @@ export class SettingsUserComponent {
     );
   }
 
-  loadAccounts() {
-    this.accountService.getAllAccounts().subscribe(accounts => {
-      this.accounts = [];
-      accounts.forEach(accountRaw => {
-        const account: Account = accountRaw.payload.val() as Account;
-        account.key = accountRaw.key ? accountRaw.key : '';
-        this.accounts.push(account);
-      });
-      this.loadMainAccount();
-    });
-  }
-
   createListeners() {
     this.settingsUserFormGroup.valueChanges.subscribe(setting => {
-      const foundAccount: Account | undefined = this.accounts.find(account => account.key === setting.mainAccount);
+      const foundAccount = this._rawAccounts().find(account => (account as any).id === setting.mainAccount);
       if (foundAccount) this.updateMainAccount(foundAccount);
-      /* if (this.mainAccount && this.mainAccount.key !== setting.mainAccount) {
-        if (foundAccount) this.updateMainAccount(foundAccount);
-      }
-      if (!this.mainAccount) {
-
-      } */
     });
-  }
-
-  loadMainAccount() {
-    if (this.accounts.length == 0) {
-      const account: Account = {
-        name: 'Kein Konto verfügbar',
-        searchName: 'Kein Konto verfügbar',
-        accountType: AccountType.creditCard,
-        owners: [this.userService.user]
-      }
-      this.accounts.push(account);
-      return;
-    } else {
-      this.mainAccount = this.userService.mainAccount;
-      this.settingsUserFormGroup.controls['mainAccount'].setValue(this.mainAccount?.key);
-    }
   }
 
   private updateMainAccount(account: Account) {

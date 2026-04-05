@@ -1,53 +1,70 @@
-<button *ngIf="isEditButtonShown" type="button" class="btn btn-dark position-absolute end-0 top-0 mt-3 me-3" (click)="onButtonEdit()"><i class="bi bi-pencil"></i></button>
-<!-- Edit -->
-<div *ngIf="!isContentReadOnly">
+@if (isEditButtonShown && isContentReadOnly) {
+  <button type="button" class="edit-btn-top" (click)="onButtonEdit()">
+    <i class="bi bi-pencil"></i>
+  </button>
+}
+
+@if (mode === 'edit') {
   <app-add-or-edit-account-content
     [account]="account"
     (onClose)="onButtonCancel()">
   </app-add-or-edit-account-content>
-</div>
+}
 
-<!-- View -->
-<div *ngIf="isContentReadOnly">
-  <h1 class="name-title pt-4 ps-3 pe-3">{{ account?.name }}</h1>
-  <div class="modal-body">
-    <ul class="list-group list-group-flush pb-3">
-      <li class="list-group-item" id="account-value">
-        <div class="custom-list-item">
-          <i class="bi bi-cash-coin"></i>
-          <span class="name ps-2">Kontostand</span>
-          <span class="limit position-absolute top-0 end-0 pe-3 pt-2">{{ priceService.convertNumberToEuro(account!.value) }}</span>
+@if (mode === 'updateBalance') {
+  <app-update-account-value
+    [account]="account"
+    (onClose)="onButtonCancel()">
+  </app-update-account-value>
+}
+
+@if (mode === 'view') {
+  <div class="modal-body sheet-body">
+    <div class="view-header">
+      <span class="account-title">{{ account?.name }}</span>
+    </div>
+
+    <div class="stats-row" role="button" (click)="onButtonUpdateBalance()">
+      <div class="stat-item">
+        <span class="stat-label">Kontostand</span>
+        <span class="stat-value">{{ priceService.convertNumberToEuro(account!.value) }}</span>
+      </div>
+      <i class="bi bi-pencil stat-edit-icon"></i>
+    </div>
+
+    @if (account?.accountType === AccountType.creditCard) {
+      <div class="info-list">
+        <div class="info-item">
+          <i class="bi bi-wallet2 info-item__icon"></i>
+          <span class="info-item__label">Referenzkonto</span>
+          <span class="info-item__value">{{ account?.referenceAccount?.name }}</span>
         </div>
-      </li>
-      <li class="list-group-item" id="credit-day-reference" *ngIf="account?.accountType === AccountType.creditCard">
-        <i class="bi bi-wallet2"></i>
-        <span class="name ps-2">Referenzkonto {{ account?.referenceAccount?.name }}</span>
-      </li>
-      <li class="list-group-item" id="credit-day" *ngIf="account?.accountType === AccountType.creditCard">
-        <i class="bi bi-arrow-right" *ngIf="!account?.creditLastDay"></i>
-        <i class="bi bi-box-arrow-in-right" *ngIf="account?.creditLastDay"></i>
-        <span class="name ps-2" *ngIf="!account?.creditLastDay">Abbuchung am {{ account?.creditDay }}.</span>
-        <span class="name ps-2" *ngIf="account?.creditLastDay">Abbuchung am letzten Tag im Monat</span>
-      </li>
-    </ul>
-    <p>Eigentümer</p>
-    <ul class="list-group list-group-flush">
-      <li class="list-group-item" id="account-owners" *ngFor="let owner of account?.owners">
-        <i class="bi bi-person"></i>
-        <span class="name ps-2">{{ owner.email }}</span>
-      </li>
-    </ul>
-  </div>
-  <ul class="list-group list-group-flush">
-    <li class="list-group-item" id="list-entries">
-      <!-- TODO: Here Entries -->
-    </li>
-  </ul>
-  <div class="modal-footer">
-    <button
-      type="button"
-      class="btn btn-light"
-      (click)="onButtonCancel()">Schließen</button>
-  </div>
-</div>
+        <div class="info-item">
+          <i class="bi bi-arrow-right info-item__icon"></i>
+          <span class="info-item__label">Abbuchung</span>
+          @if (!account?.creditLastDay) {
+            <span class="info-item__value">Am {{ account?.creditDay }}.</span>
+          } @else {
+            <span class="info-item__value">Letzter Tag</span>
+          }
+        </div>
+      </div>
+    }
 
+    @if (account?.owners && account!.owners.length > 0) {
+      <h3 class="entries-header">Eigentümer</h3>
+      <div class="entries-card-group">
+        @for (owner of account?.owners; track $index) {
+          <div class="owner-row">
+            <i class="bi bi-person owner-row__icon"></i>
+            <span class="owner-row__email">{{ owner.email }}</span>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <div class="sheet-footer">
+    <button type="button" class="btn-sheet btn-sheet--ghost" (click)="onButtonCancel()">Schließen</button>
+  </div>
+}

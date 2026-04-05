@@ -1,38 +1,40 @@
-import {Component, EventEmitter, Output} from '@angular/core';
+import { Component, DestroyRef, EventEmitter, inject, Output } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
 import {Account} from "../../../../shared/interfaces/account.model";
 import {AccountService} from "../../../services/account/account.service";
 import {AccountType} from "../../../../shared/enums/account-type.enum";
 import {InvoiceSettings} from "../../../../shared/interfaces/invoice-settings.model";
 import {InvoiceService} from "../../../services/invoice/invoice.service";
-import {LoadingService} from "../../../services/loading/loading.service";
+
+import { map } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-invoice-settings',
-  templateUrl: './invoice-settings.component.html',
-  styleUrls: ['./invoice-settings.component.scss']
+    selector: 'app-invoice-settings',
+    templateUrl: './invoice-settings.component.html',
+    styleUrls: ['./invoice-settings.component.scss'],
+    standalone: false
 })
 export class InvoiceSettingsComponent {
+  private formBuilder = inject(FormBuilder);
+  private accountService = inject(AccountService);
+  private invoiceService = inject(InvoiceService);
+  private destroyRef = inject(DestroyRef);
+
 
   @Output() onNext: EventEmitter<InvoiceSettings> = new EventEmitter<InvoiceSettings>();
 
   invoiceSettings: InvoiceSettings | undefined;
 
   invoiceAccount: Account | undefined;
-  invoiceAccounts: Account[] = [];
-  beneficiaryAccounts: Account[] = [];
-  selectedBeneficiaryAccounts: Account[] = [];
+  invoiceAccounts: (Account & { id: string })[] = [];
+  beneficiaryAccounts: (Account & { id: string })[] = [];
+  selectedBeneficiaryAccounts: (Account & { id: string })[] = [];
 
   invoiceSettingsFormGroup: FormGroup = new FormGroup({
     invoiceAccounts: new FormControl(''),
     beneficiaryAccounts: new FormControl('')
   });
-
-  constructor(private formBuilder: FormBuilder,
-              private loadingService: LoadingService,
-              private accountService: AccountService,
-              private invoiceService: InvoiceService) {
-  }
 
   ngOnInit() {
     this.createFormGroup();
@@ -50,25 +52,23 @@ export class InvoiceSettingsComponent {
   }
 
   private loadSettings(): void {
-    this.loadingService.setLoading = true;
-    this.invoiceService.getInvoiceSettings().subscribe(invoiceSettingsRaw => {
-      const invoiceSettings: InvoiceSettings = invoiceSettingsRaw.payload.val() as InvoiceSettings;
+    this.invoiceService.getInvoiceSettings().pipe(
+      map(settings => settings as InvoiceSettings | null),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(invoiceSettings => {
       if (invoiceSettings) {
         this.invoiceSettings = invoiceSettings;
         this.fillFormWithSettings(invoiceSettings);
       }
-      this.loadingService.setLoading = false;
     });
   }
 
   private loadAccounts(): void {
-    this.accountService.getAllAccountsFilteredByAccountType(AccountType.giro).subscribe(accounts => {
-      this.invoiceAccounts.length = 0;
-      accounts.forEach(accountRaw => {
-        const account: Account = accountRaw.payload.val() as Account;
-        account.key = accountRaw.key ? accountRaw.key : '';
-        this.invoiceAccounts.push(account);
-      });
+    this.accountService.getAllAccountsFilteredByAccountType(AccountType.giro).pipe(
+      map(accounts => accounts as (Account & { id: string })[]),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(accounts => {
+      this.invoiceAccounts = accounts;
       this.loadSettings();
     });
   }
@@ -87,7 +87,7 @@ export class InvoiceSettingsComponent {
   }
 
   private selectBeneficiaryAccount(key: string) {
-    const account: Account | undefined = this.beneficiaryAccounts.find(account => account.key === key);
+    const account = this.beneficiaryAccounts.find(acc => acc.id === key);
     if (account) {
       this.selectedBeneficiaryAccounts.push(account);
       this.removeAccountFromList(account, this.beneficiaryAccounts);
@@ -95,7 +95,7 @@ export class InvoiceSettingsComponent {
     }
   }
 
-  public onRemoveBeneficiaryAccountButtonClick(account: Account): void {
+  public onRemoveBeneficiaryAccountButtonClick(account: Account & { id: string }): void {
     this.removeAccountFromList(account, this.selectedBeneficiaryAccounts);
     this.beneficiaryAccounts.push(account);
     this.selectedBeneficiaryAccount = account;
@@ -103,7 +103,7 @@ export class InvoiceSettingsComponent {
 
   public addListener(): void {
     this.invoiceSettingsFormGroup.controls['invoiceAccounts'].valueChanges.subscribe(key => {
-      const account: Account | undefined = this.invoiceAccounts.find((account: Account) => account.key === key);
+      const account = this.invoiceAccounts.find(acc => acc.id === key);
       this.beneficiaryAccounts = Object.assign([], this.invoiceAccounts);
       if (account) {
         this.removeAccountFromList(account, this.beneficiaryAccounts);
@@ -112,8 +112,8 @@ export class InvoiceSettingsComponent {
     });
   }
 
-  private removeAccountFromList(account: Account, accounts: Account[]): void {
-    const index: number = accounts.map(account => account.key).indexOf(account.key);
+  private removeAccountFromList(account: Account & { id: string }, accounts: (Account & { id: string })[]): void {
+    const index: number = accounts.findIndex(acc => acc.id === account.id);
     if (index > -1) {
       accounts.splice(index, 1);
     }
@@ -121,6 +121,11 @@ export class InvoiceSettingsComponent {
 
   public get selectedInvoiceAccountKey(): string {
     return this.invoiceSettingsFormGroup.value.invoiceAccounts;
+  }
+
+  public get selectedInvoiceAccountName(): string {
+    const account = this.invoiceAccounts.find(a => a.id === this.selectedInvoiceAccountKey);
+    return account ? account.name : 'Konto auswählen';
   }
 
   private get selectedBeneficiaryAccountKey(): string {
@@ -132,13 +137,13 @@ export class InvoiceSettingsComponent {
   }
 
   private set selectedBeneficiaryAccount(account: Account) {
-    this.invoiceSettingsFormGroup.controls['beneficiaryAccounts'].setValue(account.key);
+    this.invoiceSettingsFormGroup.controls['beneficiaryAccounts'].setValue((account as any).id);
   }
 
   public onSubmit(): void {
 
     const selectedBeneficiaryAccountKeys: string[] = [];
-    this.selectedBeneficiaryAccounts.forEach((account: Account) => selectedBeneficiaryAccountKeys.push(account.key!));
+    this.selectedBeneficiaryAccounts.forEach(account => selectedBeneficiaryAccountKeys.push((account as any).id));
 
     const invoiceSettings: InvoiceSettings = {
       invoiceAccountKey: this.selectedInvoiceAccountKey,

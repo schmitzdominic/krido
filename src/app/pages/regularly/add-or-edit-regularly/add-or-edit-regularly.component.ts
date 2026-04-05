@@ -1,4 +1,5 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import { Component, DestroyRef, EventEmitter, inject, Input, Output } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {EntryType} from "../../../../shared/enums/entry-type.enum";
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {RegularlyCycleType} from "../../../../shared/enums/regularly-cycle-type.enum";
@@ -12,6 +13,8 @@ import {NgbCalendar, NgbDate} from "@ng-bootstrap/ng-bootstrap";
 import {DateService} from "../../../services/date/date.service";
 import {Entry} from "../../../../shared/interfaces/entry.model";
 import {EntryService} from "../../../services/entry/entry.service";
+import { map } from 'rxjs/operators';
+
 
 interface EntryTypeInterface {
   value: EntryType,
@@ -24,11 +27,21 @@ interface CycleTypeInterface {
 }
 
 @Component({
-  selector: 'app-add-or-edit-regularly',
-  templateUrl: './add-or-edit-regularly.component.html',
-  styleUrls: ['./add-or-edit-regularly.component.scss']
+    selector: 'app-add-or-edit-regularly',
+    templateUrl: './add-or-edit-regularly.component.html',
+    styleUrls: ['./add-or-edit-regularly.component.scss'],
+    standalone: false
 })
 export class AddOrEditRegularlyComponent {
+  private formBuilder = inject(FormBuilder);
+  private accountService = inject(AccountService);
+  private helperService = inject(HelperService);
+  private regularlyService = inject(RegularlyService);
+  private dateService = inject(DateService);
+  private ngbCalendar = inject(NgbCalendar);
+  private entryService = inject(EntryService);
+  private destroyRef = inject(DestroyRef);
+
 
   @Input() regularly: Regularly | undefined;
   @Input() type: RegularlyType | undefined;
@@ -49,15 +62,11 @@ export class AddOrEditRegularlyComponent {
   selectedDate: NgbDate = this.ngbCalendar.getToday();
   selectedDateTimestamp: number = this.dateService.getTimestampFromNgbDate(this.selectedDate);
 
-
-  accounts: Account[] = [];
+  accounts: (Account & { id?: string })[] = [];
 
   title: string = this.selectedEntryType.label;
   submitButtonText: string = 'Eintragen';
 
-  isNameInvalid: boolean = true;
-  isValueInvalid: boolean = true;
-  isMonthDayInvalid: boolean = false;
   isLastDay: boolean = false;
 
   addOrEditRegularlyFormGroup: FormGroup = new FormGroup({
@@ -71,21 +80,12 @@ export class AddOrEditRegularlyComponent {
     date: new FormControl(''),
   });
 
-  constructor(private formBuilder: FormBuilder,
-              private accountService: AccountService,
-              private helperService: HelperService,
-              private regularlyService: RegularlyService,
-              private dateService: DateService,
-              private ngbCalendar: NgbCalendar,
-              private entryService: EntryService) {
-  }
-
   ngOnInit() {
     this.createFormGroup();
     this.createListeners();
     this.loadAccounts();
     this.fillFormIfRegularlyIsAvailable();
-    this.dateService.setDateToLastDayOfMonth(new Date(2023, 9));
+    this.dateService.getLastDayOfMonth(new Date(2023, 9));
   }
 
   private createFormGroup() {
@@ -97,7 +97,7 @@ export class AddOrEditRegularlyComponent {
         value: [this.regularly ? this.regularly.value : ''],
         monthDay: [1],
         lastDay: [this.regularly?.isEndOfMonth],
-        account: [this.regularly ? this.regularly.account.key : ''],
+        account: [this.regularly ? (this.regularly.account as any)?.id : ''],
         date: [''],
       }
     );
@@ -105,10 +105,6 @@ export class AddOrEditRegularlyComponent {
 
   private fillFormIfRegularlyIsAvailable() {
     if (this.regularly) {
-
-      this.isNameInvalid = false;
-      this.isValueInvalid = false;
-      this.isMonthDayInvalid = false;
 
       this.submitButtonText = 'Ändern'
 
@@ -171,46 +167,29 @@ export class AddOrEditRegularlyComponent {
         }
         case this.yearCycleType.value: {
           this.selectedCycleType = this.yearCycleType;
-          this.isMonthDayInvalid = false;
           break;
         }
       }
-      this.checkMonthDayValidity(this.addOrEditRegularlyFormGroup.value.monthDay);
     });
     // Form behavior
     this.addOrEditRegularlyFormGroup.controls['lastDay'].valueChanges.subscribe(lastDay => {
       this.isLastDay = lastDay;
     });
     // Validators
-    this.addOrEditRegularlyFormGroup.controls['monthDay'].valueChanges.subscribe((monthDay: number) => {
-      this.checkMonthDayValidity(monthDay);
+    this.addOrEditRegularlyFormGroup.controls['monthDay'].valueChanges.subscribe((_monthDay: number) => {
+      // monthDay validity is now computed via getter — no action needed, triggers CD
     });
-    this.addOrEditRegularlyFormGroup.controls['name'].valueChanges.subscribe((name: string) => {
-      this.isNameInvalid = name.length <= 0;
-    });
-    this.addOrEditRegularlyFormGroup.controls['value'].valueChanges.subscribe(value => {
-      this.isValueInvalid = value <= 0;
-    });
-  }
-
-  private checkMonthDayValidity(monthDay: number) {
-    if (!this.isLastDay && this.isMonthDayNeeded) {
-      this.isMonthDayInvalid = !(monthDay > 0 && monthDay <= 28);
-    } else {
-      this.isMonthDayInvalid = false;
-    }
   }
 
   private loadAccounts() {
-    this.accountService.getAllAccounts().subscribe(accounts => {
-      accounts.forEach(accountRaw => {
-        const account: Account = accountRaw.payload.val() as Account;
-        account.key = accountRaw.key ? accountRaw.key : '';
-        this.accounts.push(account);
-      });
+    this.accountService.getAllAccounts().pipe(
+      map(accounts => accounts as (Account & { id: string })[]),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(accounts => {
+      this.accounts = accounts;
       if (!this.regularly) {
         if (accounts.length > 0) {
-          this.addOrEditRegularlyFormGroup.controls['account'].setValue(this.accounts[0].key);
+          this.addOrEditRegularlyFormGroup.controls['account'].setValue(this.accounts[0].id);
         }
       }
     });
@@ -218,6 +197,22 @@ export class AddOrEditRegularlyComponent {
 
   get isMonthDayNeeded() {
     return this.selectedCycleType === this.monthCycleType || this.selectedCycleType === this.quarterCycleType;
+  }
+
+  get isNameInvalid(): boolean {
+    const name = this.addOrEditRegularlyFormGroup.value.name ?? '';
+    return name.length <= 0;
+  }
+
+  get isValueInvalid(): boolean {
+    const value = this.addOrEditRegularlyFormGroup.value.value;
+    return !(value > 0);
+  }
+
+  get isMonthDayInvalid(): boolean {
+    if (!this.isMonthDayNeeded || this.isLastDay) return false;
+    const monthDay = this.addOrEditRegularlyFormGroup.value.monthDay;
+    return !(monthDay > 0 && monthDay <= 28);
   }
 
   onDateSelected(ngbDate: NgbDate) {
@@ -239,7 +234,7 @@ export class AddOrEditRegularlyComponent {
   }
 
   onEdit() {
-    this.regularlyService.updateRegularly(this.regularlyObject, this.regularly!.key!).then(() => {
+    this.regularlyService.updateRegularly(this.regularlyObject, (this.regularly as any).id).then(() => {
       this.onClose.emit();
     });
   }
@@ -341,19 +336,21 @@ export class AddOrEditRegularlyComponent {
         return date;
       }
       case RegularlyCycleType.year: {
-        return this.dateService.getDateFromTimestamp(this.selectedDateTimestamp);
+        const date: Date = this.dateService.getDateFromTimestamp(this.selectedDateTimestamp);
+        date.setFullYear(new Date().getFullYear());
+        return date;
       }
       default: return new Date();
     }
   }
 
   get selectedAccount(): Account {
-    const account = this.accounts.find((account: Account) => account.key === this.addOrEditRegularlyFormGroup.value.account);
+    const account = this.accounts.find((account: Account) => (account as any).id === this.addOrEditRegularlyFormGroup.value.account);
     return account ? account : this.accountService.noAccountValue;
   }
 
   onButtonDelete() {
-    this.regularlyService.deleteRegularly(this.regularly!.key!).then(() => this.onClose.emit());
+    this.regularlyService.deleteRegularly((this.regularly as any).id).then(() => this.onClose.emit());
   }
 
   onButtonCancel() {

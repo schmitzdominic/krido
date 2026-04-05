@@ -3,9 +3,9 @@
     <div class="me-2">
       <button type="button" class="btn top-50" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><i class="bi bi-list"></i></button>
     </div>
-    <a class="navbar-brand ps-2">{{ title }}</a>
+    <a class="navbar-brand ps-2">{{ menuTitleService.title() }}</a>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul ngbNav [(activeId)]="activeId" class="navbar-nav me-auto mb-2 mt-4 mb-lg-0">
+      <ul ngbNav [activeId]="menuTitleService.activeId()" (activeIdChange)="menuTitleService.activeId.set($event)" class="navbar-nav me-auto mb-2 mt-4 mb-lg-0">
         <li [ngbNavItem]="1">
           <button
             ngbNavLink
@@ -59,6 +59,6 @@
     </div>
   </div>
 </nav>
-<div class="p-3">
+<div class="page-content">
   <router-outlet></router-outlet>
 </div>

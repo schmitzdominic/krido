@@ -1,29 +1,32 @@
-<div class="card">
-  <div class="card-body">
-    <h1 class="card-title"><i class="bi bi-person pe-3"></i>Benutzer</h1>
-    <form class="needs-validation" [formGroup]="settingsUserFormGroup">
-      <ul class="list-group list-group-flush pb-3">
-        <li class="list-group-item" id="setting-home-name">
-          <div class="custom-list-item">
-            <i class="bi bi-envelope-at"></i>
-            <span class="name ps-2">E-Mail</span>
-            <span class="limit position-absolute top-0 end-0 pe-3 pt-2">{{ userService.user.email }}</span>
-          </div>
-        </li>
-        <li class="list-group-item" id="setting-main-account">
-          <label for="account-list" class="form-label pt-2">Hauptkonto</label>
-          <div class="mb-3">
-            <select class="form-select" id="account-list" aria-label="Select Main Account" formControlName="mainAccount">
-              <option *ngFor="let account of accounts" value="{{ account.key }}">{{ account.name }}</option>
-            </select>
-          </div>
-        </li>
-        <li class="list-group-item" id="setting-logout">
-          <div class="row m-1 pt-2">
-            <button type="button" class="btn btn-outline-light" (click)="onButtonLogout()"><i class="bi bi-box-arrow-right pe-2"></i>Abmelden</button>
-          </div>
-        </li>
-      </ul>
-    </form>
+<div class="settings-card">
+  <h2 class="settings-card__title">
+    <i class="bi bi-person me-2"></i>Benutzer
+  </h2>
+  <div class="settings-list">
+    <div class="settings-row">
+      <span class="settings-row__label">E-Mail</span>
+      <span class="settings-row__value">{{ userService.user.email }}</span>
+    </div>
+    <div class="settings-row settings-row--select">
+      <label class="settings-row__label">Hauptkonto</label>
+      <div ngbDropdown container="body" placement="bottom-end" class="w-100">
+        <button class="settings-select" type="button" ngbDropdownToggle>
+          {{ mainAccount?.name || 'Konto auswählen' }}
+          <i class="bi bi-chevron-down settings-chevron"></i>
+        </button>
+        <div ngbDropdownMenu class="sheet-dropdown">
+          @for (account of accounts(); track $index) {
+            <button ngbDropdownItem
+              (click)="settingsUserFormGroup.controls['mainAccount'].setValue((account)['id'])">
+              {{ account.name }}
+            </button>
+          }
+        </div>
+      </div>
+    </div>
   </div>
 </div>
+
+<button type="button" class="logout-btn mt-3" (click)="onButtonLogout()">
+  <i class="bi bi-box-arrow-right me-2"></i>Abmelden
+</button>

@@ -1,28 +1,31 @@
-import {Component} from '@angular/core';
+import { Component, inject } from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
-import {AngularFireAuth} from "@angular/fire/compat/auth";
 import {User} from "../../../shared/interfaces/user.model";
 import {UserService} from "../../services/user/user.service";
 import {ToastService} from "../../services/toast/toast.service";
-import {LoadingService} from "../../services/loading/loading.service";
+import {Auth, getAuth, signInWithEmailAndPassword} from "firebase/auth";
 
 @Component({
-  selector: 'app-login',
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
+    selector: 'app-login',
+    templateUrl: './login.component.html',
+    styleUrls: ['./login.component.scss'],
+    standalone: false
 })
 export class LoginComponent {
+  private formBuilder = inject(FormBuilder);
+  private auth: Auth = getAuth();
+  private userService = inject(UserService);
+  private toastService = inject(ToastService);
+
+  isLoading = false;
+
 
   loginFormGroup: FormGroup = new FormGroup({
     email: new FormControl(''),
     password: new FormControl('')
   });
 
-  constructor(private formBuilder: FormBuilder,
-              private angularFireAuth: AngularFireAuth,
-              private userService: UserService,
-              private toastService: ToastService,
-              private loadingService: LoadingService) {
+  constructor() {
   }
 
   ngOnInit(): void {
@@ -48,23 +51,27 @@ export class LoginComponent {
 
   async signIn(email: string, password: string): Promise<void> {
     try {
-      this.loadingService.setLoading = true;
-      const result = await this.angularFireAuth
-        .signInWithEmailAndPassword(email, password);
-      this.loadingService.setLoading = false;
+      this.isLoading = true;
+      const result = await signInWithEmailAndPassword(this.auth, email, password);
+      this.isLoading = false;
       await this.setUserData(result.user);
-    } catch (error) {
-      if (error) {
-        const errorMessage: string = error.toString();
-        if (errorMessage.includes('auth/wrong-password')) {
-          this.toastService.showDanger('Falsches Passwort');
-        } else if (errorMessage.includes('auth/user-not-found')) {
-          this.toastService.showDanger('E-Mail nicht registriert');
-        } else {
-          this.toastService.showDanger(error.toString());
+    } catch (error: any) {
+      if (error && error.code) {
+        switch (error.code) {
+          case 'auth/wrong-password':
+            this.toastService.showDanger('Falsches Passwort');
+            break;
+          case 'auth/user-not-found':
+            this.toastService.showDanger('E-Mail nicht registriert');
+            break;
+          default:
+            this.toastService.showDanger(error.message);
+            break;
         }
-        this.loadingService.setLoading = false;
+      } else {
+        this.toastService.showDanger('Ein unbekannter Fehler ist aufgetreten.');
       }
+      this.isLoading = false;
     }
   }
 

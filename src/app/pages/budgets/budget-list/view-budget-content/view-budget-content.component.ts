@@ -1,82 +1,103 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import { Component, DestroyRef, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {Budget} from "../../../../../shared/interfaces/budget.model";
 import {PriceService} from "../../../../services/price/price.service";
 import {NgbProgressbarConfig} from "@ng-bootstrap/ng-bootstrap";
 import {ProgressBarService} from "../../../../services/progress-bar/progress-bar.service";
 import {Entry} from "../../../../../shared/interfaces/entry.model";
 import {EntryService} from "../../../../services/entry/entry.service";
+import { map } from 'rxjs/operators';
+
+import { EntryType } from '../../../../../shared/enums/entry-type.enum';
 
 @Component({
-  selector: 'app-view-budget-content',
-  templateUrl: './view-budget-content.component.html',
-  styleUrls: ['./view-budget-content.component.scss']
+    selector: 'app-view-budget-content',
+    templateUrl: './view-budget-content.component.html',
+    styleUrls: ['./view-budget-content.component.scss'],
+    standalone: false
 })
-export class ViewBudgetContentComponent {
+export class ViewBudgetContentComponent implements OnInit {
+  private ngbProgressbarConfig = inject(NgbProgressbarConfig);
+  private entryService = inject(EntryService);
+  public progressBarService = inject(ProgressBarService);
+  private destroyRef = inject(DestroyRef);
+  public priceService = inject(PriceService);
 
-  @Input() budget: Budget | undefined;
 
-  @Output() onClose: EventEmitter<any> = new EventEmitter<any>();
+  @Input() public budget: Budget & { id: string } | undefined;
 
-  isContentReadOnly: boolean = true;
-  isEditButtonShown: boolean = true;
+  @Output() public onClose: EventEmitter<any> = new EventEmitter<any>();
+  @Output() public onEditEntry: EventEmitter<Entry & { id: string }> = new EventEmitter();
 
-  entries: Entry[] = [];
+  public isContentReadOnly: boolean = true;
+  public isEditButtonShown: boolean = true;
 
-  usedLimit: number = 0;
+  public entries: (Entry & { id: string })[] = [];
 
-  constructor(private ngbProgressbarConfig: NgbProgressbarConfig,
-              private entryService: EntryService,
-              public progressBarService: ProgressBarService,
-              public priceService: PriceService) {
-  }
+  public usedLimit: number = 0;
 
-  ngOnInit(): void {
+  /**
+   * Initializes the component.
+   */
+  public ngOnInit(): void {
     this.checkIfLimitIsSet();
     this.loadProgressBarConfig();
-    this.setUsedLimit();
     this.loadEntries();
   }
 
-  checkIfLimitIsSet() {
+  /**
+   * Checks if a limit is set on the budget.
+   * If not, it enables edit mode and hides the edit button.
+   */
+  private checkIfLimitIsSet() {
     if (!this.budget?.limit) {
       this.isEditButtonShown = false;
       this.onEdit();
     }
   }
 
-  loadProgressBarConfig() {
+  /**
+   * Configures the progress bar.
+   */
+  private loadProgressBarConfig() {
     this.progressBarService.setProgressBarConfig(this.ngbProgressbarConfig);
   }
 
-  setUsedLimit() {
-    if (this.budget && this.budget.usedLimit) {
-      this.usedLimit = this.budget.usedLimit;
-    } else {
-      this.usedLimit = 0;
-    }
-  }
-
-  loadEntries() {
-    if (this.budget!.key!) {
-      this.entryService.getAllEntriesByBudgetKey(this.budget!.key).subscribe(entries => {
-        this.entries = [];
-        entries.forEach(entryRaw => {
-          const entry: Entry = entryRaw.payload.val() as Entry;
-          entry.key = entryRaw.key ? entryRaw.key : '';
-          this.entries.push(entry);
-        });
+  /**
+   * Loads entries associated with the budget and calculates usedLimit from them.
+   */
+  private loadEntries() {
+    if (this.budget && this.budget.id) {
+      this.entryService.getAllEntriesByBudgetId(this.budget.id).pipe(
+        map(entries => entries as (Entry & { id: string })[]),
+        takeUntilDestroyed(this.destroyRef)
+      ).subscribe(entries => {
+        this.entries = entries;
+        this.usedLimit = entries.reduce((acc, entry) => {
+          if (entry.type === EntryType.outcome) return acc + entry.value;
+          if (entry.type === EntryType.income) return acc - entry.value;
+          return acc;
+        }, 0);
         this.sortEntriesByDate(this.entries);
       });
     }
   }
 
+  /**
+   * Sorts entries by date in descending order.
+   * @param {Entry[]} entries The entries to sort.
+   */
   private sortEntriesByDate(entries: Entry[]) {
     entries.sort((one, two) => {
       return one.date > two.date ? -1 : 1;
     });
   }
 
-  getRestBudget() {
+  /**
+   * Calculates the remaining budget.
+   * @returns {string} The formatted remaining budget or 'N/A'.
+   */
+  public getRestBudget() {
     if (this.budget!.limit && this.usedLimit) {
       const restBudget: number = this.budget!.limit - this.usedLimit;
       return this.priceService.convertNumberToEuro(restBudget);
@@ -85,7 +106,11 @@ export class ViewBudgetContentComponent {
     }
   }
 
-  getProgressBarText() {
+  /**
+   * Generates the text for the progress bar.
+   * @returns {string} The progress text (used / limit).
+   */
+  public getProgressBarText() {
     if ((this.usedLimit! / this.budget?.limit! * 100) < 35) {
       return '';
     } else {
@@ -95,12 +120,30 @@ export class ViewBudgetContentComponent {
     }
   }
 
-  onEdit() {
+  /**
+   * Toggles the read-only state.
+   */
+  public onEdit() {
     this.isContentReadOnly = !this.isContentReadOnly;
   }
 
-  onCancel() {
+  /**
+   * Closes the view.
+   */
+  public onCancel() {
     this.onClose.emit();
+  }
+
+  public getRestClass(): string {
+    if (!this.budget?.limit) return '';
+    const pct = this.usedLimit / this.budget.limit * 100;
+    if (pct >= 75) return 'rest--danger';
+    if (pct >= 50) return 'rest--warning';
+    return 'rest--success';
+  }
+
+  public onEntryClick(entry: Entry & { id: string }) {
+    this.onEditEntry.emit(entry);
   }
 
 }

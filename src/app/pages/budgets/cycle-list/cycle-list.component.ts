@@ -1,61 +1,78 @@
-import {Component, ViewChild} from '@angular/core';
-import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap/modal/modal-ref";
+import { Component, DestroyRef, inject, OnInit, ViewChild } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {Cycle} from "../../../../shared/interfaces/cycle.model";
 import {BudgetService} from "../../../services/budget/budget.service";
 import {PriceService} from "../../../services/price/price.service";
 import {AccountType} from "../../../../shared/enums/account-type.enum";
-import {LoadingService} from "../../../services/loading/loading.service";
+import { map } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-cycle-list',
-  templateUrl: './cycle-list.component.html',
-  styleUrls: ['./cycle-list.component.scss']
+    selector: 'app-cycle-list',
+    templateUrl: './cycle-list.component.html',
+    styleUrls: ['./cycle-list.component.scss'],
+    standalone: false
 })
-export class CycleListComponent {
+export class CycleListComponent implements OnInit {
+  private ngbModal = inject(NgbModal);
+  private budgetService = inject(BudgetService);
+  private destroyRef = inject(DestroyRef);
+  public priceService = inject(PriceService);
 
-  @ViewChild('addCycleModal') addCycleModal: NgbModalRef | undefined;
 
-  addCycleModalRef: NgbModalRef | undefined;
-  isInitialized: boolean = false;
+  @ViewChild('addCycleModal') public addCycleModal: NgbModalRef | undefined;
 
-  cycles: Cycle[] = [];
-  clickedCycle: Cycle | undefined;
+  public addCycleModalRef: NgbModalRef | undefined;
+  public isInitialized: boolean = false;
 
-  constructor(private ngbModal: NgbModal,
-              private budgetService: BudgetService,
-              private loadingService: LoadingService,
-              public priceService: PriceService) {
-  }
+  public cycles: (Cycle & { id: string })[] = [];
+  public clickedCycle: (Cycle & { id: string }) | undefined;
 
-  ngOnInit() {
+  /**
+   * Initializes the component.
+   */
+  public ngOnInit() {
     this.loadAllCycles();
   }
 
-  loadAllCycles() {
-    this.loadingService.setLoading = true;
-    this.budgetService.getAllCycles().subscribe(cycles => {
-      this.cycles = [];
-      cycles.forEach(cycleRaw => {
-        const cycle: Cycle = cycleRaw.payload.val() as Cycle;
-        cycle.key = cycleRaw.key!;
-        this.cycles.push(cycle);
-      });
-      this.loadingService.setLoading = false;
-      this.isInitialized = true;
+  /**
+   * Loads all cycles from the service.
+   */
+  private loadAllCycles() {
+    this.budgetService.getAllCycles().pipe(
+      map(cycles => cycles as (Cycle & { id: string })[]),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
+      next: cycles => {
+        this.cycles = cycles;
+        this.isInitialized = true;
+      },
+      error: () => { this.isInitialized = true; }
     });
   }
 
-  onCardClick(cycle: Cycle) {
+  /**
+   * Handles the click on a cycle card to edit it.
+   * @param {Cycle & { id: string }} cycle The cycle to edit.
+   */
+  public onCardClick(cycle: Cycle & { id: string }) {
     this.clickedCycle = cycle;
     this.onAddClick();
   }
 
-  onAddClick(): void {
+  /**
+   * Opens the modal to add or edit a cycle.
+   */
+  public onAddClick(): void {
     this.openAddOrEditCycleModal();
   }
 
-  openAddOrEditCycleModal(): void {
+  /**
+   * Opens the modal instance.
+   */
+  public openAddOrEditCycleModal(): void {
+    (document.activeElement as HTMLElement)?.blur();
     this.addCycleModalRef = this.ngbModal.open(
       this.addCycleModal,
       {
@@ -63,12 +80,15 @@ export class CycleListComponent {
       });
   }
 
-  onCloseAddOrEditCycleModal(): void {
+  /**
+   * Closes the modal and resets the selected cycle.
+   */
+  public onCloseAddOrEditCycleModal(): void {
     this.clickedCycle = undefined;
     if (this.addCycleModalRef) {
       this.addCycleModalRef.close();
     }
   }
 
-    protected readonly AccountType = AccountType;
+  public readonly AccountType = AccountType;
 }

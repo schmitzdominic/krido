@@ -4,6 +4,7 @@ import {RegularlyCycleType} from "../enums/regularly-cycle-type.enum";
 import {EntryType} from "../enums/entry-type.enum";
 
 export interface Regularly {
+  id?: string;
   key?: string,
   searchName: string;
   name: string;

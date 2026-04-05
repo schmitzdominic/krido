@@ -1,51 +1,50 @@
-import {Component, ViewChild} from '@angular/core';
+import { Component, computed, inject, ViewChild } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import {AccountService} from "../../../services/account/account.service";
 import {AccountType} from "../../../../shared/enums/account-type.enum";
 import {Account} from "../../../../shared/interfaces/account.model";
-import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap/modal/modal-ref";
+import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {UserService} from "../../../services/user/user.service";
+import { map } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-info-area',
-  templateUrl: './info-area.component.html',
-  styleUrls: ['./info-area.component.scss']
+    selector: 'app-info-area',
+    templateUrl: './info-area.component.html',
+    styleUrls: ['./info-area.component.scss'],
+    standalone: false
 })
 export class InfoAreaComponent {
+  private accountService = inject(AccountService);
+  private ngbModal = inject(NgbModal);
+  private userService = inject(UserService);
 
   @ViewChild('updateAccountValueModal') updateAccountValueModal: NgbModalRef | undefined;
 
   selectedAccount: Account | undefined;
-
   updateAccountValueModalRef: NgbModalRef | undefined;
+  isAccountsExpanded: boolean = localStorage.getItem('accounts-expanded') !== 'false';
 
-  accounts: Account[] = [];
-
-  constructor(private accountService: AccountService,
-              private ngbModal: NgbModal,
-              private userService: UserService) {
+  toggleAccountsSection(): void {
+    this.isAccountsExpanded = !this.isAccountsExpanded;
+    localStorage.setItem('accounts-expanded', String(this.isAccountsExpanded));
   }
 
-  ngOnInit() {
-    this.loadGiroAccounts();
-  }
+  private readonly allGiroAccounts = toSignal(
+    this.accountService.getAllAccountsFilteredByAccountType(AccountType.giro).pipe(
+      map(accounts => accounts as (Account & { id: string })[])
+    ),
+    { initialValue: [] as (Account & { id: string })[] }
+  );
 
-  loadGiroAccounts() {
-    this.accountService.getAllAccountsFilteredByAccountType(AccountType.giro).subscribe(accounts => {
-      this.accounts.length = 0;
-      if (this.userService.mainAccount) {
-        accounts.forEach(accountsRaw => {
-          const account: Account = accountsRaw.payload.val() as Account;
-          account.key = accountsRaw.key ? accountsRaw.key : '';
-          if (account.key === this.userService.mainAccount!.key) {
-            this.accounts.push(account);
-          }
-        });
-      }
-    });
-  }
+  readonly accounts = computed(() =>
+    this.allGiroAccounts().filter(
+      account => account.id === (this.userService.mainAccount as any)?.id
+    )
+  );
 
   openUpdateAccountValueModal(): void {
+    (document.activeElement as HTMLElement)?.blur();
     this.updateAccountValueModalRef = this.ngbModal.open(
       this.updateAccountValueModal,
       {

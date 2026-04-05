@@ -1,114 +1,84 @@
-import {Component, ViewChild} from '@angular/core';
+import { Component, computed, inject, ViewChild } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import {Regularly} from "../../../../shared/interfaces/regularly.model";
-import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap/modal/modal-ref";
+import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {RegularlyType} from "../../../../shared/enums/regularly-type.enum";
 import {RegularlyService} from "../../../services/regularly/regularly.service";
 import {RegularlyCycleType} from "../../../../shared/enums/regularly-cycle-type.enum";
 import {AccountService} from "../../../services/account/account.service";
-import {LoadingService} from "../../../services/loading/loading.service";
 import {DateService} from "../../../services/date/date.service";
+import { map } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-regularly-list',
-  templateUrl: './regularly-list.component.html',
-  styleUrls: ['./regularly-list.component.scss']
+    selector: 'app-regularly-list',
+    templateUrl: './regularly-list.component.html',
+    styleUrls: ['./regularly-list.component.scss'],
+    standalone: false
 })
 export class RegularlyListComponent {
+  private ngbModal = inject(NgbModal);
+  private regularlyService = inject(RegularlyService);
+  private accountService = inject(AccountService);
+  private dateService = inject(DateService);
+
 
   @ViewChild('addOrEditRegularlyModal') addOrEditRegularlyModal: NgbModalRef | undefined;
 
   selectedRegularly: Regularly | undefined;
   addOrEditRegularlyModalRef: NgbModalRef | undefined;
 
-  monthRegularities: Regularly[] = [];
-  quarterRegularities: Regularly[] = [];
-  yearRegularities: Regularly[] = [];
-
-  isAccountAvailable: boolean = false;
-  isToastNoAccountShown: boolean = false;
-
-  loadedLists: number = 0;
-  endLoadingOnList: number = 3;
-
   protected readonly RegularlyType = RegularlyType;
 
-  constructor(private ngbModal: NgbModal,
-              private regularlyService: RegularlyService,
-              private accountService: AccountService,
-              private loadingService: LoadingService,
-              private dateService: DateService) {
-  }
+  private readonly _monthRaw = toSignal<Regularly[]>(
+    this.regularlyService.getAllByCycleType(RegularlyCycleType.month).pipe(
+      map(r => r as Regularly[])
+    )
+  );
+  private readonly _quarterRaw = toSignal<Regularly[]>(
+    this.regularlyService.getAllByCycleType(RegularlyCycleType.quarter).pipe(
+      map(r => r as Regularly[])
+    )
+  );
+  private readonly _yearRaw = toSignal<Regularly[]>(
+    this.regularlyService.getAllByCycleType(RegularlyCycleType.year).pipe(
+      map(r => r as Regularly[])
+    )
+  );
+  private readonly _accountCount = toSignal(
+    this.accountService.getAllAccounts().pipe(map(a => a.length)),
+    { initialValue: 0 }
+  );
 
-  ngOnInit() {
-    this.loadingService.setLoading = true;
-    this.checkForAccounts();
-    this.loadMonth();
-    this.loadQuarter();
-    this.loadYear();
-  }
-
-  private loadMonth() {
-    this.loadRegularities(RegularlyCycleType.month, this.monthRegularities);
-  }
-
-  private loadQuarter() {
-    this.loadRegularities(RegularlyCycleType.quarter, this.quarterRegularities);
-  }
-
-  private loadYear() {
-    this.loadRegularities(RegularlyCycleType.year, this.yearRegularities);
-  }
-
-  private checkForAccounts() {
-    this.accountService.getAllAccounts().subscribe(accounts => {
-      this.isAccountAvailable = accounts.length > 0;
-      this.isToastNoAccountShown = !this.isAccountAvailable;
+  readonly monthRegularities = computed(() =>
+    [...(this._monthRaw() ?? [])].sort((a, b) =>
+      a.monthDay && b.monthDay ? (a.monthDay < b.monthDay ? -1 : 1) : -1
+    )
+  );
+  readonly quarterRegularities = computed(() => this._quarterRaw() ?? []);
+  readonly yearRegularities = computed(() => {
+    const actualDate = new Date();
+    return [...(this._yearRaw() ?? [])].sort((a, b) => {
+      if (a.date && b.date) {
+        const aDate = this.dateService.getDateFromTimestamp(a.date);
+        const bDate = this.dateService.getDateFromTimestamp(b.date);
+        aDate.setFullYear(actualDate.getFullYear());
+        bDate.setFullYear(actualDate.getFullYear());
+        return aDate.getTime() < bDate.getTime() ? -1 : 1;
+      }
+      return -1;
     });
-  }
+  });
 
-  private sortRegularly(cycleType: RegularlyCycleType, regularities: Regularly[]) {
-    switch (cycleType) {
-      case RegularlyCycleType.month: {
-        regularities.sort((one, two) => {
-          if (one.monthDay && two.monthDay) {
-            return one.monthDay < two.monthDay ? -1 : 1;
-          }
-          return -1;
-        });
-        break;
-      }
-      case RegularlyCycleType.quarter: {
-        break;
-      }
-      case RegularlyCycleType.year: {
-        regularities.sort((one, two) => {
-          if (one.date && two.date) {
-            const actualDate: Date = new Date();
-            const oneDate: Date = this.dateService.getDateFromTimestamp(one.date);
-            const twoDate: Date = this.dateService.getDateFromTimestamp(two.date);
-            oneDate.setFullYear(actualDate.getFullYear());
-            twoDate.setFullYear(actualDate.getFullYear());
-            return oneDate.getTime() < twoDate.getTime() ? -1 : 1;
-          }
-          return -1;
-        });
-        break;
-      }
-    }
-  }
+  readonly isAccountAvailable = computed(() => this._accountCount() > 0);
 
-  private loadRegularities(regularlyCycleType: RegularlyCycleType, list: Regularly[]) {
-    this.regularlyService.getAllByCycleType(regularlyCycleType).subscribe(regularities => {
-      list.length = 0;
-      regularities.forEach(regularlyRaw => {
-        const regularly: Regularly = regularlyRaw.payload.val() as Regularly;
-        regularly.key = regularlyRaw.key ? regularlyRaw.key : '';
-        list.push(regularly);
-      });
-      this.sortRegularly(regularlyCycleType, list);
-      if (++this.loadedLists == this.endLoadingOnList) {this.loadingService.setLoading = false;}
-    });
+  readonly isLoaded = computed(() =>
+    this._monthRaw() !== undefined &&
+    this._quarterRaw() !== undefined &&
+    this._yearRaw() !== undefined
+  );
+
+  constructor() {
   }
 
   onRegularlyClicked(regularly: Regularly) {
@@ -117,6 +87,7 @@ export class RegularlyListComponent {
   }
 
   openAddOrEditRegularlyModal(): void {
+    (document.activeElement as HTMLElement)?.blur();
     this.addOrEditRegularlyModalRef = this.ngbModal.open(
       this.addOrEditRegularlyModal,
       {
@@ -132,6 +103,6 @@ export class RegularlyListComponent {
   }
 
   isNoContentAvailable() {
-    return this.monthRegularities.length == 0 && this.quarterRegularities.length == 0 && this.yearRegularities.length == 0;
+    return this.monthRegularities().length === 0 && this.quarterRegularities().length === 0 && this.yearRegularities().length === 0;
   }
 }

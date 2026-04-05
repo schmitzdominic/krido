@@ -1,35 +1,30 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import {MenuTitleService} from "../../../shared/behavior/menu-title/menu-title.service";
 import {InvoiceSettings} from "../../../shared/interfaces/invoice-settings.model";
 
 @Component({
-  selector: 'app-invoice',
-  templateUrl: './invoice.component.html',
-  styleUrls: ['./invoice.component.scss']
+    selector: 'app-invoice',
+    templateUrl: './invoice.component.html',
+    styleUrls: ['./invoice.component.scss'],
+    standalone: false
 })
 export class InvoiceComponent {
+  private menuTitleService = inject(MenuTitleService);
 
-  active: string = 'settings';
-  breadCrumbActive: string = 'breadcrumb-item';
-  breadCrumbInactive: string = 'breadcrumb-item active';
+  showInvoice = false;
 
-  classSettings: string = this.breadCrumbActive;
-  classInvoice: string = this.breadCrumbInactive;
+  /** Inserted by Angular inject() migration for backwards compatibility */
+  constructor(...args: unknown[]);
 
-  invoiceSettings: InvoiceSettings | undefined;
-
-  constructor(private menuTitleService: MenuTitleService) {
+  constructor() {
   }
 
   ngOnInit(): void {
     this.setInitialValues();
   }
 
-  public onNextSettings(invoiceSettings: InvoiceSettings): void {
-    this.invoiceSettings = invoiceSettings;
-    this.active = 'invoice';
-    this.classSettings = this.breadCrumbInactive;
-    this.classInvoice = this.breadCrumbActive;
+  public onNextSettings(_invoiceSettings: InvoiceSettings): void {
+    this.showInvoice = true;
   }
 
   /**

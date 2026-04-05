@@ -1,4 +1,29 @@
+@use "bootstrap/scss/bootstrap" as *;
+
 /* You can add global styles to this file, and also import other style files */
+
+:root {
+  --app-bg: #0d0f14;
+  --app-card-bg: #161920;
+  --app-card-bg-hover: #1e2028;
+  --app-border: rgba(255, 255, 255, 0.06);
+  --app-border-hover: rgba(255, 255, 255, 0.12);
+  --app-radius: 16px;
+  --app-text-muted: #5a6070;
+  --app-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+  --accent: #3b82f6;
+  --green: #22c55e;
+  --red: #c0595c;
+}
+
+.section-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--app-text-muted);
+  margin: 0 0 12px;
+}
 $position-values: (
   0: 0,
   50: 50%,
@@ -7,7 +32,7 @@ $position-values: (
 );
 
 html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; background-color: var(--app-bg); }
 
 $enable-negative-margins: true;
 
@@ -20,6 +45,35 @@ hr {
 
 .badge.medium {
   font-size: 1em;
+}
+
+// ── Entry form dropdown (rendered via container="body") ──────────────
+.dropdown-menu.sheet-dropdown {
+  background: #1e2028 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 12px !important;
+  padding: 4px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5) !important;
+  min-width: 0 !important;
+  width: max-content !important;
+
+  .dropdown-item {
+    color: #cbd5e1;
+    border-radius: 8px;
+    font-size: 14px;
+    padding: 9px 12px;
+    transition: background 0.1s;
+
+    &:hover, &:focus {
+      background: rgba(255, 255, 255, 0.08) !important;
+      color: #fff !important;
+    }
+
+    &:active {
+      background: rgba(59, 130, 246, 0.18) !important;
+      color: #fff !important;
+    }
+  }
 }
 
 .badge.large {

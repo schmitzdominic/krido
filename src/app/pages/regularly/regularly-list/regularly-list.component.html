@@ -6,68 +6,74 @@
     (onClose)="onCloseAddOrEditRegularlyModal()">
   </app-add-or-edit-regularly>
 </ng-template>
-<div class="container pt-3">
-  <div class="row" *ngIf="monthRegularities.length > 0">
-    <ul class="list-group list-group-flush pb-3">
-      <div class="row">
-        <div class="col-8">
-          <h1>Monatlich</h1>
-        </div>
-      </div>
-      <li class="list-group-item" id="entry-list-month-regularities" *ngFor="let regularly of monthRegularities" (click)="onRegularlyClicked(regularly)">
-        <app-regularly-list-entry [regularly]="regularly"
-          >
-        </app-regularly-list-entry>
-      </li>
-    </ul>
-  </div>
-  <div class="row" *ngIf="quarterRegularities.length > 0">
-    <ul class="list-group list-group-flush pb-3">
-      <div class="row">
-        <div class="col-8">
-          <h1>Quartal</h1>
-        </div>
-      </div>
-      <li class="list-group-item" id="entry-list-quarter-regularities" *ngFor="let regularly of quarterRegularities" (click)="onRegularlyClicked(regularly)">
-        <app-regularly-list-entry [regularly]="regularly"
-        >
-        </app-regularly-list-entry>
-      </li>
-    </ul>
-  </div>
-  <div class="row" *ngIf="yearRegularities.length > 0">
-    <ul class="list-group list-group-flush pb-3">
-      <div class="row">
-        <div class="col-8">
-          <h1>Jährlich</h1>
-        </div>
-      </div>
-      <li class="list-group-item" id="entry-list-year-regularities" *ngFor="let regularly of yearRegularities" (click)="onRegularlyClicked(regularly)">
-        <app-regularly-list-entry [regularly]="regularly"
-        >
-        </app-regularly-list-entry>
-      </li>
-    </ul>
-  </div>
-  <div class="row" *ngIf="isNoContentAvailable()">
-    <div class="card">
-      <div class="m-2 mt-3">
-        <img src="assets/img/no-account.gif" class="card-img-top" alt="no regularly" style="border-radius: 6px;">
-      </div>
-      <div class="card-body">
-        <h1 class="card-title">Keine Regelmäßigen Einträge</h1>
-        <div class="no-regularly-card-content">
-          <p class="card-text">Du hast noch keine regelmäßigen Aus- oder Eingaben angelegt. Lege jetzt direkt welche an.</p>
-        </div>
-        <div class="position-absolute end-0 bottom-0 me-4 mb-4" *ngIf="isAccountAvailable">
-          <button type="button" class="btn btn-primary" (click)="openAddOrEditRegularlyModal()">Anlegen</button>
-        </div>
+
+<div class="regularly-page">
+  @if (!isLoaded()) {
+    <div class="d-flex justify-content-center py-5">
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">Lädt...</span>
       </div>
     </div>
-  </div>
-  <!-- No Account Toast and Add Button -->
-  <ngb-toast class="position-fixed bottom-0 mb-4" *ngIf="isToastNoAccountShown" [autohide]="false"> Um eine regelmäßige Ein- oder Ausgabe anzulegen, benötigst du ein Konto. <a [routerLink]="['/accounts']">Hier</a> kannst du ein Konto anlegen. </ngb-toast>
-  <div class="position-fixed end-0 bottom-0 me-4 mb-4" *ngIf="isAccountAvailable && !isNoContentAvailable()">
-    <button type="button" class="btn btn-primary" (click)="openAddOrEditRegularlyModal()"><i class="bi bi-plus-lg"></i></button>
-  </div>
+  }
+  @if (monthRegularities().length > 0) {
+    <section>
+      <h2 class="section-label">Monatlich</h2>
+      <div class="entries-card-group">
+        @for (regularly of monthRegularities(); track regularly.id) {
+          <div class="entry-row" (click)="onRegularlyClicked(regularly)">
+            <app-regularly-list-entry [regularly]="regularly"></app-regularly-list-entry>
+          </div>
+        }
+      </div>
+    </section>
+  }
+  @if (quarterRegularities().length > 0) {
+    <section>
+      <h2 class="section-label">Quartal</h2>
+      <div class="entries-card-group">
+        @for (regularly of quarterRegularities(); track regularly.id) {
+          <div class="entry-row" (click)="onRegularlyClicked(regularly)">
+            <app-regularly-list-entry [regularly]="regularly"></app-regularly-list-entry>
+          </div>
+        }
+      </div>
+    </section>
+  }
+  @if (yearRegularities().length > 0) {
+    <section>
+      <h2 class="section-label">Jährlich</h2>
+      <div class="entries-card-group">
+        @for (regularly of yearRegularities(); track regularly.id) {
+          <div class="entry-row" (click)="onRegularlyClicked(regularly)">
+            <app-regularly-list-entry [regularly]="regularly"></app-regularly-list-entry>
+          </div>
+        }
+      </div>
+    </section>
+  }
+
+  @if (isNoContentAvailable() && isLoaded()) {
+    <div class="empty-state">
+      <img src="assets/img/no-account.gif" class="empty-state__img" alt="keine regelmäßigen Einträge">
+      <h2 class="empty-state__title">Keine Regelmäßigen Einträge</h2>
+      <p class="empty-state__text">Noch keine regelmäßigen Ein- oder Ausgaben. Lege jetzt welche an.</p>
+      @if (isAccountAvailable()) {
+        <button type="button" class="btn-cta" (click)="openAddOrEditRegularlyModal()">Anlegen</button>
+      }
+    </div>
+  }
+
+  @if (!isAccountAvailable()) {
+    <div class="no-account-hint">
+      <i class="bi bi-info-circle me-2"></i>
+      Um eine regelmäßige Ein- oder Ausgabe anzulegen, benötigst du ein
+      <a [routerLink]="['/accounts']">Konto</a>.
+    </div>
+  }
 </div>
+
+@if (isAccountAvailable() && !isNoContentAvailable()) {
+  <button type="button" class="fab" (click)="openAddOrEditRegularlyModal()">
+    <i class="bi bi-plus-lg"></i>
+  </button>
+}

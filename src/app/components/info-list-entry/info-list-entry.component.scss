@@ -1,19 +1,51 @@
-.list-icon {
-  font-size: 22px;
-}
+.account-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
 
-.name {
-  display: inline-block;
-  width: 200px;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
+  &__icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 13px;
+    background: rgba(59, 130, 246, 0.14);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 19px;
+    color: var(--accent, #3b82f6);
+    flex-shrink: 0;
+  }
 
-.upside {
+  &__body {
+    flex: 1;
+    min-width: 0;
+  }
 
-}
+  &__row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
 
-.downside {
-  font-size: 12px;
+  &__row--sub {
+    font-size: 12px;
+    color: var(--app-text-muted, #6b7280);
+    margin-top: 4px;
+  }
+
+  &__name {
+    font-size: 15px;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 55%;
+  }
+
+  &__value {
+    font-size: 17px;
+    font-weight: 700;
+    flex-shrink: 0;
+    letter-spacing: -0.3px;
+  }
 }

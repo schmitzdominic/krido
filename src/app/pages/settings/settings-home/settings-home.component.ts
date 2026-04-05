@@ -1,28 +1,20 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { map } from 'rxjs/operators';
 import {UserService} from "../../../services/user/user.service";
 
 @Component({
-  selector: 'app-settings-home',
-  templateUrl: './settings-home.component.html',
-  styleUrls: ['./settings-home.component.scss']
+    selector: 'app-settings-home',
+    templateUrl: './settings-home.component.html',
+    styleUrls: ['./settings-home.component.scss'],
+    standalone: false
 })
 export class SettingsHomeComponent {
+  userService = inject(UserService);
 
-  home: string = '';
-  pin: string = '';
-
-  constructor(public userService: UserService) {
-  }
-
-  ngOnInit() {
-    this.home = this.userService.home;
-    this.setPin();
-  }
-
-  setPin() {
-    this.userService.getHomePin.subscribe(pinReference => {
-      this.pin = pinReference.payload.val() as string;
-    });
-  }
-
+  readonly home: string = this.userService.home;
+  readonly pin = toSignal(
+    this.userService.getHomePin.pipe(map(p => p ? String(p) : '')),
+    { initialValue: '' }
+  );
 }

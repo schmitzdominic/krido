@@ -1,44 +1,65 @@
-<form class="needs-validation mt-3" [formGroup]="invoiceSettingsFormGroup" (ngSubmit)="onSubmit()" novalidate>
-  <div class="row" *ngIf="invoiceAccounts.length > 0">
-    <label for="invoice-settings-invoice-accounts" class="form-label">Abrechnungskonto</label>
-    <div class="mb-3">
-      <select class="form-select" id="invoice-settings-invoice-accounts" aria-label="Select Invoice Account" formControlName="invoiceAccounts">
-        <option *ngFor="let invoiceAccount of invoiceAccounts" value="{{ invoiceAccount.key }}">{{ invoiceAccount.name }}</option>
-      </select>
-    </div>
-  </div>
-  <div *ngIf="selectedInvoiceAccountKey">
-    <div class="mt-3">
-      <label for="invoice-settings-beneficiary-accounts-select" class="form-label">Verrechnungskonten</label>
-      <div *ngIf="beneficiaryAccounts.length > 0" class="row mb-3">
-        <div class="col-10">
-          <select class="form-select" id="invoice-settings-beneficiary-accounts-select" aria-label="Select Beneficiary Account" formControlName="beneficiaryAccounts">
-            <option *ngFor="let beneficiaryAccount of beneficiaryAccounts" value="{{ beneficiaryAccount.key }}">{{ beneficiaryAccount.name }}</option>
-          </select>
-        </div>
-        <div class="col-2">
-          <button type="button" class="btn btn-outline-light" (click)="addSelectedBeneficiaryAccount()"><i class="bi bi-plus-lg"></i></button>
+<div class="invoice-settings">
+  <form [formGroup]="invoiceSettingsFormGroup" novalidate>
+
+    @if (invoiceAccounts.length > 0) {
+      <div class="form-field mb-4">
+        <label class="form-field__label">Abrechnungskonto</label>
+        <div ngbDropdown container="body" placement="bottom-end">
+          <button class="form-field__select" type="button" ngbDropdownToggle>
+            {{ selectedInvoiceAccountName }}
+            <i class="bi bi-chevron-down form-field__chevron"></i>
+          </button>
+          <div ngbDropdownMenu class="sheet-dropdown">
+            @for (invoiceAccount of invoiceAccounts; track invoiceAccount.id) {
+              <button ngbDropdownItem
+                (click)="invoiceSettingsFormGroup.controls['invoiceAccounts'].setValue(invoiceAccount.id)">
+                {{ invoiceAccount.name }}
+              </button>
+            }
+          </div>
         </div>
       </div>
-    </div>
-    <div class="row" *ngIf="selectedBeneficiaryAccounts.length > 0">
-      <ul class="list-group list-group-flush px-3">
-        <li class="list-group-item" id="invoice-account-settings-beneficiary-accounts" *ngFor="let beneficiaryAccount of selectedBeneficiaryAccounts">{{ beneficiaryAccount.name }}
-          <button type="button" class="btn btn btn-dark position-absolute btn-sm end-0 top-0" (click)="onRemoveBeneficiaryAccountButtonClick(beneficiaryAccount)"><i class="bi bi-dash-lg"></i></button>
-        </li>
-      </ul>
-    </div>
-  </div>
-  <!-- Auszahlungsberechtigt -->
-  <!-- Sparrate -->
-  <!-- Anteil + max Betrag-->
-  <!-- Monat -->
-</form>
-<div class="modal-footer mt-3">
-  <button
-    type="button"
-    class="btn btn-light"
-    (click)="onSubmit()">Weiter</button>
-</div>
+    }
 
+    @if (selectedInvoiceAccountKey) {
+      <div class="form-field mb-3">
+        <label class="form-field__label">Verrechnungskonten</label>
+        @if (beneficiaryAccounts.length > 0) {
+          <div ngbDropdown container="body" placement="bottom-end">
+            <button class="form-field__select" type="button" ngbDropdownToggle>
+              Konto hinzufügen
+              <i class="bi bi-chevron-down form-field__chevron"></i>
+            </button>
+            <div ngbDropdownMenu class="sheet-dropdown">
+              @for (beneficiaryAccount of beneficiaryAccounts; track beneficiaryAccount.id) {
+                <button ngbDropdownItem
+                  (click)="invoiceSettingsFormGroup.controls['beneficiaryAccounts'].setValue(beneficiaryAccount.id); addSelectedBeneficiaryAccount()">
+                  {{ beneficiaryAccount.name }}
+                </button>
+              }
+            </div>
+          </div>
+        }
+      </div>
+
+      @if (selectedBeneficiaryAccounts.length > 0) {
+        <div class="beneficiary-list mb-4">
+          @for (account of selectedBeneficiaryAccounts; track account.id) {
+            <div class="beneficiary-item">
+              <span class="beneficiary-name">{{ account.name }}</span>
+              <button type="button" class="btn-remove" (click)="onRemoveBeneficiaryAccountButtonClick(account)">
+                <i class="bi bi-dash-lg"></i>
+              </button>
+            </div>
+          }
+        </div>
+      }
+    }
+
+  </form>
+
+  <div class="settings-footer">
+    <button type="button" class="btn-sheet btn-sheet--primary" (click)="onSubmit()">Weiter</button>
+  </div>
+</div>
 

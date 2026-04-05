@@ -1,0 +1,33 @@
+import { NgModule, NO_ERRORS_SCHEMA } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+
+import { CurrencyMaskModule } from 'ng2-currency-mask';
+
+import { HistoryComponent } from './history.component';
+import { HistoryListComponent } from './history-list/history-list.component';
+import { HomeModule } from "../home/home.module";
+
+@NgModule({
+  declarations: [
+    HistoryComponent,
+    HistoryListComponent,
+  ],
+  imports: [
+    CommonModule,
+    RouterModule.forChild([{ path: '', component: HistoryComponent }]),
+    ReactiveFormsModule,
+    FormsModule,
+    NgbModule,
+    CurrencyMaskModule,
+    HomeModule
+],
+  exports: [
+    HistoryComponent,
+    HistoryListComponent,
+  ],
+  schemas: [NO_ERRORS_SCHEMA],
+})
+export class HistoryModule { }

@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, inject } from '@angular/core';
 import {EntryType} from "../../../shared/enums/entry-type.enum";
 import {AccountType} from "../../../shared/enums/account-type.enum";
 import {Regularly} from "../../../shared/interfaces/regularly.model";
@@ -7,19 +7,26 @@ import {DateService} from "../../services/date/date.service";
 import {RegularlyCycleType} from "../../../shared/enums/regularly-cycle-type.enum";
 
 @Component({
-  selector: 'app-regularly-list-entry',
-  templateUrl: './regularly-list-entry.component.html',
-  styleUrls: ['./regularly-list-entry.component.scss']
+    selector: 'app-regularly-list-entry',
+    templateUrl: './regularly-list-entry.component.html',
+    styleUrls: ['./regularly-list-entry.component.scss'],
+    standalone: false,
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class RegularlyListEntryComponent {
+  priceService = inject(PriceService);
+  dateService = inject(DateService);
+
 
   @Input() regularly: Regularly | undefined;
 
   protected readonly EntryType = EntryType;
   protected readonly AccountType = AccountType;
 
-  constructor(public priceService: PriceService,
-              public dateService: DateService) {
+  /** Inserted by Angular inject() migration for backwards compatibility */
+  constructor(...args: unknown[]);
+
+  constructor() {
   }
 
   ngOnInit() {

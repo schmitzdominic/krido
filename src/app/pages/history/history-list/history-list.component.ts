@@ -1,11 +1,14 @@
-import {Component, Input, SimpleChanges, ViewChild} from '@angular/core';
+import { Component, computed, inject, input, ViewChild } from '@angular/core';
+import { toSignal, toObservable } from '@angular/core/rxjs-interop';
 import {EntryService} from "../../../services/entry/entry.service";
 import {HelperService} from "../../../services/helper/helper.service";
 import {Entry} from "../../../../shared/interfaces/entry.model";
 import {DateService} from "../../../services/date/date.service";
-import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap/modal/modal-ref";
+import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {Account} from "../../../../shared/interfaces/account.model";
+import { map, switchMap } from 'rxjs/operators';
+import { of } from 'rxjs';
 
 export interface HistorySearchObject {
   searchValue: string,
@@ -14,100 +17,85 @@ export interface HistorySearchObject {
 }
 
 @Component({
-  selector: 'app-history-list',
-  templateUrl: './history-list.component.html',
-  styleUrls: ['./history-list.component.scss']
+    selector: 'app-history-list',
+    templateUrl: './history-list.component.html',
+    styleUrls: ['./history-list.component.scss'],
+    standalone: false
 })
 export class HistoryListComponent {
+  private entryService = inject(EntryService);
+  private helperService = inject(HelperService);
+  private dateService = inject(DateService);
+  private ngbModal = inject(NgbModal);
 
-  @Input() historySearchObject: HistorySearchObject | undefined;
+  readonly historySearchObject = input<HistorySearchObject>();
 
   @ViewChild('addOrEditEntryModal') addOrEditEntryModal: NgbModalRef | undefined;
 
-  title: string = '';
-
   addOrEditEntryModalRef: NgbModalRef | undefined;
+  selectedEntry: (Entry & { id: string }) | undefined;
 
-  entries: Entry[] = [];
+  readonly entries = toSignal(
+    toObservable(this.historySearchObject).pipe(
+      switchMap(search => {
+        if (!search) return of([] as (Entry & { id: string })[]);
 
-  selectedEntry: Entry | undefined;
-
-  constructor(private entryService: EntryService,
-              private helperService: HelperService,
-              private dateService: DateService,
-              private ngbModal: NgbModal) {
-  }
-
-  ngOnInit() {
-  }
-
-  ngOnChanges(changes: SimpleChanges) {
-
-    this.historySearchObject = changes['historySearchObject']?.currentValue;
-
-    if (this.historySearchObject!.searchValue.length > 3) {
-      this.search(this.historySearchObject!.searchValue, this.historySearchObject!.account);
-    } else {
-      if (this.historySearchObject!.isLastMonth) {
-        this.loadLastMonth(this.historySearchObject!.account);
-      } else {
-        this.entries.length = 0;
-      }
-    }
-  }
-
-  search(value: string, account: Account | undefined = undefined) {
-    this.title = 'Ergebnisse'
-    this.entryService.searchEntriesByName(this.helperService.createSearchName(value)).subscribe(results => {
-      this.entries.length = 0;
-      results.filter(entry => (entry.payload.val() as Entry).searchName.includes(this.helperService.createSearchName(value))).forEach(result => {
-        const entry: Entry = result.payload.val() as Entry;
-        entry.key = result.key ? result.key : '';
-        this.entries.push(entry);
-      });
-      if (this.entries.length === 0) {
-        this.title = 'Nichts gefunden!'
-      } else {
-        if (account) {
-          this.filterEntriesByAccount(account);
+        if (search.searchValue.length > 2) {
+          const searchName = this.helperService.createSearchName(search.searchValue);
+          return this.entryService.searchEntriesByName(searchName).pipe(
+            map(results => {
+              let filtered = (results as (Entry & { id: string })[])
+                .filter(e => e.searchName.includes(searchName));
+              if (search.account) {
+                filtered = filtered.filter(e =>
+                  (e.account as any)?.id === (search.account as any)?.id
+                );
+              }
+              return filtered.sort((a, b) => a.date > b.date ? -1 : 1);
+            })
+          );
         }
-        this.sortEntriesByDate(this.entries);
-      }
-    });
-  }
 
-  private sortEntriesByDate(entries: Entry[]) {
-    entries.sort((one, two) => {
-      return one.date > two.date ? -1 : 1;
-    });
-  }
+        if (search.isLastMonth) {
+          const lastMonthString = this.dateService.getMonthStringFromMonth(-1);
+          return this.entryService.searchEntriesByMonthString(lastMonthString).pipe(
+            map(results => {
+              let filtered = (results as (Entry & { id: string })[])
+                .filter(e => e.monthString.includes(lastMonthString));
+              if (search.account) {
+                filtered = filtered.filter(e =>
+                  (e.account as any)?.id === (search.account as any)?.id
+                );
+              }
+              return filtered;
+            })
+          );
+        }
 
-  loadLastMonth(account: Account | undefined = undefined) {
-    const lastMonthString: string = this.dateService.getMonthStringFromMonth(-1);
-    this.title = `${this.dateService.getMonthName(lastMonthString)} ${this.dateService.getYear(lastMonthString)}`;
-    this.entryService.searchEntriesByMonthString(lastMonthString).subscribe(results => {
-      this.entries.length = 0;
-      results.filter(entry => (entry.payload.val() as Entry).monthString.includes(lastMonthString)).forEach(result => {
-        const entry: Entry = result.payload.val() as Entry;
-        entry.key = result.key ? result.key : '';
-        this.entries.push(entry);
-      });
-      if (account) {
-        this.filterEntriesByAccount(account);
-      }
-    });
-  }
+        return of([] as (Entry & { id: string })[]);
+      })
+    ),
+    { initialValue: [] as (Entry & { id: string })[] }
+  );
 
-  filterEntriesByAccount(account: Account) {
-    this.entries = this.entries.filter(entry => entry.account.key == account.key);
-  }
+  readonly title = computed(() => {
+    const search = this.historySearchObject();
+    if (!search) return '';
+    if (search.searchValue.length > 2) {
+      return this.entries().length === 0 ? 'Nichts gefunden!' : 'Ergebnisse';
+    }
+    if (search.isLastMonth) {
+      const lastMonthString = this.dateService.getMonthStringFromMonth(-1);
+      return `${this.dateService.getMonthName(lastMonthString)} ${this.dateService.getYear(lastMonthString)}`;
+    }
+    return '';
+  });
 
   openAddOrEditEntryModal(): void {
+    (document.activeElement as HTMLElement)?.blur();
     this.addOrEditEntryModalRef = this.ngbModal.open(
       this.addOrEditEntryModal,
-      {
-        size: 'md'
-      });
+      { size: 'md' });
   }
 
   onCloseAddOrEditEntryModal(): void {
@@ -117,7 +105,7 @@ export class HistoryListComponent {
     }
   }
 
-  onEntryClick(entry: Entry) {
+  onEntryClick(entry: Entry & { id: string }) {
     this.selectedEntry = entry;
     this.openAddOrEditEntryModal();
   }

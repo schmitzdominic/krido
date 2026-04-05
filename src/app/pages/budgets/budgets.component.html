@@ -1,25 +1,13 @@
-<ul ngbNav #nav="ngbNav" [(activeId)]="active" class="nav-tabs">
-  <li [ngbNavItem]="'budgets'">
-    <button ngbNavLink>Aktiv</button>
-    <ng-template ngbNavContent>
-      <app-budget-list>
-      </app-budget-list>
-    </ng-template>
-  </li>
-  <li [ngbNavItem]="'cycles'">
-    <button ngbNavLink>Zyklen</button>
-    <ng-template ngbNavContent>
-      <app-cycle-list>
-      </app-cycle-list>
-    </ng-template>
-  </li>
-  <li [ngbNavItem]="'archive'" *ngIf="isArchiveShown">
-    <button ngbNavLink>Archiv</button>
-    <ng-template ngbNavContent>
-      <app-budget-archive-list>
-      </app-budget-archive-list>
-    </ng-template>
-  </li>
-</ul>
+<div class="page-tabs">
+  <button class="page-tab" [class.page-tab--active]="active === 'budgets'" (click)="active = 'budgets'">Aktiv</button>
+  <button class="page-tab" [class.page-tab--active]="active === 'cycles'" (click)="active = 'cycles'">Zyklen</button>
+  @if (isArchiveShown) {
+    <button class="page-tab" [class.page-tab--active]="active === 'archive'" (click)="active = 'archive'">Archiv</button>
+  }
+</div>
 
-<div [ngbNavOutlet]="nav" class="mt-2"></div>
+<app-budget-list [hidden]="active !== 'budgets'"></app-budget-list>
+<app-cycle-list [hidden]="active !== 'cycles'"></app-cycle-list>
+@if (isArchiveShown) {
+  <app-budget-archive-list [hidden]="active !== 'archive'"></app-budget-archive-list>
+}

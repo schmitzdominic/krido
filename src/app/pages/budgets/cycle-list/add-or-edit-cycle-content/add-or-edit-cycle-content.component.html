@@ -1,71 +1,70 @@
-<div>
-  <h1 class="d-flex align-items-center justify-content-center pt-4">{{ title }}</h1>
-</div>
-<div class="modal-body">
-  <form class="needs-validation" [formGroup]="addCycleFormGroup" (ngSubmit)="onSubmit()" novalidate>
-    <div class="col-md-12 mb-3">
-      <label for="add-cycle-name" class="form-label">Name</label>
-      <div class="input-group has-validation">
-        <input formControlName="name" type="text" class="form-control" id="add-cycle-name" aria-describedby="inputGroupPrepend" required>
-        <div class="invalid-feedback">
-          Name fehlt!
+<div class="modal-body sheet-body">
+  <div class="sheet-header">
+    <span class="sheet-header__title">{{ title }}</span>
+  </div>
+
+  <form [formGroup]="addCycleFormGroup" novalidate>
+
+    <!-- Name -->
+    <div class="form-field mb-3">
+      <label class="form-field__label">Name</label>
+      <input formControlName="name" type="text" class="form-field__input"
+        placeholder="z. B. Lebensmittel" autocomplete="off" id="add-cycle-name">
+    </div>
+
+    <!-- Typ -->
+    <div class="form-field mb-3">
+      <label class="form-field__label">Typ</label>
+      <div class="info-badge"><i class="bi bi-arrow-repeat me-2"></i>Monatlich</div>
+    </div>
+
+    <!-- Initiales Limit -->
+    <div class="toggle-row mb-3">
+      <label class="toggle-row__label" for="add-cycle-initial-limit">Initiales Limit setzen</label>
+      <input formControlName="initialLimit" class="toggle-row__check" type="checkbox"
+        id="add-cycle-initial-limit">
+    </div>
+
+    @if (isLimitVisible) {
+      <div class="form-field mb-3">
+        <label class="form-field__label">Limit</label>
+        <div class="form-field__amount-wrap">
+          <input currencyMask class="form-field__input form-field__input--amount"
+            formControlName="limit"
+            [options]="{ prefix: '', thousands: '.', decimal: ',' }"
+            inputmode="decimal" placeholder="0,00" id="add-cycle-limit">
+          <span class="form-field__currency">€</span>
         </div>
       </div>
+    }
+
+    <!-- Übertrag -->
+    <div class="toggle-row mb-3">
+      <label class="toggle-row__label" for="add-cycle-transfer">Übertrag (REST vom Vormonat)</label>
+      <input formControlName="transfer" class="toggle-row__check" type="checkbox"
+        id="add-cycle-transfer">
     </div>
-    <div ngbDropdown class="col-md-12 mb-4">
-      <button type="button" class="btn btn-outline-primary" id="add-cycle-type" ngbDropdownToggle>
-        {{ chosenCycleType == CycleType.monthly ? 'Monatlich' : '' }}
-      </button>
-      <div ngbDropdownMenu aria-labelledby="budgetType">
+
+    @if (isCreateNowVisible) {
+      <div class="toggle-row mb-3">
+        <label class="toggle-row__label" for="add-cycle-create-now">Budget für diesen Monat erstellen</label>
+        <input formControlName="createNow" class="toggle-row__check" type="checkbox"
+          id="add-cycle-create-now">
       </div>
-    </div>
-    <div class="col-12 mb-3">
-      <div class="form-check">
-        <input formControlName="initialLimit" class="form-check-input" type="checkbox" value="" id="add-cycle-initial-limit">
-        <label class="form-check-label ps-1" for="add-cycle-initial-limit">
-          Initial Limit
-        </label>
-      </div>
-    </div>
-    <div *ngIf="isLimitVisible" class="col-md-12 mb-3">
-      <label for="add-cycle-limit" class="form-label">Limit</label>
-      <div class="input-group has-validation">
-        <input
-          currencyMask
-          class="form-control"
-          id="add-cycle-limit"
-          formControlName="limit"
-          aria-describedby="inputGroupPrepend"
-          [options]="{ prefix: '', thousands: '', decimal: ',' }"
-          inputmode="numeric"
-          pattern="^\d+(\,\d{1,2})?$">
-        <span class="input-group-text" id="inputGroupPrepend">€</span>
-      </div>
-    </div>
-    <div class="col-12 mb-3">
-      <div class="form-check">
-        <input formControlName="transfer" class="form-check-input" type="checkbox" value="" id="add-cycle-transfer">
-        <label class="form-check-label ps-1" for="add-cycle-transfer">
-          Übertrag
-        </label>
-      </div>
-    </div>
-    <div *ngIf="isCreateNowVisible" class="col-12 mb-3">
-      <div class="form-check">
-        <input formControlName="createNow" class="form-check-input" type="checkbox" value="" id="add-cycle-create-now">
-        <label class="form-check-label ps-1" for="add-cycle-create-now">
-          Budget für diesen Zyklus erstellen?
-        </label>
-      </div>
-    </div>
+    }
+
   </form>
-  <button *ngIf="cycle && budgets.length === 0" type="button" class="btn btn-danger ms-2" (click)="onDelete()">Löschen</button>
+
+  @if (cycle && budgets.length === 0) {
+    <button type="button" class="btn-sheet btn-sheet--danger mt-2" (click)="onDelete()">
+      <i class="bi bi-trash me-1"></i>Löschen
+    </button>
+  }
 </div>
-<div class="modal-footer">
-  <button type="button" class="btn btn-dark" (click)="onCancel()">Abbrechen</button>
-  <button
-    type="button"
-    class="btn btn-light"
+
+<div class="sheet-footer">
+  <button type="button" class="btn-sheet btn-sheet--ghost" (click)="onCancel()">Abbrechen</button>
+  <button type="button" class="btn-sheet btn-sheet--primary"
     [disabled]="isNameInvalid || isLimitInvalid"
     (click)="onSubmit()">{{ submitButtonText }}</button>
 </div>

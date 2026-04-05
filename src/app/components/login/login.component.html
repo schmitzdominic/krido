@@ -1,28 +1,71 @@
-<div class="d-flex align-items-center vh-100">
-  <div class="container">
-    <h1 class="d-flex justify-content-center pb-5 display-1" style="font-size: 50px">Login</h1>
-    <form class="needs-validation" [formGroup]="loginFormGroup" (ngSubmit)="onSubmit()" novalidate>
-      <div class="col-md-12 mb-3">
+<div class="login-wrapper d-flex align-items-center justify-content-center vh-100">
+  <div class="login-card">
+    <div class="text-center mb-4 login-header">
+      <div class="login-icon mb-3">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" width="80" height="80" fill="none">
+          <defs>
+            <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#3b82f6"/>
+              <stop offset="100%" stop-color="#6366f1"/>
+            </linearGradient>
+            <linearGradient id="houseGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#ffffff" stop-opacity="1"/>
+              <stop offset="100%" stop-color="#c7d2fe" stop-opacity="0.85"/>
+            </linearGradient>
+            <filter id="glow">
+              <feGaussianBlur stdDeviation="2.5" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+          </defs>
+          <!-- Background circle with gradient -->
+          <circle cx="40" cy="40" r="38" fill="url(#bgGrad)" opacity="0.18"/>
+          <circle cx="40" cy="40" r="32" fill="url(#bgGrad)" opacity="0.12"/>
+          <!-- House body -->
+          <g filter="url(#glow)">
+            <!-- Roof -->
+            <polygon points="40,16 18,36 22,36 22,60 58,60 58,36 62,36" fill="url(#houseGrad)" opacity="0.95"/>
+            <!-- Door -->
+            <rect x="33" y="44" width="14" height="16" rx="2" fill="url(#bgGrad)"/>
+            <!-- Window left -->
+            <rect x="22" y="40" width="9" height="9" rx="1.5" fill="url(#bgGrad)" opacity="0.7"/>
+            <!-- Window right -->
+            <rect x="49" y="40" width="9" height="9" rx="1.5" fill="url(#bgGrad)" opacity="0.7"/>
+            <!-- Chimney -->
+            <rect x="50" y="20" width="5" height="12" rx="1" fill="url(#houseGrad)" opacity="0.7"/>
+          </g>
+        </svg>
+      </div>
+      <h1 class="h2 fw-bold mb-0 login-title">HOME</h1>
+      <p class="text-body-secondary small mt-1 login-subtitle">Haushalts-Finanzmanagement</p>
+    </div>
+
+    <form [formGroup]="loginFormGroup" (ngSubmit)="onSubmit()" novalidate>
+      <div class="mb-3 login-field login-field--1">
         <label for="login-input-username" class="form-label">E-Mail</label>
-        <div class="input-group has-validation">
-          <span class="input-group-text" id="inputGroupPrepend">@</span>
-          <input formControlName="email" type="text" class="form-control" id="login-input-username" aria-describedby="inputGroupPrepend" required>
-          <div class="invalid-feedback">
-            E-Mail fehlt!
-          </div>
+        <div class="input-group">
+          <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+          <input formControlName="email" type="email" class="form-control" id="login-input-username" autocomplete="email" required>
         </div>
       </div>
-      <div class="col-md-12 mb-3">
-        <label for="login-input-password" class="form-label">Password</label>
-        <input formControlName="password" type="password" class="form-control" id="login-input-password" required>
-        <div class="valid-feedback">
-          Passwort fehlt!
+
+      <div class="mb-4 login-field login-field--2">
+        <label for="login-input-password" class="form-label">Passwort</label>
+        <div class="input-group">
+          <span class="input-group-text"><i class="bi bi-lock"></i></span>
+          <input formControlName="password" type="password" class="form-control" id="login-input-password" autocomplete="current-password" required>
         </div>
       </div>
-      <div class="col-md-12">
-        <button [disabled]="loginFormGroup.invalid" class="btn btn-primary float-end" type="submit">Login</button>
-      </div>
+
+      <button [disabled]="loginFormGroup.invalid || isLoading" class="btn btn-primary w-100 login-field login-field--3" type="submit">
+        @if (isLoading) {
+          <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+        }
+        Anmelden
+      </button>
     </form>
   </div>
+
+  <p class="position-fixed bottom-0 mb-3 text-body-secondary small text-center">
+    Nur zur privaten Nutzung &mdash; keine Registrierung möglich.
+  </p>
 </div>
-<div class="position-fixed bottom-0 m-3"><p>This page is only for private use. It is <b>not</b> possible to create a account.</p></div>

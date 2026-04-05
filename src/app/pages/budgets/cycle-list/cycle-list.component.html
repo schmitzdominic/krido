@@ -5,35 +5,41 @@
     (onClose)="onCloseAddOrEditCycleModal()">
   </app-add-or-edit-cycle-content>
 </ng-template>
-<div class="container">
-  <div class="row">
-    <ul class="list-group list-group-flush">
-      <li class="list-group-item" id="list-cycles" *ngFor="let cycle of cycles" (click)="onCardClick(cycle)">
-        <div class="custom-list-item">
-          <span class="name ps-2 pt-1"> {{ cycle.name }} </span>
-          <span class="limit position-absolute top-0 end-0 pt-3 pe-3 value">{{ cycle.limit ? priceService.convertNumberToEuro(cycle.limit!) : 'Kein Limit gesetzt' }}</span>
+
+<div class="cycle-page">
+  @if (!isInitialized) {
+    <div class="d-flex justify-content-center py-5">
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">Lädt...</span>
+      </div>
+    </div>
+  }
+  @if (cycles.length > 0) {
+    <div class="entries-card-group">
+      @for (cycle of cycles; track cycle.id) {
+        <div class="cycle-row" (click)="onCardClick(cycle)">
+          <div class="cycle-row__icon">
+            <i class="bi bi-arrow-repeat"></i>
+          </div>
+          <span class="cycle-row__name">{{ cycle.name }}</span>
+          <span class="cycle-row__value">{{ cycle.limit ? priceService.convertNumberToEuro(cycle.limit!) : '–' }}</span>
         </div>
-      </li>
-    </ul>
-  </div>
-</div>
-<div class="row" *ngIf="cycles.length == 0 && isInitialized">
-  <div class="card">
-    <div class="m-2 mt-3">
-      <img src="assets/img/no-cycle.gif" class="card-img-top" alt="no cycle" style="border-radius: 6px;">
+      }
     </div>
-    <div class="card-body">
-      <h1 class="card-title">Keine Zyklen</h1>
-      <div class="no-cycle-card-content">
-        <p class="card-text">Du hast noch keinen Zyklus angelegt. Ein Zyklus legt für dich bequem budgets an.</p>
-      </div>
-      <div class="position-absolute end-0 bottom-0 me-4 mb-4">
-        <button type="button" class="btn btn-primary" (click)="onAddClick()">Anlegen</button>
-      </div>
+  }
+
+  @if (cycles.length === 0 && isInitialized) {
+    <div class="empty-state">
+      <img src="assets/img/no-cycle.gif" class="empty-state__img" alt="keine Zyklen">
+      <h2 class="empty-state__title">Keine Zyklen</h2>
+      <p class="empty-state__text">Noch keine Zyklen angelegt. Zyklen legen automatisch Budgets für dich an.</p>
+      <button type="button" class="btn-cta" (click)="onAddClick()">Anlegen</button>
     </div>
-  </div>
+  }
 </div>
-<!-- Add Button -->
-<div class="position-fixed end-0 bottom-0 me-4 mb-4" *ngIf="cycles.length > 0">
-  <button type="button" class="btn btn-primary" (click)="onAddClick()"><i class="bi bi-plus-lg"></i></button>
-</div>
+
+@if (cycles.length > 0) {
+  <button type="button" class="fab" (click)="onAddClick()">
+    <i class="bi bi-plus-lg"></i>
+  </button>
+}

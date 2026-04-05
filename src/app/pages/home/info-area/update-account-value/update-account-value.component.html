@@ -1,52 +1,57 @@
-<div>
-  <h1 class="d-flex align-items-center justify-content-center pt-4">Kontostand anpassen</h1>
-</div>
-<div class="modal-body">
-  <form class="needs-validation" [formGroup]="updateAccountValueFormGroup" (ngSubmit)="onSubmit()" novalidate>
-    <div class="col-md-12 mb-3">
-      <label for="update-account-date" class="form-label">Datum</label>
-      <div class="input-group">
+<div class="modal-body sheet-body">
+  <form [formGroup]="updateAccountValueFormGroup" (ngSubmit)="onSubmit()" novalidate>
+
+    <!-- Kontoname -->
+    @if (account) {
+      <div class="account-title">{{ account.name }}</div>
+    }
+
+    <!-- Datum -->
+    <div class="form-field mb-3">
+      <label class="form-field__label">Datum</label>
+      <div class="form-field__date-wrap">
         <input
-          id="update-account-date"
-          class="form-control"
-          placeholder="{{ selectedDateTimestamp | date: 'dd.MM.yyyy'}}"
+          class="form-field__input"
+          placeholder="{{ selectedDateTimestamp | date: 'dd.MM.yyyy' }}"
           name="date"
           formControlName="date"
           ngbDatepicker
-          [readOnly]="true"
-          value="{{ selectedDateTimestamp | date: 'dd.MM.yyyy'}}"
+          container="body"
+          placement="bottom-end"
           [showWeekNumbers]="true"
+          [startDate]="selectedDate"
           (dateSelect)="onDateSelected($event)"
           #date="ngbDatepicker"
-        />
-        <button class="btn btn-outline-secondary bi bi-calendar3" (click)="date.toggle()" type="button"></button>
+          readonly />
+        <button class="form-field__date-btn" (click)="date.toggle()" type="button">
+          <i class="bi bi-calendar3"></i>
+        </button>
       </div>
     </div>
-    <div class="col-md-12 mb-3">
-      <label for="update-account-value" class="form-label">Betrag</label>
-      <div class="input-group has-validation">
+
+    <!-- Betrag -->
+    <div class="form-field mb-1">
+      <label class="form-field__label">Neuer Kontostand</label>
+      <div class="form-field__amount-wrap">
         <input
           currencyMask
-          class="form-control"
-          id="update-account-value"
+          class="form-field__input form-field__input--amount"
           formControlName="value"
-          aria-describedby="inputGroupPrepend"
-          [options]="{ prefix: '', thousands: '', decimal: ',' }"
-          inputmode="numeric"
-          pattern="^\d+(\,\d{1,2})?$">
-        <span class="input-group-text" id="inputGroupPrepend">€</span>
-        <div class="invalid-feedback">
-          Betrag fehlt!
-        </div>
+          [options]="{ prefix: '', thousands: '.', decimal: ',' }"
+          inputmode="decimal"
+          placeholder="0,00">
+        <span class="form-field__currency">€</span>
       </div>
     </div>
+
   </form>
 </div>
-<div class="modal-footer">
-  <button type="button" class="btn btn-dark" (click)="onButtonCancel()">Abbrechen</button>
+
+<div class="sheet-footer">
+  <button type="button" class="btn-sheet btn-sheet--ghost" (click)="onButtonCancel()">Abbrechen</button>
   <button
     type="button"
-    class="btn btn-light"
+    class="btn-sheet btn-sheet--primary"
     [disabled]="isValueInvalid"
     (click)="onSubmit()">Anpassen</button>
 </div>

@@ -1,46 +1,55 @@
-<div>
-  <h1 class="d-flex align-items-center justify-content-center pt-4">{{ title }}</h1>
-</div>
-<div class="modal-body">
-  <form class="needs-validation" [formGroup]="addBudgetFormGroup" (ngSubmit)="onSubmit()" novalidate>
-    <div class="col-md-12 mb-3">
-      <label for="add-budget-name" class="form-label">Name</label>
-      <div class="input-group has-validation">
-        <input formControlName="name" type="text" class="form-control" id="add-budget-name" aria-describedby="inputGroupPrepend" required>
-        <div class="invalid-feedback">
-          Name fehlt!
-        </div>
-      </div>
+<div class="modal-body sheet-body">
+  <div class="budget-edit-title">{{ title }}</div>
+
+  <form [formGroup]="addBudgetFormGroup" (ngSubmit)="onSubmit()" novalidate>
+
+    <!-- Name -->
+    <div class="form-field mb-3">
+      <label class="form-field__label">Name</label>
+      <input formControlName="name" type="text" class="form-field__input" placeholder="z. B. Lebensmittel" autocomplete="off">
     </div>
-    <div class="col-md-12 mb-3">
-      <label for="add-budget-limit" class="form-label">Limit</label>
-      <div class="input-group has-validation">
+
+    <!-- Limit -->
+    <div class="form-field mb-3">
+      <label class="form-field__label">Limit</label>
+      <div class="form-field__amount-wrap">
         <input
           currencyMask
-          class="form-control"
-          id="add-budget-limit"
+          class="form-field__input form-field__input--amount"
           formControlName="limit"
-          aria-describedby="inputGroupPrepend"
-          [options]="{ prefix: '', thousands: '', decimal: ',' }"
-          inputmode="numeric"
-          pattern="^\d+(\,\d{1,2})?$"
-          required>
-        <span class="input-group-text" id="inputGroupPrepend">€</span>
-        <div class="invalid-feedback">
-          Limit fehlt!
-        </div>
+          [options]="{ prefix: '', thousands: '.', decimal: ',' }"
+          inputmode="decimal"
+          placeholder="0,00">
+        <span class="form-field__currency">€</span>
       </div>
     </div>
+
   </form>
-  <button *ngIf="budget && !budget?.isArchived" type="button" class="btn btn-secondary" (click)="onArchive()">Archivieren</button>
-  <button *ngIf="budget && budget?.isArchived" type="button" class="btn btn-success" (click)="onDeArchive()">Aktivieren</button>
-  <button *ngIf="isDeleteAvailable" type="button" class="btn btn-danger ms-2" (click)="onDelete()">Löschen</button>
+
+  <!-- Archive / Delete actions -->
+  @if (budget) {
+    <div class="action-row">
+      @if (!budget.isArchived) {
+        <button type="button" class="btn-action btn-action--secondary" (click)="onArchive()">Archivieren</button>
+      }
+      @if (budget.isArchived) {
+        <button type="button" class="btn-action btn-action--success" (click)="onDeArchive()">Aktivieren</button>
+      }
+      @if (isDeleteAvailable) {
+        <button type="button" class="btn-action btn-action--danger" (click)="onDelete()">
+          <i class="bi bi-trash"></i>
+        </button>
+      }
+    </div>
+  }
+
 </div>
-<div class="modal-footer">
-  <button type="button" class="btn btn-dark" (click)="onCancel()">Abbrechen</button>
+
+<div class="sheet-footer">
+  <button type="button" class="btn-sheet btn-sheet--ghost" (click)="onCancel()">Abbrechen</button>
   <button
     type="button"
-    class="btn btn-light"
-    [disabled]="addBudgetFormGroup.invalid"
+    class="btn-sheet btn-sheet--primary"
+    [disabled]="addBudgetFormGroup.invalid || !isEdited"
     (click)="onSubmit()">{{ submitButtonText }}</button>
 </div>
