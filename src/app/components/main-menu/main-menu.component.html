@@ -19,11 +19,11 @@
           <i class="bi" [ngClass]="homeUIService.isSearchActive() ? 'bi-x-lg' : 'bi-search'"></i>
         </button>
         @if (!homeUIService.isSearchActive() && !homeUIService.isAccountsExpanded()) {
-          <div ngbDropdown placement="bottom-end" container="body">
+          <div ngbDropdown placement="bottom-end">
             <button type="button" class="btn btn-icon-nav no-caret" ngbDropdownToggle>
               <i class="bi bi-three-dots-vertical"></i>
             </button>
-            <div ngbDropdownMenu>
+            <div ngbDropdownMenu class="dropdown-menu-end">
               <button ngbDropdownItem (click)="homeUIService.requestShowAccounts()">
                 <i class="bi bi-eye pe-2"></i>Konten einblenden
               </button>
