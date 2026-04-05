@@ -1,16 +1,15 @@
 .home-page {
   display: flex;
   flex-direction: column;
-  gap: 0;
+  gap: 24px;
   padding-bottom: 80px; // room for FAB
 }
 
 .home-section {
-  margin-top: 24px;
+  // used by budget section wrapper
 }
 
 app-entry-list {
-  margin-top: 24px;
 }
 
 .budget-cards {
