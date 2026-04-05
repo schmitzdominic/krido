@@ -1,6 +1,9 @@
 import { Component, inject } from '@angular/core';
 import {MenuTitleService} from "../../../shared/behavior/menu-title/menu-title.service";
-import {Router} from "@angular/router";
+import {NavigationEnd, Router} from "@angular/router";
+import { filter, map, startWith } from 'rxjs';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { HomeUIService } from '../../services/home/home-ui.service';
 
 @Component({
     selector: 'app-main-menu',
@@ -10,7 +13,17 @@ import {Router} from "@angular/router";
 })
 export class MainMenuComponent {
   protected menuTitleService = inject(MenuTitleService);
+  protected homeUIService = inject(HomeUIService);
   private router = inject(Router);
+
+  readonly isOnHome = toSignal(
+    this.router.events.pipe(
+      filter(e => e instanceof NavigationEnd),
+      map((e: NavigationEnd) => e.urlAfterRedirects.startsWith('/home')),
+      startWith(this.router.url.startsWith('/home'))
+    ),
+    { initialValue: this.router.url.startsWith('/home') }
+  );
 
   navigateToAccounts(): void {
     this.router.navigate(['/accounts']);

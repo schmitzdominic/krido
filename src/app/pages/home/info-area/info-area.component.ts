@@ -7,6 +7,7 @@ import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {UserService} from "../../../services/user/user.service";
 import { map } from 'rxjs/operators';
+import { HomeUIService } from '../../../services/home/home-ui.service';
 
 @Component({
     selector: 'app-info-area',
@@ -21,14 +22,10 @@ export class InfoAreaComponent {
 
   @ViewChild('updateAccountValueModal') updateAccountValueModal: NgbModalRef | undefined;
 
+  protected homeUIService = inject(HomeUIService);
+
   selectedAccount: Account | undefined;
   updateAccountValueModalRef: NgbModalRef | undefined;
-  isAccountsExpanded: boolean = localStorage.getItem('accounts-expanded') !== 'false';
-
-  toggleAccountsSection(): void {
-    this.isAccountsExpanded = !this.isAccountsExpanded;
-    localStorage.setItem('accounts-expanded', String(this.isAccountsExpanded));
-  }
 
   private readonly allGiroAccounts = toSignal(
     this.accountService.getAllAccountsFilteredByAccountType(AccountType.giro).pipe(

@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
 import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {AccountService} from "../../../services/account/account.service";
@@ -7,6 +7,7 @@ import {DateService} from "../../../services/date/date.service";
 import {Entry} from "../../../../shared/interfaces/entry.model";
 import { combineLatest, forkJoin, map, Subject, take, takeUntil } from 'rxjs';
 import { Account } from '../../../../shared/interfaces/account.model';
+import { HomeUIService } from '../../../services/home/home-ui.service';
 
 @Component({
     selector: 'app-entry-list',
@@ -40,6 +41,10 @@ export class EntryListComponent implements OnInit, OnDestroy {
   isAccountAvailable: boolean = false;
   isToastNoAccountShown: boolean = false;
   isShowAll: boolean = false;
+  isFabVisible: boolean = true;
+
+  protected homeUIService = inject(HomeUIService);
+  private lastScrollY: number = 0;
 
   private destroy$ = new Subject<void>();
 
@@ -116,6 +121,30 @@ export class EntryListComponent implements OnInit, OnDestroy {
   onButtonShowAllClick() {
     this.isShowAll = !this.isShowAll;
     this.filterAndSortEntries();
+  }
+
+  @HostListener('window:scroll')
+  onScroll(): void {
+    const currentY = window.scrollY;
+    if (currentY > this.lastScrollY + 10) {
+      this.isFabVisible = false;
+    } else if (currentY < this.lastScrollY - 5) {
+      this.isFabVisible = true;
+    }
+    if (currentY < 50) {
+      this.isFabVisible = true;
+    }
+    this.lastScrollY = currentY;
+  }
+
+  get searchResults(): (Entry & { id: string })[] {
+    const query = this.homeUIService.searchQuery().trim().toLowerCase();
+    if (!query) return [];
+    const all = [...this.allActualMonthEntries, ...this.allNextMonthEntries];
+    return all.filter(entry =>
+      entry.name.toLowerCase().includes(query) ||
+      entry.account?.name?.toLowerCase().includes(query)
+    );
   }
 
   ngOnDestroy(): void {

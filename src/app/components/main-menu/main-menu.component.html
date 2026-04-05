@@ -3,7 +3,35 @@
     <div class="me-2">
       <button type="button" class="btn top-50" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><i class="bi bi-list"></i></button>
     </div>
-    <a class="navbar-brand ps-2">{{ menuTitleService.title() }}</a>
+    <a class="navbar-brand ps-2" [hidden]="homeUIService.isSearchActive()">{{ menuTitleService.title() }}</a>
+    @if (homeUIService.isSearchActive()) {
+      <div class="flex-grow-1 mx-2">
+        <input type="text" class="form-control form-control-sm search-input"
+               placeholder="Suchen..."
+               autofocus
+               [value]="homeUIService.searchQuery()"
+               (input)="homeUIService.searchQuery.set($any($event.target).value)">
+      </div>
+    }
+    @if (isOnHome()) {
+      <div class="d-flex align-items-center gap-1" [class.ms-auto]="!homeUIService.isSearchActive()">
+        <button type="button" class="btn btn-icon-nav" (click)="homeUIService.toggleSearch()">
+          <i class="bi" [ngClass]="homeUIService.isSearchActive() ? 'bi-x-lg' : 'bi-search'"></i>
+        </button>
+        @if (!homeUIService.isSearchActive() && !homeUIService.isAccountsExpanded()) {
+          <div ngbDropdown placement="bottom-end">
+            <button type="button" class="btn btn-icon-nav no-caret" ngbDropdownToggle>
+              <i class="bi bi-three-dots-vertical"></i>
+            </button>
+            <div ngbDropdownMenu>
+              <button ngbDropdownItem (click)="homeUIService.requestShowAccounts()">
+                <i class="bi bi-eye pe-2"></i>Konten einblenden
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    }
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul ngbNav [activeId]="menuTitleService.activeId()" (activeIdChange)="menuTitleService.activeId.set($event)" class="navbar-nav me-auto mb-2 mt-4 mb-lg-0">
         <li [ngbNavItem]="1">
