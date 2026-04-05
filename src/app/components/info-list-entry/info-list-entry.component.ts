@@ -57,19 +57,16 @@ export class InfoListEntryComponent implements OnChanges {
       takeUntilDestroyed(this.destroyRef)
     ).subscribe(({ monthBudgets, allTimeBudgets, entries, account }) => {
       const allBudgets = [...monthBudgets, ...allTimeBudgets];
+      const currentAccountId = (account as any)?.id ?? (account as any)?.key;
 
       // Only entries for THIS account after updatedDate — same set for both calculations.
-      // Entries before updatedDate are already baked into account.value; entries from other
-      // accounts don't affect this account's balance.
       const relevantEntries = entries.filter(entry => {
         const entryAccountId = (entry.account as any)?.id ?? (entry.account as any)?.key;
-        const currentAccountId = (account as any)?.id ?? (account as any)?.key;
         return entryAccountId && currentAccountId && entryAccountId === currentAccountId
           && entry.date >= account.updatedDate!;
       });
 
       // Compute how much of each budget has been spent via the relevant entries.
-      // This way pre-updatedDate or other-account entries don't distort the remaining budget.
       const budgetUsedLimitMap = new Map<string, number>();
       for (const entry of relevantEntries) {
         const budgetId = entry.budgetKey ?? (entry as any).budget?.id ?? (entry as any).budget?.key;
@@ -90,8 +87,7 @@ export class InfoListEntryComponent implements OnChanges {
           return acc + (limit < 0 || restBudget > 0 ? restBudget : 0);
         }, 0);
 
-      // Sum all relevant entries (budget-assigned ones cancel out against overallValueLeftBudgets,
-      // so their net effect on rest is 0 — only non-budget entries move the needle)
+      // Sum all relevant entries (budget-assigned ones cancel out against overallValueLeftBudgets)
       this.overallValueEntries = relevantEntries
         .reduce((acc, entry) => acc + this.getValueLeftByEntry(entry), 0);
 
