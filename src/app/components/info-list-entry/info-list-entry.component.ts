@@ -67,7 +67,8 @@ export class InfoListEntryComponent implements OnChanges {
           const entryAccountId = (entry.account as any)?.id ?? (entry.account as any)?.key;
           const currentAccountId = (account as any)?.id ?? (account as any)?.key;
           return entryAccountId && currentAccountId && entryAccountId === currentAccountId
-            && entry.date >= account.updatedDate!;
+            && entry.date >= account.updatedDate!
+            && !entry.budgetKey && !(entry as any).budget?.id;  // Budget-Einträge werden über overallValueLeftBudgets berechnet
         })
         .reduce((acc, entry) => acc + this.getValueLeftByEntry(entry), 0);
 
