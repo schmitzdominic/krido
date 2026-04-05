@@ -1,6 +1,7 @@
 <div class="reg-item"
      [class.reg-item--income]="regularly!.entryType === EntryType.income"
      [class.reg-item--outcome]="regularly!.entryType === EntryType.outcome">
+  <div class="reg-item__indicator"></div>
   <div class="reg-item__body">
     <div class="reg-item__row">
       <span class="reg-item__name">{{ regularly!.name }}</span>

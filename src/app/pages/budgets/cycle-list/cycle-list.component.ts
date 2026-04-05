@@ -6,7 +6,6 @@ import {Cycle} from "../../../../shared/interfaces/cycle.model";
 import {BudgetService} from "../../../services/budget/budget.service";
 import {PriceService} from "../../../services/price/price.service";
 import {AccountType} from "../../../../shared/enums/account-type.enum";
-import {LoadingService} from "../../../services/loading/loading.service";
 import { map } from 'rxjs/operators';
 
 @Component({
@@ -18,7 +17,6 @@ import { map } from 'rxjs/operators';
 export class CycleListComponent implements OnInit {
   private ngbModal = inject(NgbModal);
   private budgetService = inject(BudgetService);
-  private loadingService = inject(LoadingService);
   private destroyRef = inject(DestroyRef);
   public priceService = inject(PriceService);
 
@@ -42,13 +40,11 @@ export class CycleListComponent implements OnInit {
    * Loads all cycles from the service.
    */
   private loadAllCycles() {
-    this.loadingService.setLoading = true;
     this.budgetService.getAllCycles().pipe(
       map(cycles => cycles as (Cycle & { id: string })[]),
       takeUntilDestroyed(this.destroyRef)
     ).subscribe(cycles => {
       this.cycles = cycles;
-      this.loadingService.setLoading = false;
       this.isInitialized = true;
     });
   }

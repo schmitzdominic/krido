@@ -3,8 +3,8 @@ import {DbService} from "../db.service";
 import {User} from "../../../shared/interfaces/user.model";
 import {Router} from "@angular/router";
 import {Account} from "../../../shared/interfaces/account.model";
-import {Auth, signOut} from "@angular/fire/auth";
-import {equalTo, orderByChild, startAt} from "@angular/fire/database";
+import {Auth, getAuth, signOut} from "firebase/auth";
+import {equalTo, orderByChild, startAt} from "firebase/database";
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +12,7 @@ import {equalTo, orderByChild, startAt} from "@angular/fire/database";
 export class UserService {
   private dbService = inject(DbService);
   private router = inject(Router);
-  private auth: Auth = inject(Auth);
+  private auth: Auth = getAuth();
 
   constructor() { }
 

@@ -3,8 +3,7 @@ import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {User} from "../../../shared/interfaces/user.model";
 import {UserService} from "../../services/user/user.service";
 import {ToastService} from "../../services/toast/toast.service";
-import {LoadingService} from "../../services/loading/loading.service";
-import {Auth, signInWithEmailAndPassword} from "@angular/fire/auth";
+import {Auth, getAuth, signInWithEmailAndPassword} from "firebase/auth";
 
 @Component({
     selector: 'app-login',
@@ -14,10 +13,11 @@ import {Auth, signInWithEmailAndPassword} from "@angular/fire/auth";
 })
 export class LoginComponent {
   private formBuilder = inject(FormBuilder);
-  private auth: Auth = inject(Auth);
+  private auth: Auth = getAuth();
   private userService = inject(UserService);
   private toastService = inject(ToastService);
-  private loadingService = inject(LoadingService);
+
+  isLoading = false;
 
 
   loginFormGroup: FormGroup = new FormGroup({
@@ -51,9 +51,9 @@ export class LoginComponent {
 
   async signIn(email: string, password: string): Promise<void> {
     try {
-      this.loadingService.setLoading = true;
+      this.isLoading = true;
       const result = await signInWithEmailAndPassword(this.auth, email, password);
-      this.loadingService.setLoading = false;
+      this.isLoading = false;
       await this.setUserData(result.user);
     } catch (error: any) {
       if (error && error.code) {
@@ -71,7 +71,7 @@ export class LoginComponent {
       } else {
         this.toastService.showDanger('Ein unbekannter Fehler ist aufgetreten.');
       }
-      this.loadingService.setLoading = false;
+      this.isLoading = false;
     }
   }
 

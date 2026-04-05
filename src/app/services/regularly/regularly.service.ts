@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import {DbService} from "../db.service";
 import {Regularly} from "../../../shared/interfaces/regularly.model";
 import {RegularlyCycleType} from "../../../shared/enums/regularly-cycle-type.enum";
-import {equalTo, orderByChild} from "@angular/fire/database";
+import {equalTo, orderByChild} from "firebase/database";
 
 @Injectable({
   providedIn: 'root'

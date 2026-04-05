@@ -9,15 +9,18 @@
   background: var(--app-card-bg);
   border-radius: var(--app-radius);
   border: 1px solid var(--app-border);
+  box-shadow: var(--app-shadow);
   overflow: hidden;
 }
 
 .entry-row {
+  padding: 13px 16px;
   cursor: pointer;
   border-bottom: 1px solid rgba(255, 255, 255, 0.04);
   transition: background 0.1s ease;
   &:last-child { border-bottom: none; }
-  &:active { background: rgba(255, 255, 255, 0.03); }
+  &:hover { background: rgba(255, 255, 255, 0.03); }
+  &:active { background: rgba(255, 255, 255, 0.05); }
 }
 
 // ── Empty state ────────────────────────────────────

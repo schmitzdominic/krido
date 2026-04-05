@@ -7,6 +7,13 @@
 </ng-template>
 
 <div class="cycle-page">
+  @if (!isInitialized) {
+    <div class="d-flex justify-content-center py-5">
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">Lädt...</span>
+      </div>
+    </div>
+  }
   @if (cycles.length > 0) {
     <div class="entries-card-group">
       @for (cycle of cycles; track cycle.id) {

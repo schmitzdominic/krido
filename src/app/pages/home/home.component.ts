@@ -44,8 +44,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   private readonly allTimeBudgets = toSignal(
     this.budgetService.getAllNoTimeLimitBudgets().pipe(
       map(budgets => (budgets as (Budget & { id: string })[]).filter(b => !b.isArchived))
-    ),
-    { initialValue: [] as (Budget & { id: string })[] }
+    )
   );
 
   private readonly monthlyBudgets = toSignal(
@@ -56,11 +55,15 @@ export class HomeComponent implements OnInit, OnDestroy {
           b => !b.isArchived && String(b.validityPeriod) === currentMonth
         );
       })
-    ),
-    { initialValue: [] as (Budget & { id: string })[] }
+    )
   );
 
-  readonly allBudgets = computed(() => [...this.allTimeBudgets(), ...this.monthlyBudgets()]);
+  readonly allBudgets = computed(() => {
+    const allTime = this.allTimeBudgets();
+    const monthly = this.monthlyBudgets();
+    if (allTime === undefined || monthly === undefined) return undefined;
+    return [...allTime, ...monthly];
+  });
 
   /**
    * Angular lifecycle hook that runs on component initialization.

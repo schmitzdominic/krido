@@ -5,7 +5,6 @@ import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap";
 import {Budget} from "../../../../shared/interfaces/budget.model";
 import {BudgetService} from "../../../services/budget/budget.service";
 import {PriceService} from "../../../services/price/price.service";
-import {LoadingService} from "../../../services/loading/loading.service";
 import { map } from 'rxjs/operators';
 
 interface DropdownItem {
@@ -22,7 +21,6 @@ interface DropdownItem {
 export class BudgetListComponent implements OnInit {
   private ngbModal = inject(NgbModal);
   private budgetService = inject(BudgetService);
-  private loadingService = inject(LoadingService);
   private destroyRef = inject(DestroyRef);
   public priceService = inject(PriceService);
 
@@ -121,7 +119,6 @@ export class BudgetListComponent implements OnInit {
     ).subscribe(budgets => {
       this.noTimeLimitBudgets = this.processBudgets(budgets);
       this.isNoTimeLimitInitialized = true;
-      if (this.isMonthlyInitialized) this.loadingService.setLoading = false;
     });
   }
 
@@ -135,7 +132,6 @@ export class BudgetListComponent implements OnInit {
     ).subscribe(budgets => {
       this.monthlyBudgets = this.processBudgets(budgets);
       this.isMonthlyInitialized = true;
-      if (this.isNoTimeLimitInitialized) this.loadingService.setLoading = false;
     });
   }
 

@@ -1,10 +1,9 @@
-import { Component, effect, signal, ViewChild, inject, Injector, runInInjectionContext } from '@angular/core';
+import { Component, signal, ViewChild, inject, Injector, runInInjectionContext } from '@angular/core';
 import {UserService} from "./services/user/user.service";
 import {Router} from "@angular/router";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap";
-import {LoadingService} from "./services/loading/loading.service";
-import {Auth, onAuthStateChanged} from "@angular/fire/auth";
+import {Auth, getAuth, onAuthStateChanged} from "firebase/auth";
 
 @Component({
     selector: 'app-root',
@@ -15,9 +14,8 @@ import {Auth, onAuthStateChanged} from "@angular/fire/auth";
 export class AppComponent {
   private userService = inject(UserService);
   private router = inject(Router);
-  private auth: Auth = inject(Auth);
+  private auth: Auth = getAuth();
   private modalService = inject(NgbModal);
-  private loadingService = inject(LoadingService);
   private injector = inject(Injector);
 
   @ViewChild('loadingModal') loadingModal: NgbModalRef | undefined;
@@ -31,13 +29,6 @@ export class AppComponent {
   readonly showMain     = signal(false);
 
   constructor() {
-    effect(() => {
-      if (this.loadingService.isLoading()) {
-        this.openLoading();
-      } else {
-        this.closeLoading();
-      }
-    });
   }
 
   ngOnInit() {
@@ -98,23 +89,5 @@ export class AppComponent {
 
   private showHomeSetupPage(): void {
     this.setPageState(false, false, true);
-  }
-
-  openLoading() {
-    if (!this.loadingModal) return;
-    this.modalRef = this.modalService.open(
-      this.loadingModal,
-      {
-        centered: true,
-        size: 'md',
-        keyboard: false,
-        backdrop: 'static'
-      });
-  }
-
-  closeLoading() {
-    if (this.modalRef) {
-      this.modalRef.close();
-    }
   }
 }

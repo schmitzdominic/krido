@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, ViewChild } from '@angular/core';
+import { Component, computed, inject, ViewChild } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
@@ -6,7 +6,6 @@ import {Account} from "../../../../shared/interfaces/account.model";
 import {AccountService} from "../../../services/account/account.service";
 import {AccountType} from "../../../../shared/enums/account-type.enum";
 import {PriceService} from "../../../services/price/price.service";
-import {LoadingService} from "../../../services/loading/loading.service";
 import { map } from 'rxjs/operators';
 
 @Component({
@@ -18,7 +17,6 @@ import { map } from 'rxjs/operators';
 export class AccountListComponent {
   private ngbModal = inject(NgbModal);
   private accountService = inject(AccountService);
-  private loadingService = inject(LoadingService);
   priceService = inject(PriceService);
 
 
@@ -39,15 +37,6 @@ export class AccountListComponent {
   );
 
   readonly isInitialized = computed(() => this.accounts() !== undefined);
-
-  constructor() {
-    this.loadingService.setLoading = true;
-    effect(() => {
-      if (this.accounts() !== undefined) {
-        this.loadingService.setLoading = false;
-      }
-    });
-  }
 
   onClickAccount(account: Account & { id: string }) {
     this.selectedAccount = account;

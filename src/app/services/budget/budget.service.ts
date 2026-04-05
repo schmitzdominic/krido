@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import {Budget} from "../../../shared/interfaces/budget.model";
 import {DbService} from "../db.service";
 import {Cycle} from "../../../shared/interfaces/cycle.model";
-import {equalTo, orderByChild} from "@angular/fire/database";
+import {equalTo, orderByChild} from "firebase/database";
 
 /**
  * Service for managing budgets (general, monthly) and cycles in the database.

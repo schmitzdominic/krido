@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, ViewChild } from '@angular/core';
+import { Component, computed, inject, ViewChild } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import {Regularly} from "../../../../shared/interfaces/regularly.model";
 import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap";
@@ -7,7 +7,6 @@ import {RegularlyType} from "../../../../shared/enums/regularly-type.enum";
 import {RegularlyService} from "../../../services/regularly/regularly.service";
 import {RegularlyCycleType} from "../../../../shared/enums/regularly-cycle-type.enum";
 import {AccountService} from "../../../services/account/account.service";
-import {LoadingService} from "../../../services/loading/loading.service";
 import {DateService} from "../../../services/date/date.service";
 import { map } from 'rxjs/operators';
 
@@ -21,7 +20,6 @@ export class RegularlyListComponent {
   private ngbModal = inject(NgbModal);
   private regularlyService = inject(RegularlyService);
   private accountService = inject(AccountService);
-  private loadingService = inject(LoadingService);
   private dateService = inject(DateService);
 
 
@@ -74,19 +72,13 @@ export class RegularlyListComponent {
 
   readonly isAccountAvailable = computed(() => this._accountCount() > 0);
 
-  private readonly isLoaded = computed(() =>
+  readonly isLoaded = computed(() =>
     this._monthRaw() !== undefined &&
     this._quarterRaw() !== undefined &&
     this._yearRaw() !== undefined
   );
 
   constructor() {
-    this.loadingService.setLoading = true;
-    effect(() => {
-      if (this.isLoaded()) {
-        this.loadingService.setLoading = false;
-      }
-    });
   }
 
   onRegularlyClicked(regularly: Regularly) {

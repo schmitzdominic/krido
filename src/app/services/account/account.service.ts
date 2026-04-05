@@ -3,7 +3,7 @@ import {DbService} from "../db.service";
 import {Account} from "../../../shared/interfaces/account.model";
 import {AccountType} from "../../../shared/enums/account-type.enum";
 import {UserService} from "../user/user.service";
-import {equalTo, orderByChild} from "@angular/fire/database";
+import {equalTo, orderByChild} from "firebase/database";
 
 /**
  * Service for managing accounts in the database.

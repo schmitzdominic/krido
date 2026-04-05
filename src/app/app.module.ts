@@ -16,10 +16,9 @@ import { ToastsContainerComponent } from './components/toasts-container/toasts-c
 import { ServiceWorkerModule } from '@angular/service-worker';
 import {NgbDateCustomParserFormatter} from "../shared/formatter/ngb-date-custom-parser-formatter";
 
-// AngularFire Modular Imports
-import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
-import { getDatabase, provideDatabase } from '@angular/fire/database';
-import { getAuth, provideAuth } from '@angular/fire/auth';
+import { initializeApp } from 'firebase/app';
+
+initializeApp(environment.firebase);
 
 @NgModule({
   declarations: [
@@ -43,9 +42,6 @@ import { getAuth, provideAuth } from '@angular/fire/auth';
     }),
   ],
   providers: [
-    provideFirebaseApp(() => initializeApp(environment.firebase)),
-    provideAuth(() => getAuth()),
-    provideDatabase(() => getDatabase()),
     { provide: NgbDateParserFormatter, useClass: NgbDateCustomParserFormatter },
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA],

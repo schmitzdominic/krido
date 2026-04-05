@@ -6,7 +6,7 @@ import {AccountService} from "../../../services/account/account.service";
 import {AccountType} from "../../../../shared/enums/account-type.enum";
 import {InvoiceSettings} from "../../../../shared/interfaces/invoice-settings.model";
 import {InvoiceService} from "../../../services/invoice/invoice.service";
-import {LoadingService} from "../../../services/loading/loading.service";
+
 import { map } from 'rxjs/operators';
 
 @Component({
@@ -17,7 +17,6 @@ import { map } from 'rxjs/operators';
 })
 export class InvoiceSettingsComponent {
   private formBuilder = inject(FormBuilder);
-  private loadingService = inject(LoadingService);
   private accountService = inject(AccountService);
   private invoiceService = inject(InvoiceService);
   private destroyRef = inject(DestroyRef);
@@ -53,7 +52,6 @@ export class InvoiceSettingsComponent {
   }
 
   private loadSettings(): void {
-    this.loadingService.setLoading = true;
     this.invoiceService.getInvoiceSettings().pipe(
       map(settings => settings as InvoiceSettings | null),
       takeUntilDestroyed(this.destroyRef)
@@ -62,7 +60,6 @@ export class InvoiceSettingsComponent {
         this.invoiceSettings = invoiceSettings;
         this.fillFormWithSettings(invoiceSettings);
       }
-      this.loadingService.setLoading = false;
     });
   }
 

@@ -7,6 +7,7 @@ import {ProgressBarService} from "../../../../services/progress-bar/progress-bar
 import {Entry} from "../../../../../shared/interfaces/entry.model";
 import {EntryService} from "../../../../services/entry/entry.service";
 import { map } from 'rxjs/operators';
+
 import { EntryType } from '../../../../../shared/enums/entry-type.enum';
 
 @Component({

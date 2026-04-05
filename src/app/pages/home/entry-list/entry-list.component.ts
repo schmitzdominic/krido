@@ -5,7 +5,7 @@ import {AccountService} from "../../../services/account/account.service";
 import {EntryService} from "../../../services/entry/entry.service";
 import {DateService} from "../../../services/date/date.service";
 import {Entry} from "../../../../shared/interfaces/entry.model";
-import { combineLatest, forkJoin, asapScheduler, map, observeOn, Subject, take, takeUntil } from 'rxjs';
+import { combineLatest, forkJoin, map, Subject, take, takeUntil } from 'rxjs';
 import { Account } from '../../../../shared/interfaces/account.model';
 
 @Component({
@@ -53,7 +53,6 @@ export class EntryListComponent implements OnInit, OnDestroy {
     const nextMonth$ = this.entryService.getAllEntriesByMonthString(this.dateService.getMonthStringFromMonth(1));
 
     combineLatest([actualMonth$, nextMonth$]).pipe(
-      observeOn(asapScheduler),
       takeUntil(this.destroy$)).
       subscribe(([actualEntries, nextEntries]) => {
 

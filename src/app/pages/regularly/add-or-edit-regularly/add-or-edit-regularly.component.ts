@@ -15,6 +15,7 @@ import {Entry} from "../../../../shared/interfaces/entry.model";
 import {EntryService} from "../../../services/entry/entry.service";
 import { map } from 'rxjs/operators';
 
+
 interface EntryTypeInterface {
   value: EntryType,
   label: string,
@@ -66,9 +67,6 @@ export class AddOrEditRegularlyComponent {
   title: string = this.selectedEntryType.label;
   submitButtonText: string = 'Eintragen';
 
-  isNameInvalid: boolean = true;
-  isValueInvalid: boolean = true;
-  isMonthDayInvalid: boolean = false;
   isLastDay: boolean = false;
 
   addOrEditRegularlyFormGroup: FormGroup = new FormGroup({
@@ -107,10 +105,6 @@ export class AddOrEditRegularlyComponent {
 
   private fillFormIfRegularlyIsAvailable() {
     if (this.regularly) {
-
-      this.isNameInvalid = false;
-      this.isValueInvalid = false;
-      this.isMonthDayInvalid = false;
 
       this.submitButtonText = 'Ändern'
 
@@ -173,34 +167,18 @@ export class AddOrEditRegularlyComponent {
         }
         case this.yearCycleType.value: {
           this.selectedCycleType = this.yearCycleType;
-          this.isMonthDayInvalid = false;
           break;
         }
       }
-      this.checkMonthDayValidity(this.addOrEditRegularlyFormGroup.value.monthDay);
     });
     // Form behavior
     this.addOrEditRegularlyFormGroup.controls['lastDay'].valueChanges.subscribe(lastDay => {
       this.isLastDay = lastDay;
     });
     // Validators
-    this.addOrEditRegularlyFormGroup.controls['monthDay'].valueChanges.subscribe((monthDay: number) => {
-      this.checkMonthDayValidity(monthDay);
+    this.addOrEditRegularlyFormGroup.controls['monthDay'].valueChanges.subscribe((_monthDay: number) => {
+      // monthDay validity is now computed via getter — no action needed, triggers CD
     });
-    this.addOrEditRegularlyFormGroup.controls['name'].valueChanges.subscribe((name: string) => {
-      this.isNameInvalid = name.length <= 0;
-    });
-    this.addOrEditRegularlyFormGroup.controls['value'].valueChanges.subscribe(value => {
-      this.isValueInvalid = value <= 0;
-    });
-  }
-
-  private checkMonthDayValidity(monthDay: number) {
-    if (!this.isLastDay && this.isMonthDayNeeded) {
-      this.isMonthDayInvalid = !(monthDay > 0 && monthDay <= 28);
-    } else {
-      this.isMonthDayInvalid = false;
-    }
   }
 
   private loadAccounts() {
@@ -219,6 +197,22 @@ export class AddOrEditRegularlyComponent {
 
   get isMonthDayNeeded() {
     return this.selectedCycleType === this.monthCycleType || this.selectedCycleType === this.quarterCycleType;
+  }
+
+  get isNameInvalid(): boolean {
+    const name = this.addOrEditRegularlyFormGroup.value.name ?? '';
+    return name.length <= 0;
+  }
+
+  get isValueInvalid(): boolean {
+    const value = this.addOrEditRegularlyFormGroup.value.value;
+    return !(value > 0);
+  }
+
+  get isMonthDayInvalid(): boolean {
+    if (!this.isMonthDayNeeded || this.isLastDay) return false;
+    const monthDay = this.addOrEditRegularlyFormGroup.value.monthDay;
+    return !(monthDay > 0 && monthDay <= 28);
   }
 
   onDateSelected(ngbDate: NgbDate) {

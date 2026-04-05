@@ -1,18 +1,19 @@
-import {inject, Injectable} from '@angular/core';
-import {LoadingService} from './loading/loading.service';
+import {Injectable, NgZone, inject} from '@angular/core';
 import {User} from "../../shared/interfaces/user.model";
 import {
-  Database,
-  listVal,
-  objectVal,
+  DatabaseReference,
+  Query,
+  QueryConstraint,
+  ThenableReference,
+  getDatabase,
+  onValue,
   push,
   query,
-  QueryConstraint,
   ref,
   remove,
   set,
-  update, ThenableReference
-} from "@angular/fire/database";
+  update
+} from "firebase/database";
 import {Observable, of} from "rxjs";
 import {catchError} from "rxjs/operators";
 
@@ -24,9 +25,41 @@ import {catchError} from "rxjs/operators";
   providedIn: 'root'
 })
 export class DbService {
-  private db: Database = inject(Database);
-  private loadingService = inject(LoadingService);
+  private db = getDatabase();
+  private ngZone = inject(NgZone);
   private _home: string | null = null;
+
+  private objectVal<T>(dbRef: DatabaseReference | Query): Observable<T | null> {
+    return new Observable<T | null>((subscriber) => {
+      const unsubscribe = onValue(
+        dbRef,
+        (snapshot) => this.ngZone.run(() => subscriber.next(snapshot.val() as T | null)),
+        (error) => this.ngZone.run(() => subscriber.error(error))
+      );
+      return () => unsubscribe();
+    });
+  }
+
+  private listVal<T>(dbRef: DatabaseReference | Query, options?: { keyField?: string }): Observable<T[]> {
+    return new Observable<T[]>((subscriber) => {
+      const unsubscribe = onValue(
+        dbRef,
+        (snapshot) => this.ngZone.run(() => {
+          const items: T[] = [];
+          snapshot.forEach((child) => {
+            const item = child.val() as T;
+            if (options?.keyField) {
+              (item as unknown as Record<string, unknown>)[options.keyField] = child.key;
+            }
+            items.push(item);
+          });
+          subscriber.next(items);
+        }),
+        (error) => this.ngZone.run(() => subscriber.error(error))
+      );
+      return () => unsubscribe();
+    });
+  }
 
   /**
    * Gets the current user's home ID from local storage.
@@ -54,14 +87,11 @@ export class DbService {
    * @template T The type of the object being created.
    */
   async create<T>(path: string, object: T): Promise<void> {
-    this.loadingService.setLoading = true;
     try {
-      return await set(ref(this.db, path), object); // set does not need the db instance directly
+      return await set(ref(this.db, path), object);
     } catch (error) {
       console.error(`Error creating data at path: ${path}`, error);
-      throw error; // Re-throw the error to be handled by the caller
-    } finally {
-      this.loadingService.setLoading = false;
+      throw error;
     }
   }
 
@@ -72,7 +102,7 @@ export class DbService {
    * @template T The expected type of the object.
    */
   public read<T>(path: string): Observable<T | null> {
-    return objectVal<T>(ref(this.db, path)).pipe(
+    return this.objectVal<T>(ref(this.db, path)).pipe(
       catchError(error => {
         console.error(`Error reading data at path: ${path}`, error);
         return of(null);
@@ -88,7 +118,7 @@ export class DbService {
    * @template T The expected type of objects in the list.
    */
   public readList<T>(path: string): Observable<T[]> {
-    return listVal<T>(ref(this.db, path), { keyField: 'id' }).pipe(
+    return this.listVal<T>(ref(this.db, path), { keyField: 'id' }).pipe(
       catchError(error => {
         console.error(`Error reading list at path: ${path}`, error);
         return of([] as T[]);
@@ -106,7 +136,7 @@ export class DbService {
    */
   public readFilteredList<T>(path: string, ...constraints: QueryConstraint[]): Observable<T[]> {
     const q = query(ref(this.db, path), ...constraints);
-    return listVal<T>(q, { keyField: 'id' }).pipe(
+    return this.listVal<T>(q, { keyField: 'id' }).pipe(
       catchError(error => {
         console.error(`Error reading filtered list at path: ${path}`, error);
         return of([] as T[]);
@@ -123,14 +153,11 @@ export class DbService {
    * @template T The type of the object being updated.
    */
   public async update<T extends object>(path: string, object: Partial<T>, loading: boolean = true): Promise<void> {
-    if (loading) this.loadingService.setLoading = true;
     try {
-      return await update(ref(this.db, path), object); // update does not need the db instance directly
+      return await update(ref(this.db, path), object);
     } catch (error) {
       console.error(`Error updating data at path: ${path}`, error);
       throw error;
-    } finally {
-      if (loading) this.loadingService.setLoading = false;
     }
   }
 
@@ -140,14 +167,11 @@ export class DbService {
    * @returns A promise that resolves when the deletion is complete.
    */
   public async delete(path: string): Promise<void> {
-    this.loadingService.setLoading = true;
     try {
-      return await remove(ref(this.db, path)); // remove does not need the db instance directly
+      return await remove(ref(this.db, path));
     } catch (error) {
       console.error(`Error deleting data at path: ${path}`, error);
       throw error;
-    } finally {
-      this.loadingService.setLoading = false;
     }
   }
 
@@ -172,14 +196,11 @@ export class DbService {
    * @template T The type of the object being updated.
    */
   public async updateListValue<T extends object>(path: string, key: string, object: Partial<T>, loading: boolean = true): Promise<void> {
-    if (loading) this.loadingService.setLoading = true;
     try {
       await update(ref(this.db, `${path}/${key}`), object);
     } catch (error) {
       console.error(`Error updating list value at path: ${path}/${key}`, error);
       throw error;
-    } finally {
-      if (loading) this.loadingService.setLoading = false;
     }
   }
 
@@ -190,14 +211,11 @@ export class DbService {
    * @returns A promise that resolves when the deletion is complete.
    */
   public async deleteListValue(path: string, key: string): Promise<void> {
-    this.loadingService.setLoading = true;
     try {
       await remove(ref(this.db, `${path}/${key}`));
     } catch (error) {
       console.error(`Error deleting list value at path: ${path}/${key}`, error);
       throw error;
-    } finally {
-      this.loadingService.setLoading = false;
     }
   }
 

@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import {DbService} from "../db.service";
 import {Entry} from "../../../shared/interfaces/entry.model";
-import {equalTo, orderByChild, startAt} from "@angular/fire/database";
+import {equalTo, orderByChild, startAt} from "firebase/database";
 import { Observable, combineLatest } from 'rxjs';
 import { map } from 'rxjs/operators';
 
