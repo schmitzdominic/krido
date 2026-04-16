@@ -1,10 +1,11 @@
-import { Component, HostListener, Input, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
+import { Component, HostListener, Input, OnDestroy, OnInit, TemplateRef, ViewChild, inject } from '@angular/core';
 import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {AccountService} from "../../../services/account/account.service";
 import {EntryService} from "../../../services/entry/entry.service";
 import {DateService} from "../../../services/date/date.service";
-import {Entry} from "../../../../shared/interfaces/entry.model";
+import { Entry } from '../../../../shared/interfaces/entry.model';
+import { EntryType } from '../../../../shared/enums/entry-type.enum';
 import { combineLatest, forkJoin, map, Subject, take, takeUntil } from 'rxjs';
 import { Account } from '../../../../shared/interfaces/account.model';
 
@@ -20,10 +21,17 @@ export class EntryListComponent implements OnInit, OnDestroy {
   private entryService = inject(EntryService);
   private dateService = inject(DateService);
   @ViewChild('addOrEditEntryModal') addOrEditEntryModal: NgbModalRef | undefined;
+  @ViewChild('calculatorModal') calculatorModal: TemplateRef<any> | undefined;
 
   selectedEntry: (Entry & { id: string }) | undefined;
-
   addOrEditEntryModalRef: NgbModalRef | undefined;
+  calculatorModalRef: NgbModalRef | undefined;
+
+  // Calculator state
+  calcStartAmount: number = 0;
+  calcIsCalculated: boolean = false;
+  calcRows: { entry: Entry & { id: string }; delta: number; balance: number }[] = [];
+  calcFinalBalance: number = 0;
 
   actualMonthName: string = this.dateService.getActualMonthName();
   nextMonthName: string = this.dateService.getMonthName(this.dateService.getMonthStringFromMonth(1));
@@ -146,6 +154,42 @@ export class EntryListComponent implements OnInit, OnDestroy {
   onButtonShowAllClick() {
     this.isShowAll = !this.isShowAll;
     this.filterAndSortEntries();
+  }
+
+  openCalculatorModal(): void {
+    (document.activeElement as HTMLElement)?.blur();
+    this.resetCalculator();
+    if (this.calculatorModal) {
+      this.calculatorModalRef = this.ngbModal.open(this.calculatorModal, { size: 'md' });
+    }
+  }
+
+  calculateMonth(): void {
+    let balance = this.calcStartAmount;
+    const nextMonthString = this.dateService.getMonthStringFromMonth(1);
+    const sorted = [...this.allNextMonthEntries]
+      .filter(e => String(e.monthString) === nextMonthString)
+      .sort((a, b) => a.date - b.date);
+    this.calcRows = sorted.map(entry => {
+      const delta = entry.type === EntryType.income ? entry.value : -entry.value;
+      balance += delta;
+      return { entry, delta, balance };
+    });
+    this.calcFinalBalance = balance;
+    this.calcIsCalculated = true;
+  }
+
+  resetCalculator(): void {
+    this.calcStartAmount = 0;
+    this.calcIsCalculated = false;
+    this.calcRows = [];
+    this.calcFinalBalance = 0;
+  }
+
+  closeCalculatorModal(): void {
+    if (this.calculatorModalRef) {
+      this.calculatorModalRef.close();
+    }
   }
 
   ngOnDestroy(): void {
