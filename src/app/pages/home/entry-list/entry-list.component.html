@@ -102,7 +102,7 @@
 <!-- FAB add button -->
 @if ((isAccountAvailable && totalActualMonthEntries > 0) || totalNextMonthEntries > 0) {
   <div class="position-fixed end-0 bottom-0 me-4 mb-4">
-    <button type="button" class="btn btn-primary fab" (click)="onButtonAddClick()">
+    <button type="button" class="btn btn-primary fab" [class.fab--hidden]="!isFabVisible" (click)="onButtonAddClick()">
       <i class="bi bi-plus-lg"></i>
     </button>
   </div>

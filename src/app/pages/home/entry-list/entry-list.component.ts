@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
+import { Component, HostListener, Input, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
 import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {AccountService} from "../../../services/account/account.service";
@@ -40,6 +40,16 @@ export class EntryListComponent implements OnInit, OnDestroy {
   isAccountAvailable: boolean = false;
   isToastNoAccountShown: boolean = false;
   isShowAll: boolean = false;
+  isFabVisible: boolean = true;
+
+  private lastScrollY: number = 0;
+
+  @HostListener('window:scroll')
+  onWindowScroll(): void {
+    const currentY = window.scrollY;
+    this.isFabVisible = currentY <= this.lastScrollY || currentY < 80;
+    this.lastScrollY = currentY;
+  }
 
   private _searchTerm: string = '';
 
