@@ -48,6 +48,14 @@ export class EntryListComponent implements OnInit, OnDestroy {
     this.filterAndSortEntries();
   }
 
+  get isSearching(): boolean {
+    return this._searchTerm.length > 0;
+  }
+
+  get searchResultEntries(): (Entry & { id: string })[] {
+    return [...this.actualMonthEntries, ...this.nextMonthEntries];
+  }
+
   private destroy$ = new Subject<void>();
 
   ngOnInit() {

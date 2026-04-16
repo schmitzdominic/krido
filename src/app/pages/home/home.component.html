@@ -16,7 +16,9 @@
 </ng-template>
 <div class="home-page">
   <!-- Info area -->
-  <app-info-area></app-info-area>
+  @if (menuTitleService.isAccountsVisible()) {
+    <app-info-area></app-info-area>
+  }
 
   @if (allBudgets() === undefined) {
     <section class="home-section">

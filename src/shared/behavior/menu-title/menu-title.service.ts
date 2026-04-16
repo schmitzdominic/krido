@@ -10,6 +10,7 @@ export class MenuTitleService {
   readonly isSearchActive = signal(false);
   readonly isSearchOpen = signal(false);
   readonly searchTerm = signal('');
+  readonly isAccountsVisible = signal(localStorage.getItem('accounts-expanded') !== 'false');
 
   setTitle(newTitle: string): void {
     queueMicrotask(() => this.title.set(newTitle));
@@ -25,5 +26,10 @@ export class MenuTitleService {
       this.isSearchOpen.set(false);
       this.searchTerm.set('');
     }
+  }
+
+  setAccountsVisible(value: boolean): void {
+    this.isAccountsVisible.set(value);
+    localStorage.setItem('accounts-expanded', String(value));
   }
 }

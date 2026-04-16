@@ -6,6 +6,7 @@ import {Account} from "../../../../shared/interfaces/account.model";
 import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {UserService} from "../../../services/user/user.service";
+import {MenuTitleService} from "../../../../shared/behavior/menu-title/menu-title.service";
 import { map } from 'rxjs/operators';
 
 @Component({
@@ -18,16 +19,15 @@ export class InfoAreaComponent {
   private accountService = inject(AccountService);
   private ngbModal = inject(NgbModal);
   private userService = inject(UserService);
+  protected menuTitleService = inject(MenuTitleService);
 
   @ViewChild('updateAccountValueModal') updateAccountValueModal: NgbModalRef | undefined;
 
   selectedAccount: Account | undefined;
   updateAccountValueModalRef: NgbModalRef | undefined;
-  isAccountsExpanded: boolean = localStorage.getItem('accounts-expanded') !== 'false';
 
-  toggleAccountsSection(): void {
-    this.isAccountsExpanded = !this.isAccountsExpanded;
-    localStorage.setItem('accounts-expanded', String(this.isAccountsExpanded));
+  hideAccounts(): void {
+    this.menuTitleService.setAccountsVisible(false);
   }
 
   private readonly allGiroAccounts = toSignal(

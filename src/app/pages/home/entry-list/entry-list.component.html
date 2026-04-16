@@ -13,8 +13,26 @@
   </div>
 }
 
+<!-- Search results -->
+@if (isSearching) {
+  <section class="entry-section">
+    <div class="entry-section__header">
+      <h2 class="section-label">Ergebnisse ({{ searchResultEntries.length }})</h2>
+    </div>
+    @if (searchResultEntries.length > 0) {
+      <div class="entry-card-group">
+        @for (entry of searchResultEntries; track entry.id) {
+          <div class="entry-row" (click)="onEntryClick(entry)">
+            <app-entry-list-entry [entry]="entry"></app-entry-list-entry>
+          </div>
+        }
+      </div>
+    }
+  </section>
+}
+
 <!-- Current month entries -->
-@if (totalActualMonthEntries > 0) {
+@if (!isSearching && totalActualMonthEntries > 0) {
   <section class="entry-section">
     <div class="entry-section__header">
       <h2 class="section-label">Aktuell</h2>
@@ -44,7 +62,7 @@
 }
 
 <!-- Next month entries -->
-@if (totalNextMonthEntries > 0) {
+@if (!isSearching && totalNextMonthEntries > 0) {
   <section class="entry-section">
     <div class="entry-section__header">
       <h2 class="section-label">{{ nextMonthName }}</h2>
@@ -60,7 +78,7 @@
 }
 
 <!-- No entries empty state -->
-@if (totalActualMonthEntries == 0 && totalNextMonthEntries == 0) {
+@if (!isSearching && totalActualMonthEntries == 0 && totalNextMonthEntries == 0) {
   <div class="empty-state-card">
     <img src="assets/img/no-entries.gif" class="empty-state-card__img" alt="no entry">
     <div class="empty-state-card__body">

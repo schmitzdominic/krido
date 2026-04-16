@@ -16,6 +16,18 @@
       <button type="button" class="btn search-toggle-btn ms-auto" (click)="toggleSearch()">
         <i class="bi" [ngClass]="menuTitleService.isSearchOpen() ? 'bi-x-lg' : 'bi-search'"></i>
       </button>
+      @if (!menuTitleService.isAccountsVisible()) {
+        <div ngbDropdown placement="bottom-end" style="position: relative">
+          <button type="button" class="btn search-toggle-btn no-caret" ngbDropdownToggle>
+            <i class="bi bi-three-dots-vertical"></i>
+          </button>
+          <div ngbDropdownMenu class="navbar-dropdown">
+            <button ngbDropdownItem (click)="menuTitleService.setAccountsVisible(true)">
+              <i class="bi bi-eye pe-2"></i>Konten einblenden
+            </button>
+          </div>
+        </div>
+      }
     }
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul ngbNav [activeId]="menuTitleService.activeId()" (activeIdChange)="menuTitleService.activeId.set($event)" class="navbar-nav me-auto mb-2 mt-4 mb-lg-0">

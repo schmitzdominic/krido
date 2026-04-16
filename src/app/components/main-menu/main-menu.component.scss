@@ -51,4 +51,12 @@
   color: #94a3b8;
   padding: 4px 8px;
   flex-shrink: 0;
+
+  &:first-of-type {
+    margin-left: auto;
+  }
+
+  &.no-caret::after {
+    display: none;
+  }
 }
