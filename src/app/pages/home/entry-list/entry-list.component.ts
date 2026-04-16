@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
 import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {AccountService} from "../../../services/account/account.service";
@@ -41,6 +41,13 @@ export class EntryListComponent implements OnInit, OnDestroy {
   isToastNoAccountShown: boolean = false;
   isShowAll: boolean = false;
 
+  private _searchTerm: string = '';
+
+  @Input() set searchTerm(value: string) {
+    this._searchTerm = value.toLowerCase().replace(/\s+/g, '');
+    this.filterAndSortEntries();
+  }
+
   private destroy$ = new Subject<void>();
 
   ngOnInit() {
@@ -65,10 +72,15 @@ export class EntryListComponent implements OnInit, OnDestroy {
   }
 
   private filterAndSortEntries() {
-    const filteredActual = this.isShowAll ? this.allActualMonthEntries : this.allActualMonthEntries.filter(entry => entry.date >= this.dateService.getActualDayTimestamp());
-    this.actualMonthEntries = this.sortEntriesByDate(filteredActual);
+    let filteredActual = this.isShowAll ? this.allActualMonthEntries : this.allActualMonthEntries.filter(entry => entry.date >= this.dateService.getActualDayTimestamp());
+    let filteredNext = this.isShowAll ? this.allNextMonthEntries : this.allNextMonthEntries.filter(entry => entry.date >= this.dateService.getActualDayTimestamp());
 
-    const filteredNext = this.isShowAll ? this.allNextMonthEntries : this.allNextMonthEntries.filter(entry => entry.date >= this.dateService.getActualDayTimestamp());
+    if (this._searchTerm) {
+      filteredActual = filteredActual.filter(e => e.searchName.includes(this._searchTerm));
+      filteredNext = filteredNext.filter(e => e.searchName.includes(this._searchTerm));
+    }
+
+    this.actualMonthEntries = this.sortEntriesByDate(filteredActual);
     this.nextMonthEntries = this.sortEntriesByDate(filteredNext);
   }
 

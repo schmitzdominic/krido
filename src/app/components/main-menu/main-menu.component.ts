@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, ElementRef, ViewChild, inject } from '@angular/core';
 import {MenuTitleService} from "../../../shared/behavior/menu-title/menu-title.service";
 import {Router} from "@angular/router";
 
@@ -11,6 +11,19 @@ import {Router} from "@angular/router";
 export class MainMenuComponent {
   protected menuTitleService = inject(MenuTitleService);
   private router = inject(Router);
+
+  @ViewChild('searchInput') private searchInput: ElementRef<HTMLInputElement> | undefined;
+
+  toggleSearch(): void {
+    const isOpen = this.menuTitleService.isSearchOpen();
+    if (isOpen) {
+      this.menuTitleService.isSearchOpen.set(false);
+      this.menuTitleService.searchTerm.set('');
+    } else {
+      this.menuTitleService.isSearchOpen.set(true);
+      this.searchInput?.nativeElement.focus();
+    }
+  }
 
   navigateToAccounts(): void {
     this.router.navigate(['/accounts']);

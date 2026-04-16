@@ -18,3 +18,37 @@
     padding: 4px 8px;
   }
 }
+
+.navbar-search-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 0;
+  color: var(--bs-body-color);
+  padding: 4px 8px;
+  font-size: 16px;
+  font-weight: 500;
+  outline: none;
+
+  &:focus {
+    box-shadow: none;
+    border-bottom-color: var(--bs-primary);
+  }
+
+  &::placeholder {
+    color: #64748b;
+    font-weight: 400;
+  }
+
+  &--hidden {
+    display: none;
+  }
+}
+
+.search-toggle-btn {
+  font-size: 18px;
+  color: #94a3b8;
+  padding: 4px 8px;
+  flex-shrink: 0;
+}

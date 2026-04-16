@@ -21,7 +21,7 @@ import { map } from 'rxjs/operators';
     standalone: false
 })
 export class HomeComponent implements OnInit, OnDestroy {
-  private menuTitleService = inject(MenuTitleService);
+  protected menuTitleService = inject(MenuTitleService);
   private dateService = inject(DateService);
   private budgetService = inject(BudgetService);
   private ngbModal = inject(NgbModal);
@@ -77,6 +77,7 @@ export class HomeComponent implements OnInit, OnDestroy {
    * Angular lifecycle hook that runs when the component is destroyed.
    */
   public ngOnDestroy(): void {
+    this.menuTitleService.setSearchActive(false);
     if (this.activeModalRef) {
       this.activeModalRef.close();
     }
@@ -89,6 +90,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     const actualDate: Date = this.dateService.getActualDate();
     this.menuTitleService.setTitle(this.dateService.getDayShortName(actualDate.getDay()) + ' ' + actualDate.getDate() + '. ' + this.actualMonth + ' ' + this.actualYear);
     this.menuTitleService.setActiveId(1);
+    this.menuTitleService.setSearchActive(true);
   }
 
   /**
