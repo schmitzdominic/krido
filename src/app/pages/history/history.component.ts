@@ -4,6 +4,8 @@ import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
 import {AccountService} from "../../services/account/account.service";
 import {Account} from "../../../shared/interfaces/account.model";
 import {HistorySearchObject} from "./history-list/history-list.component";
+import {EntryService} from "../../services/entry/entry.service";
+import {DateService} from "../../services/date/date.service";
 import { map, Subject, takeUntil } from 'rxjs';
 
 @Component({
@@ -21,13 +23,16 @@ export class HistoryComponent implements OnInit, OnDestroy {
   private menuTitleService = inject(MenuTitleService);
   private formBuilder = inject(FormBuilder);
   private accountService = inject(AccountService);
+  private entryService = inject(EntryService);
+  public dateService = inject(DateService);
 
   /** A stream of all available accounts. */
   accounts: (Account & { id: string })[] = [];
+  availableMonths: string[] = [];
   historySearchObject: HistorySearchObject = {
     searchValue: '',
     account: undefined,
-    isLastMonth: false
+    selectedMonth: null
   };
 
   /** The form group for search and account selection. */
@@ -43,6 +48,7 @@ export class HistoryComponent implements OnInit, OnDestroy {
     this.searchFormGroup = this.createFormGroup();
     this.createListeners();
     this.loadAccounts();
+    this.loadAvailableMonths();
   }
 
   ngOnDestroy(): void {
@@ -57,9 +63,10 @@ export class HistoryComponent implements OnInit, OnDestroy {
     return account ? account.name : 'Alle Konten';
   }
 
-  /** Handles the click event for the "Last Month" button. */
-  onClickLastMonth(): void {
-    this.historySearchObject = this.getHistorySearchObject('', this.historySearchObject.account, !this.historySearchObject.isLastMonth);
+  /** Handles month selection from the dropdown. */
+  onSelectMonth(monthString: string): void {
+    const newMonth = this.historySearchObject.selectedMonth === monthString ? null : monthString;
+    this.historySearchObject = this.getHistorySearchObject(this.historySearchObject.searchValue, this.historySearchObject.account, newMonth);
   }
 
   /** Creates the form group for the search controls. */
@@ -74,20 +81,18 @@ export class HistoryComponent implements OnInit, OnDestroy {
     this.searchFormGroup.controls['search'].valueChanges.pipe(
       takeUntil(this.destroy$)
     ).subscribe(searchValue => {
-      if (searchValue.length > 2) {
-        this.historySearchObject = this.getHistorySearchObject(searchValue, undefined, false);
-      }
+      this.historySearchObject = this.getHistorySearchObject(searchValue, this.historySearchObject.account, this.historySearchObject.selectedMonth);
     });
     this.searchFormGroup.controls['accounts'].valueChanges.pipe(
       takeUntil(this.destroy$)
     ).subscribe(value => {
       const account = this.accounts.find(account => account.id === value);
-      this.historySearchObject = this.getHistorySearchObject('', account, this.historySearchObject.isLastMonth);
+      this.historySearchObject = this.getHistorySearchObject(this.historySearchObject.searchValue, account, this.historySearchObject.selectedMonth);
     });
   }
   /** Sets initial page values like the title. */
   private setInitialValues(): void {
-    this.menuTitleService.setTitle('Historie');
+    this.menuTitleService.setTitle('Suche');
     this.menuTitleService.setActiveId(3);
   }
 
@@ -99,11 +104,34 @@ export class HistoryComponent implements OnInit, OnDestroy {
     ).subscribe(allAccounts => this.accounts = allAccounts);
   }
 
-  getHistorySearchObject(searchValue: string = '', account: Account | undefined = undefined, isLastMonth: boolean = false) {
+  /** Loads all months that have entries, ensuring current month is included. */
+  private loadAvailableMonths(): void {
+    this.entryService.getAvailableMonthStrings().pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(months => {
+      const currentMonth = this.dateService.getActualMonthString();
+      const set = new Set([currentMonth, ...months]);
+      this.availableMonths = [...set].sort((a, b) => b > a ? 1 : -1);
+    });
+  }
+
+  getHistorySearchObject(searchValue: string = '', account: Account | undefined = undefined, selectedMonth: string | null = null) {
     return {
       searchValue: searchValue,
       account: account,
-      isLastMonth: isLastMonth
+      selectedMonth: selectedMonth
     } as HistorySearchObject;
+  }
+
+  get isFilterActive(): boolean {
+    return this.historySearchObject.searchValue.length > 0
+      || !!this.historySearchObject.account
+      || !!this.historySearchObject.selectedMonth;
+  }
+
+  resetFilters(): void {
+    this.searchFormGroup.controls['search'].setValue('', { emitEvent: false });
+    this.searchFormGroup.controls['accounts'].setValue('', { emitEvent: false });
+    this.historySearchObject = this.getHistorySearchObject();
   }
 }

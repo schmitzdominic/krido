@@ -32,13 +32,12 @@ export class PredictService {
   private accountService = inject(AccountService);
 
 
-  private lastMonthString: string = '';
-  private nextMonthString: string = '';
+  private generationDone = false;
 
   public createEntries() {
     if (this.userService.home) {
       this.homeService.getActualMonthString().pipe(
-        take(1), // Ensure the stream completes after the first value
+        take(1),
         switchMap(dbMonthString => {
           // Case 1: No month string in DB, set it for the first time.
           if (!dbMonthString) {
@@ -47,36 +46,38 @@ export class PredictService {
           // Case 2: DB month is outdated, create next month's data.
           const actualMonth = Number(this.dateService.getMonthStringFromMonth(0));
           if (dbMonthString < actualMonth) {
-            this.lastMonthString = String(dbMonthString);
-            this.nextMonthString = this.dateService.getMonthStringFromMonth(1);
+            if (this.generationDone) return of(undefined);
+            this.generationDone = true;
+            const lastMonthString = String(dbMonthString);
+            const nextMonthString = this.dateService.getMonthStringFromMonth(1);
             // Chain the promise to set the new month string
             return from(this.homeService.setActualMonthString()).pipe(
-              tap(() => this.createNextMonthData())
+              tap(() => this.createNextMonthData(lastMonthString, nextMonthString))
             );
           }
           // Case 3: DB is up-to-date, do nothing.
           return of(undefined);
         })
-      ).subscribe(); // A single subscription to trigger the whole chain.
+      ).subscribe();
     }
   }
 
-  private createNextMonthData() {
-    this.createBudgets();
-    this.createRegularEntries();
-    this.createCreditCardEntries();
+  private createNextMonthData(lastMonthString: string, nextMonthString: string) {
+    this.createBudgets(lastMonthString);
+    this.createRegularEntries(nextMonthString);
+    this.createCreditCardEntries(nextMonthString);
     this.toastService.showSuccess('Nächster Monat wurde angelegt', 3000);
   }
 
   public forceCreateNextMonth(): void {
-    this.lastMonthString = this.dateService.getActualMonthString();
-    this.nextMonthString = this.dateService.getMonthStringFromMonth(1);
-    this.createRegularEntries();
-    this.createCreditCardEntries();
+    const lastMonthString = this.dateService.getActualMonthString();
+    const nextMonthString = this.dateService.getMonthStringFromMonth(1);
+    this.createRegularEntries(nextMonthString);
+    this.createCreditCardEntries(nextMonthString);
     this.toastService.showSuccess('Nächster Monat wurde generiert', 3000);
   }
 
-  private createBudgets() {
+  private createBudgets(lastMonthString: string) {
     const currentMonth = this.dateService.getActualMonthString();
 
     forkJoin([
@@ -99,7 +100,7 @@ export class PredictService {
         const prevBudget = allBudgets.find(b =>
           !b.isArchived &&
           b.cycleKey === cycle.id &&
-          String(b.validityPeriod) === this.lastMonthString
+          String(b.validityPeriod) === lastMonthString
         );
 
         if (prevBudget) {
@@ -133,7 +134,7 @@ export class PredictService {
 
     if (budget.cycleKey) {
       this.budgetService.getCycle(budget.cycleKey).pipe(
-        map(cycle => cycle as Cycle | null), // Explicitly type the stream
+        map(cycle => cycle as Cycle | null),
         take(1),
         filter((cycle: Cycle | null): cycle is Cycle => !!cycle),
         switchMap(cycle =>
@@ -168,49 +169,49 @@ export class PredictService {
     this.budgetService.addMonthBudget(newBudget);
   }
 
-  private createRegularEntries() {
+  private createRegularEntries(nextMonthString: string) {
 
     // Month
     this.regularlyService.getAllByCycleType(RegularlyCycleType.month).pipe(
-      map(regularities => regularities as Regularly[]), // Explicitly type the stream
+      map(regularities => regularities as Regularly[]),
       take(1),
       mergeMap((regularities: Regularly[]) => from(regularities)),
-      tap((regularly: Regularly) => this.checkRegularMonth(regularly))
+      tap((regularly: Regularly) => this.checkRegularMonth(regularly, nextMonthString))
     ).subscribe();
 
     // TODO: Quarter
 
     // Year
     this.regularlyService.getAllByCycleType(RegularlyCycleType.year).pipe(
-      map(regularities => regularities as Regularly[]), // Explicitly type the stream
+      map(regularities => regularities as Regularly[]),
       take(1),
       mergeMap((regularities: Regularly[]) => from(regularities)),
       filter((regularly: Regularly) => !!regularly.date),
-      tap((regularly: Regularly) => this.checkRegularYear(regularly))
+      tap((regularly: Regularly) => this.checkRegularYear(regularly, nextMonthString))
     ).subscribe();
   }
 
-  private checkRegularMonth(regularly: Regularly) {
+  private checkRegularMonth(regularly: Regularly, nextMonthString: string) {
 
     // Calculate Time for monthly regular entry
-    const year: number = this.dateService.getYear(this.nextMonthString);
-    const month: number = this.dateService.getMonthIndex(this.nextMonthString);
+    const year: number = this.dateService.getYear(nextMonthString);
+    const month: number = this.dateService.getMonthIndex(nextMonthString);
     const day: number = regularly.isEndOfMonth ? this.dateService.getLastDayOfMonth(new Date(year, month)) : regularly.monthDay;
 
     const date: Date = new Date(year, month, day);
-    const entry: Entry = this.createEntryObjectFromRegularly(regularly, this.dateService.getAvailableWeekdayAsTimestampFromTimestamp(date.getTime()), this.nextMonthString);
+    const entry: Entry = this.createEntryObjectFromRegularly(regularly, this.dateService.getAvailableWeekdayAsTimestampFromTimestamp(date.getTime()), nextMonthString);
 
     this.entryService.addEntry(entry);
   }
 
-  private checkRegularYear(regularly: Regularly) {
+  private checkRegularYear(regularly: Regularly, nextMonthString: string) {
     if (regularly.date) {
       const dateFromTimestamp: Date = this.dateService.getDateFromTimestamp(regularly.date);
-      if (this.dateService.getMonthIndex(this.nextMonthString) == dateFromTimestamp.getMonth()) {
+      if (this.dateService.getMonthIndex(nextMonthString) == dateFromTimestamp.getMonth()) {
         // Update the year to the current year so the entry isn't placed in the past
-        const currentYear: number = this.dateService.getYear(this.nextMonthString);
+        const currentYear: number = this.dateService.getYear(nextMonthString);
         const correctedDate: Date = new Date(currentYear, dateFromTimestamp.getMonth(), dateFromTimestamp.getDate());
-        const entry: Entry = this.createEntryObjectFromRegularly(regularly, this.dateService.getAvailableWeekdayAsTimestampFromTimestamp(correctedDate.getTime()), this.nextMonthString);
+        const entry: Entry = this.createEntryObjectFromRegularly(regularly, this.dateService.getAvailableWeekdayAsTimestampFromTimestamp(correctedDate.getTime()), nextMonthString);
         this.entryService.addEntry(entry);
       }
     }
@@ -242,23 +243,23 @@ export class PredictService {
     }
   }
 
-  private createCreditCardEntries() {
+  private createCreditCardEntries(nextMonthString: string) {
     this.accountService.getAllAccountsFilteredByAccountType(AccountType.creditCard).pipe(
-      map(accounts => accounts as Account[]), // Explicitly type the stream
+      map(accounts => accounts as Account[]),
       take(1),
       mergeMap((accounts: Account[]) => from(accounts)),
-      tap((account: Account) => this.checkAccountAndCreateEntry(account))
+      tap((account: Account) => this.checkAccountAndCreateEntry(account, nextMonthString))
     ).subscribe();
   }
 
-  private checkAccountAndCreateEntry(account: Account) {
+  private checkAccountAndCreateEntry(account: Account, nextMonthString: string) {
     // Calculate Time for monthly regular entry
-    const year: number = this.dateService.getYear(this.nextMonthString);
-    const month: number = this.dateService.getMonthIndex(this.nextMonthString);
+    const year: number = this.dateService.getYear(nextMonthString);
+    const month: number = this.dateService.getMonthIndex(nextMonthString);
     const day: number = account.creditLastDay ? this.dateService.getLastDayOfMonth(new Date(year, month)) : (account.creditDay ?? 1);
 
     const date: Date = new Date(year, month, day);
-    const entry: Entry = this.createEntryObjectFromAccount(account, this.dateService.getAvailableWeekdayAsTimestampFromTimestamp(date.getTime()), this.nextMonthString);
+    const entry: Entry = this.createEntryObjectFromAccount(account, this.dateService.getAvailableWeekdayAsTimestampFromTimestamp(date.getTime()), nextMonthString);
     this.entryService.addEntry(entry);
   }
 }

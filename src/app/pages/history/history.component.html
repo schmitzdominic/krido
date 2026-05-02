@@ -30,12 +30,37 @@
     </div>
   </form>
 
-  <button type="button"
-    class="chip-btn mb-3"
-    [class.chip-btn--active]="historySearchObject.isLastMonth"
-    (click)="onClickLastMonth()">
-    <i class="bi bi-clock-history"></i>Letzter Monat
-  </button>
+  <div class="form-field mb-3">
+    <div ngbDropdown container="body" placement="bottom-start">
+      <button class="form-field__select" type="button" ngbDropdownToggle>
+        <span>
+          @if (historySearchObject.selectedMonth) {
+            {{ dateService.getMonthName(historySearchObject.selectedMonth) }} {{ dateService.getYear(historySearchObject.selectedMonth) }}
+          } @else {
+            Monat wählen…
+          }
+        </span>
+        <i class="bi bi-chevron-down form-field__chevron"></i>
+      </button>
+      <div ngbDropdownMenu class="sheet-dropdown">
+        @for (month of availableMonths; track month) {
+          <button ngbDropdownItem
+            [class.active]="historySearchObject.selectedMonth === month"
+            (click)="onSelectMonth(month)">
+            {{ dateService.getMonthName(month) }} {{ dateService.getYear(month) }}
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+
+  @if (historySearchObject.searchValue.length > 0 || historySearchObject.account || historySearchObject.selectedMonth) {
+    <div class="mb-3">
+      <button type="button" class="btn btn-outline-secondary w-100" (click)="resetFilters()">
+        <i class="bi bi-x-circle me-2"></i>Filter zurücksetzen
+      </button>
+    </div>
+  }
 
   <app-history-list [historySearchObject]="historySearchObject"></app-history-list>
 </div>

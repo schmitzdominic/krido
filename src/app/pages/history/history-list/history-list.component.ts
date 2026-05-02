@@ -13,7 +13,7 @@ import { of } from 'rxjs';
 export interface HistorySearchObject {
   searchValue: string,
   account: Account | undefined,
-  isLastMonth: boolean
+  selectedMonth: string | null
 }
 
 @Component({
@@ -40,39 +40,39 @@ export class HistoryListComponent {
       switchMap(search => {
         if (!search) return of([] as (Entry & { id: string })[]);
 
-        if (search.searchValue.length > 2) {
-          const searchName = this.helperService.createSearchName(search.searchValue);
-          return this.entryService.searchEntriesByName(searchName).pipe(
-            map(results => {
-              let filtered = (results as (Entry & { id: string })[])
-                .filter(e => e.searchName.includes(searchName));
-              if (search.account) {
-                filtered = filtered.filter(e =>
-                  (e.account as any)?.id === (search.account as any)?.id
-                );
-              }
-              return filtered.sort((a, b) => a.date > b.date ? -1 : 1);
-            })
-          );
+        const hasSearch = search.searchValue.length > 2;
+        const hasMonth = !!search.selectedMonth;
+        const hasAccount = !!search.account;
+
+        if (!hasSearch && !hasMonth && !hasAccount) return of([] as (Entry & { id: string })[]);
+
+        const accountId = hasAccount ? (search.account as any)?.id : null;
+
+        let source$: ReturnType<typeof this.entryService.getAllEntriesByMonthString>;
+        if (hasMonth) {
+          source$ = this.entryService.getAllEntriesByMonthString(search.selectedMonth!);
+        } else if (hasAccount && !hasSearch) {
+          source$ = this.entryService.getAllEntries();
+        } else {
+          source$ = this.entryService.searchEntriesByName(this.helperService.createSearchName(search.searchValue));
         }
 
-        if (search.isLastMonth) {
-          const lastMonthString = this.dateService.getMonthStringFromMonth(-1);
-          return this.entryService.searchEntriesByMonthString(lastMonthString).pipe(
-            map(results => {
-              let filtered = (results as (Entry & { id: string })[])
-                .filter(e => e.monthString.includes(lastMonthString));
-              if (search.account) {
-                filtered = filtered.filter(e =>
-                  (e.account as any)?.id === (search.account as any)?.id
-                );
-              }
-              return filtered;
-            })
-          );
-        }
+        return source$.pipe(
+          map(results => {
+            let filtered = results as (Entry & { id: string })[];
 
-        return of([] as (Entry & { id: string })[]);
+            if (hasSearch) {
+              const searchName = this.helperService.createSearchName(search.searchValue);
+              filtered = filtered.filter(e => e.searchName.includes(searchName));
+            }
+            if (hasAccount) {
+              filtered = filtered.filter(e =>
+                (e.account as any)?.id === accountId || (e.account as any)?.key === accountId
+              );
+            }
+            return filtered.sort((a, b) => a.date > b.date ? -1 : 1);
+          })
+        );
       })
     ),
     { initialValue: [] as (Entry & { id: string })[] }
@@ -84,9 +84,8 @@ export class HistoryListComponent {
     if (search.searchValue.length > 2) {
       return this.entries().length === 0 ? 'Nichts gefunden!' : 'Ergebnisse';
     }
-    if (search.isLastMonth) {
-      const lastMonthString = this.dateService.getMonthStringFromMonth(-1);
-      return `${this.dateService.getMonthName(lastMonthString)} ${this.dateService.getYear(lastMonthString)}`;
+    if (search.selectedMonth) {
+      return `${this.dateService.getMonthName(search.selectedMonth)} ${this.dateService.getYear(search.selectedMonth)}`;
     }
     return '';
   });

@@ -1,4 +1,4 @@
-import { Component, HostListener, Input, OnDestroy, OnInit, TemplateRef, ViewChild, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, HostListener, Input, OnDestroy, OnInit, TemplateRef, ViewChild, inject } from '@angular/core';
 import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {AccountService} from "../../../services/account/account.service";
@@ -20,6 +20,7 @@ export class EntryListComponent implements OnInit, OnDestroy {
   private accountService = inject(AccountService);
   private entryService = inject(EntryService);
   private dateService = inject(DateService);
+  private cdr = inject(ChangeDetectorRef);
   @ViewChild('addOrEditEntryModal') addOrEditEntryModal: NgbModalRef | undefined;
   @ViewChild('calculatorModal') calculatorModal: TemplateRef<any> | undefined;
 
@@ -94,6 +95,7 @@ export class EntryListComponent implements OnInit, OnDestroy {
       this.totalActualMonthEntries = actualEntries.length;
       this.totalNextMonthEntries = nextEntries.length;
       this.filterAndSortEntries();
+      this.cdr.detectChanges();
       });
   }
 

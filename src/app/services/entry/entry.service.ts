@@ -128,4 +128,20 @@ export class EntryService {
   public searchEntriesByMonthString(monthString: string): Observable<(Entry & { id: string })[]> {
     return this.dbService.readFilteredList(this.rootPath, orderByChild('monthString'), startAt(monthString));
   }
+
+  /**
+   * Returns all unique monthStrings that have at least one entry, sorted descending.
+   */
+  public getAvailableMonthStrings(): Observable<string[]> {
+    return this.dbService.readFilteredList<Entry & { id: string }>(this.rootPath, orderByChild('monthString'), startAt('')).pipe(
+      map(entries => {
+        const months = new Set(entries.map(e => e.monthString).filter(Boolean));
+        return [...months].sort((a, b) => b > a ? 1 : -1);
+      })
+    );
+  }
+
+  public getAllEntries(): Observable<(Entry & { id: string })[]> {
+    return this.dbService.readList<Entry & { id: string }>(this.rootPath);
+  }
 }

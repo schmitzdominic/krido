@@ -14,7 +14,7 @@
       @for (entry of entries(); track entry.id) {
         <div class="entry-row" (click)="onEntryClick(entry)">
           <app-entry-list-entry
-            [withMonth]="historySearchObject()?.isLastMonth ?? false"
+            [withMonth]="true"
             [entry]="entry">
           </app-entry-list-entry>
         </div>
@@ -22,6 +22,6 @@
     </div>
   }
   @if (entries().length === 0) {
-    <p class="empty-hint">Suche nach Einträgen oder wähle "Letzter Monat".</p>
+    <p class="empty-hint">Suche nach Einträgen oder wähle einen Monat.</p>
   }
 </div>
