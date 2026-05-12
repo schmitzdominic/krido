@@ -24,7 +24,22 @@
 - **Kontosaldo**: `Account.updatedDate` MUSS beim Anlegen initialisiert werden, sonst wird `calculateRest()` in `InfoListEntryComponent` übersprungen.
 - **DbService**: Generischer CRUD-Wrapper. Home-ID wird aus localStorage gelesen und gecacht.
 
-## Build
-- Dev: `ng serve --ssl`
-- Prod: `ng build --production --localize`
-- Deploy: Firebase Hosting
+## Build & Deploy
+
+### Dev
+```bash
+npm run start
+```
+
+### Production Build
+```bash
+npx ng build --configuration=production --localize --progress
+```
+> Hinweis: `npm run build:production` funktioniert nicht (veraltete Flags). Immer `npx ng build ...` verwenden.
+
+### Deploy (Firebase Hosting)
+```bash
+/home/dominics/.npm-global/bin/firebase deploy --only hosting
+```
+> `firebase` ist nicht im PATH. Firebase CLI liegt unter `/home/dominics/.npm-global/bin/firebase`.
+> Projekt-ID: `krido-2d5f7` – Hosting URL: https://krido-2d5f7.web.app
