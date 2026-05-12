@@ -52,7 +52,7 @@ export class AddOrEditEntryComponent {
   selectedDateTimestamp: number = this.dateService.getTimestampFromNgbDate(this.selectedDate);
 
   isNameInvalid: boolean = true;
-  isValueInvalid: boolean = true;
+  isValueInvalid: boolean = false;
   isEdited: boolean = false;
 
   addOrEditEntryFormGroup: FormGroup = new FormGroup({
@@ -154,7 +154,7 @@ export class AddOrEditEntryComponent {
       this.isEdited = true;
     });
     this.addOrEditEntryFormGroup.controls['value'].valueChanges.subscribe(value => {
-      this.isValueInvalid = value < 0 || value === null || value === undefined;
+      this.isValueInvalid = typeof value === 'number' && value < 0;
       this.isEdited = true;
     });
     this.addOrEditEntryFormGroup.controls['account'].valueChanges.subscribe(() => {
