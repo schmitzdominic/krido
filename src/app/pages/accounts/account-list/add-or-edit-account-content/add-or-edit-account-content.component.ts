@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, DestroyRef, EventEmitter, inject, Input, Output } from '@angular/core';
+import { Component, DestroyRef, EventEmitter, inject, Input, Output } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {AccountType} from "../../../../../shared/enums/account-type.enum";
@@ -28,7 +28,6 @@ export class AddOrEditAccountContentComponent {
   private userService = inject(UserService);
   private dbService = inject(DbService);
   private destroyRef = inject(DestroyRef);
-  private cdr = inject(ChangeDetectorRef);
 
 
   @Input() account: (Account & { id: string }) | undefined;
@@ -48,12 +47,27 @@ export class AddOrEditAccountContentComponent {
   submitButtonText: string = 'Erstellen';
 
   isNameInvalid: boolean = true;
-  isMonthDayInvalid: boolean = false;
+
+  get isMonthDayInvalid(): boolean {
+    if (this.selectedAccountType.value !== AccountType.creditCard) return false;
+    if (this.addOrEditAccountFormGroup?.value?.creditLastDay) return false;
+    const creditDay: number = this.addOrEditAccountFormGroup?.value?.creditDay;
+    return !(creditDay > 0 && creditDay <= 31);
+  }
+
+  get isBillingDayInvalid(): boolean {
+    if (this.selectedAccountType.value !== AccountType.creditCard) return false;
+    if (this.addOrEditAccountFormGroup?.value?.billingLastDay) return false;
+    const billingDay: number = this.addOrEditAccountFormGroup?.value?.billingDay;
+    return !(billingDay > 0 && billingDay <= 31);
+  }
 
   addOrEditAccountFormGroup: FormGroup = new FormGroup({
     accountType: new FormControl(''),
     name: new FormControl('', Validators.required),
     owners: new FormControl(''),
+    billingDay: new FormControl(''),
+    billingLastDay: new FormControl(''),
     creditDay: new FormControl(''),
     creditLastDay: new FormControl(''),
     referenceAccount: new FormControl(''),
@@ -73,7 +87,9 @@ export class AddOrEditAccountContentComponent {
         accountType: [this.account ? this.account.accountType : this.selectedAccountType.value],
         name: [this.account ? this.account.name : '', Validators.required],
         owners: [''],
-        creditDay: [this.account ? this.account.creditDay : ''],
+        billingDay: [this.account ? this.account.billingDay ?? null : null],
+        billingLastDay: [this.account ? this.account.billingLastDay : ''],
+        creditDay: [this.account ? this.account.creditDay ?? null : null],
         creditLastDay: [this.account ? this.account.creditLastDay : ''],
         referenceAccount: [this.account ? (this.account.referenceAccount as any)?.id : ''],
       }
@@ -110,9 +126,6 @@ export class AddOrEditAccountContentComponent {
     // Validators
     this.addOrEditAccountFormGroup.controls['name'].valueChanges.subscribe((name: string) => {
       this.isNameInvalid = name.length <= 0;
-    });
-    this.addOrEditAccountFormGroup.controls['creditDay'].valueChanges.subscribe((creditDay: number) => {
-      this.isMonthDayInvalid = !(creditDay > 0 && creditDay <= 31);
     });
   }
 
@@ -152,7 +165,6 @@ export class AddOrEditAccountContentComponent {
       } else if (!this.account && accounts.length > 0) {
         this.addOrEditAccountFormGroup.controls['referenceAccount'].setValue(accounts[0].id);
       }
-      this.cdr.detectChanges();
     });
   }
 
@@ -178,6 +190,8 @@ export class AddOrEditAccountContentComponent {
 
   get accountObject(): Account {
     const name: string = this.addOrEditAccountFormGroup.value.name;
+    const billingDay: number = this.addOrEditAccountFormGroup.value.billingDay;
+    const billingLastDay: boolean = this.addOrEditAccountFormGroup.value.billingLastDay;
     const creditDay: number = this.addOrEditAccountFormGroup.value.creditDay;
     const creditLastDay: boolean = this.addOrEditAccountFormGroup.value.creditLastDay;
     return {
@@ -185,6 +199,8 @@ export class AddOrEditAccountContentComponent {
       name: name,
       searchName: this.helperService.createSearchName(name),
       owners: this.selectedOwners as User[],
+      billingDay: billingDay,
+      billingLastDay: billingLastDay,
       creditDay: creditDay,
       creditLastDay: creditLastDay,
       referenceAccount: this.selectedReferenceAccount,
@@ -227,6 +243,17 @@ export class AddOrEditAccountContentComponent {
 
   get isLastDay() {
     return this.addOrEditAccountFormGroup.controls['creditLastDay'].value;
+  }
+
+  get isBillingLastDay() {
+    return this.addOrEditAccountFormGroup.controls['billingLastDay'].value;
+  }
+
+  get isCreditCardValid(): boolean {
+    if (this.selectedAccountType.value !== AccountType.creditCard) return true;
+    const billingOk = this.isBillingLastDay
+      || (this.addOrEditAccountFormGroup.value.billingDay > 0 && this.addOrEditAccountFormGroup.value.billingDay <= 31);
+    return billingOk;
   }
 
   protected readonly AccountType = AccountType;

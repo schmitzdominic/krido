@@ -40,6 +40,15 @@
           <span class="info-item__value">{{ account?.referenceAccount?.name }}</span>
         </div>
         <div class="info-item">
+          <i class="bi bi-calendar-check info-item__icon"></i>
+          <span class="info-item__label">Abrechnungstag</span>
+          @if (!account?.billingLastDay) {
+            <span class="info-item__value">Am {{ account?.billingDay }}.</span>
+          } @else {
+            <span class="info-item__value">Letzter Tag</span>
+          }
+        </div>
+        <div class="info-item">
           <i class="bi bi-arrow-right info-item__icon"></i>
           <span class="info-item__label">Abbuchung</span>
           @if (!account?.creditLastDay) {

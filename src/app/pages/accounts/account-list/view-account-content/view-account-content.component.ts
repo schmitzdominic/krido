@@ -52,7 +52,17 @@ export class ViewAccountContentComponent {
         this.mode = 'view';
       }
     } else if (this.mode === 'edit') {
-      this.mode = 'view';
+      if (this.account?.id) {
+        this.accountService.getAccountById(this.account.id).pipe(take(1)).subscribe(updated => {
+          if (updated) {
+            this.account = { ...updated, id: this.account!.id };
+          }
+          this.mode = 'view';
+          this.cdr.markForCheck();
+        });
+      } else {
+        this.mode = 'view';
+      }
     } else {
       this.onClose.emit();
     }

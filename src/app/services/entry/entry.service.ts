@@ -97,17 +97,16 @@ export class EntryService {
   }
 
   /**
-   * Finds the credit card invoice entry for a given credit card account's searchName and monthString.
-   * @param creditCardSearchName The searchName of the credit card account.
-   * @param monthString The month in YYYYMM format.
+   * Finds all credit card invoice entries for a given credit card account's searchName and monthString.
+   * Returns an array because multiple CC entries for the same month can exist (e.g. shifted billing cycles).
    */
-  public getCreditCardInvoiceEntry(creditCardSearchName: string, monthString: string): Observable<(Entry & { id: string }) | undefined> {
+  public getCreditCardInvoiceEntries(creditCardSearchName: string, monthString: string): Observable<(Entry & { id: string })[]> {
     return this.dbService.readFilteredList<Entry & { id: string }>(
       this.rootPath,
       orderByChild('searchName'),
       equalTo(creditCardSearchName)
     ).pipe(
-      map(entries => entries.find(e => e.monthString === monthString))
+      map(entries => entries.filter(e => e.monthString === monthString))
     );
   }
 

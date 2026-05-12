@@ -8,6 +8,8 @@ export interface Account {
   owners: User[];
   accountType: AccountType;
   value?: number;
+  billingDay?: number;
+  billingLastDay?: boolean;
   creditDay?: number;
   creditLastDay?: boolean;
   referenceAccount?: Account;

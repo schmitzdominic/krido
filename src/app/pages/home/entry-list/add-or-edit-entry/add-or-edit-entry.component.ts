@@ -154,7 +154,7 @@ export class AddOrEditEntryComponent {
       this.isEdited = true;
     });
     this.addOrEditEntryFormGroup.controls['value'].valueChanges.subscribe(value => {
-      this.isValueInvalid = value <= 0;
+      this.isValueInvalid = value < 0 || value === null || value === undefined;
       this.isEdited = true;
     });
     this.addOrEditEntryFormGroup.controls['account'].valueChanges.subscribe(() => {
@@ -275,7 +275,7 @@ export class AddOrEditEntryComponent {
     this.entryService.deleteEntry(this.entry!.id).then(() => {
       if (account.accountType === AccountType.creditCard) {
         const delta = -this.getCCDelta(this.entry!.value, this.entry!.type);
-        this.updateCreditCardInvoiceEntry(account, this.entry!.monthString, delta);
+        this.updateCreditCardInvoiceEntry(account, this.entry!.monthString, this.entry!.date, delta);
       }
       this.closeModal();
     }).catch(err => console.error("Error deleting entry:", err));
@@ -312,12 +312,12 @@ export class AddOrEditEntryComponent {
       // Reverse old CC contribution
       if (oldAccount.accountType === AccountType.creditCard) {
         const reverseDelta = -this.getCCDelta(this.entry!.value, this.entry!.type);
-        this.updateCreditCardInvoiceEntry(oldAccount, this.entry!.monthString, reverseDelta);
+        this.updateCreditCardInvoiceEntry(oldAccount, this.entry!.monthString, this.entry!.date, reverseDelta);
       }
       // Apply new CC contribution
       if (newAccount.accountType === AccountType.creditCard) {
         const forwardDelta = this.getCCDelta(entryData.value, entryData.type);
-        this.updateCreditCardInvoiceEntry(newAccount, entryData.monthString, forwardDelta);
+        this.updateCreditCardInvoiceEntry(newAccount, entryData.monthString, entryData.date, forwardDelta);
       }
       this.closeModal();
     }).catch(err => console.error("Error updating entry:", err));
@@ -332,7 +332,7 @@ export class AddOrEditEntryComponent {
     this.entryService.addEntry(entryObject).then(() => {
       if (account.accountType === AccountType.creditCard) {
         const delta = this.getCCDelta(entryObject.value, entryObject.type);
-        this.updateCreditCardInvoiceEntry(account, entryObject.monthString, delta);
+        this.updateCreditCardInvoiceEntry(account, entryObject.monthString, entryObject.date, delta);
       }
       this.closeModal();
     }).catch(err => console.error("Error adding entry:", err));
@@ -374,19 +374,78 @@ export class AddOrEditEntryComponent {
     this.onClose.emit();
   }
 
+  /** Returns the timestamp of the CC statement day (billingDay) for a given month.
+   *  Used to determine whether an entry falls before or after the statement cutoff.
+   */
+  private getCCStatementTimestamp(account: Account, monthString: string): number {
+    const year = this.dateService.getYear(monthString);
+    const monthIndex = this.dateService.getMonthIndex(monthString);
+    const day = account.billingLastDay
+      ? this.dateService.getLastDayOfMonth(new Date(year, monthIndex))
+      : (account.billingDay ?? 1);
+    return new Date(year, monthIndex, day).getTime();
+  }
+
+  /** Returns the expected debit timestamp (creditDay) of the CC invoice entry for a given month.
+   *  Used by pickEntry to identify the correct invoice entry among duplicates.
+   */
+  private getCCDebitTimestamp(account: Account, monthString: string): number {
+    const year = this.dateService.getYear(monthString);
+    const monthIndex = this.dateService.getMonthIndex(monthString);
+    const day = account.creditLastDay
+      ? this.dateService.getLastDayOfMonth(new Date(year, monthIndex))
+      : (account.creditDay ?? 1);
+    return this.dateService.getAvailableWeekdayAsTimestampFromTimestamp(new Date(year, monthIndex, day).getTime());
+  }
+
+  /** Returns the billing month string (next month) for a given transaction month string.
+   *  CC invoice entries are always created for the following month by PredictService.
+   */
+  private getBillingMonthString(transactionMonthString: string): string {
+    const year = this.dateService.getYear(transactionMonthString);
+    const monthIndex = this.dateService.getMonthIndex(transactionMonthString);
+    const date = new Date(year, monthIndex + 1, 1);
+    return this.dateService.getMonthStringFromDate(date);
+  }
+
   /** Returns the signed delta that a given entry contributes to the CC invoice total. */
   private getCCDelta(value: number, type: EntryType): number {
     return type === EntryType.outcome ? value : -value;
   }
 
-  /** Finds the CC invoice entry for the given account + month and adjusts its value by valueDelta. */
-  private updateCreditCardInvoiceEntry(account: Account, monthString: string, valueDelta: number): void {
+  /** Finds the correct CC invoice entry and adjusts its value by valueDelta.
+   *  - If entryDate > statement day of transactionMonth → update next month's CC invoice entry.
+   *  - If entryDate <= statement day → update same month's CC invoice entry.
+   *  - If no matching entry exists in the target month → skip silently (no fallback).
+   *  - If multiple entries exist in the target month, the one matching creditDay is preferred.
+   */
+  private updateCreditCardInvoiceEntry(account: Account, transactionMonthString: string, entryDate: number, valueDelta: number): void {
     if (!valueDelta) return;
-    this.entryService.getCreditCardInvoiceEntry(account.searchName, monthString)
+
+    const statementTs = this.getCCStatementTimestamp(account, transactionMonthString);
+    const targetMonthString = entryDate > statementTs
+      ? this.getBillingMonthString(transactionMonthString)
+      : transactionMonthString;
+
+    const pickEntry = (entries: (Entry & { id: string })[]): (Entry & { id: string }) | undefined => {
+      if (entries.length === 0) return undefined;
+      if (entries.length === 1) return entries[0];
+      const expectedTs = this.getCCDebitTimestamp(account, targetMonthString);
+      return entries.find(e => e.date === expectedTs) ?? entries[0];
+    };
+
+    this.entryService.getCreditCardInvoiceEntries(account.searchName, targetMonthString)
       .pipe(take(1))
-      .subscribe(invoiceEntry => {
+      .subscribe(entries => {
+        const invoiceEntry = pickEntry(entries);
         if (invoiceEntry) {
-          this.entryService.updateEntry({ value: invoiceEntry.value + valueDelta }, invoiceEntry.id!);
+          const currentSigned = invoiceEntry.type === EntryType.outcome
+            ? invoiceEntry.value
+            : -invoiceEntry.value;
+          const newSigned = currentSigned + valueDelta;
+          const newType = newSigned >= 0 ? EntryType.outcome : EntryType.income;
+          const newValue = Math.abs(newSigned);
+          this.entryService.updateEntry({ value: newValue, type: newType }, invoiceEntry.id!);
         }
       });
   }
