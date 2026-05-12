@@ -1,6 +1,27 @@
 <div class="invoice-settings">
   <form [formGroup]="invoiceSettingsFormGroup" novalidate>
 
+    <!-- Abrechnungsmonat -->
+    <div class="form-field mb-4">
+      <label class="form-field__label">Abrechnungsmonat</label>
+      <div ngbDropdown container="body" placement="bottom-end">
+        <button class="form-field__select" type="button" ngbDropdownToggle>
+          {{ selectedMonthLabel }}
+          <i class="bi bi-chevron-down form-field__chevron"></i>
+        </button>
+        <div ngbDropdownMenu class="sheet-dropdown">
+          @for (month of availableMonths; track month) {
+            <button ngbDropdownItem (click)="selectedMonthString = month">
+              {{ getMonthLabel(month) }}
+            </button>
+          }
+          @if (availableMonths.length === 0) {
+            <button ngbDropdownItem disabled>Keine Monate verfügbar</button>
+          }
+        </div>
+      </div>
+    </div>
+
     @if (invoiceAccounts.length > 0) {
       <div class="form-field mb-4">
         <label class="form-field__label">Abrechnungskonto</label>
@@ -59,7 +80,9 @@
   </form>
 
   <div class="settings-footer">
-    <button type="button" class="btn-sheet btn-sheet--primary" (click)="onSubmit()">Weiter</button>
+    <button type="button" class="btn-sheet btn-sheet--primary"
+      [disabled]="!selectedInvoiceAccountKey || !selectedMonthString"
+      (click)="onSubmit()">Weiter</button>
   </div>
 </div>
 

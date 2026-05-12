@@ -6,8 +6,10 @@ import {AccountService} from "../../../services/account/account.service";
 import {AccountType} from "../../../../shared/enums/account-type.enum";
 import {InvoiceSettings} from "../../../../shared/interfaces/invoice-settings.model";
 import {InvoiceService} from "../../../services/invoice/invoice.service";
-
+import {EntryService} from "../../../services/entry/entry.service";
+import {DateService} from "../../../services/date/date.service";
 import { map } from 'rxjs/operators';
+import { take } from 'rxjs';
 
 @Component({
     selector: 'app-invoice-settings',
@@ -19,6 +21,8 @@ export class InvoiceSettingsComponent {
   private formBuilder = inject(FormBuilder);
   private accountService = inject(AccountService);
   private invoiceService = inject(InvoiceService);
+  private entryService = inject(EntryService);
+  private dateService = inject(DateService);
   private destroyRef = inject(DestroyRef);
 
 
@@ -31,6 +35,9 @@ export class InvoiceSettingsComponent {
   beneficiaryAccounts: (Account & { id: string })[] = [];
   selectedBeneficiaryAccounts: (Account & { id: string })[] = [];
 
+  availableMonths: string[] = [];
+  selectedMonthString: string = '';
+
   invoiceSettingsFormGroup: FormGroup = new FormGroup({
     invoiceAccounts: new FormControl(''),
     beneficiaryAccounts: new FormControl('')
@@ -40,6 +47,7 @@ export class InvoiceSettingsComponent {
     this.createFormGroup();
     this.loadAccounts();
     this.addListener();
+    this.loadAvailableMonths();
   }
 
   private createFormGroup(): void {
@@ -58,7 +66,13 @@ export class InvoiceSettingsComponent {
     ).subscribe(invoiceSettings => {
       if (invoiceSettings) {
         this.invoiceSettings = invoiceSettings;
-        this.fillFormWithSettings(invoiceSettings);
+        this.selectedInvoiceAccount = invoiceSettings.invoiceAccountKey;
+        invoiceSettings.beneficiaryAccountKeys.forEach(key => {
+          this.selectBeneficiaryAccount(key);
+        });
+        if (invoiceSettings.monthString && !this.selectedMonthString) {
+          this.selectedMonthString = invoiceSettings.monthString;
+        }
       }
     });
   }
@@ -73,13 +87,14 @@ export class InvoiceSettingsComponent {
     });
   }
 
-  private fillFormWithSettings(invoiceSettings: InvoiceSettings) {
-    if (invoiceSettings) {
-      this.selectedInvoiceAccount = invoiceSettings.invoiceAccountKey;
-      invoiceSettings.beneficiaryAccountKeys.forEach(key => {
-        this.selectBeneficiaryAccount(key);
-      });
-    }
+  private loadAvailableMonths(): void {
+    const currentMonth = this.dateService.getActualMonthString();
+    this.entryService.getAvailableMonthStrings().pipe(take(1)).subscribe(months => {
+      this.availableMonths = months.filter(m => m < currentMonth);
+      if (!this.selectedMonthString && this.availableMonths.length > 0) {
+        this.selectedMonthString = this.availableMonths[0];
+      }
+    });
   }
 
   public addSelectedBeneficiaryAccount(): void {
@@ -119,6 +134,15 @@ export class InvoiceSettingsComponent {
     }
   }
 
+  public get selectedMonthLabel(): string {
+    if (!this.selectedMonthString) return 'Monat auswählen';
+    return `${this.dateService.getMonthName(this.selectedMonthString)} ${this.dateService.getYear(this.selectedMonthString)}`;
+  }
+
+  public getMonthLabel(monthString: string): string {
+    return `${this.dateService.getMonthName(monthString)} ${this.dateService.getYear(monthString)}`;
+  }
+
   public get selectedInvoiceAccountKey(): string {
     return this.invoiceSettingsFormGroup.value.invoiceAccounts;
   }
@@ -147,7 +171,8 @@ export class InvoiceSettingsComponent {
 
     const invoiceSettings: InvoiceSettings = {
       invoiceAccountKey: this.selectedInvoiceAccountKey,
-      beneficiaryAccountKeys: selectedBeneficiaryAccountKeys
+      beneficiaryAccountKeys: selectedBeneficiaryAccountKeys,
+      monthString: this.selectedMonthString
     }
 
     if (this.invoiceSettings) {

@@ -11,4 +11,6 @@ export interface Entry {
   account: Account;
   date: number;
   monthString: string;
+  /** Identifies this entry as an invoice entry. Format: '{billedMonthString}_{beneficiaryAccountId}' */
+  abrechnung?: string;
 }

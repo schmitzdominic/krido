@@ -12,6 +12,9 @@
 - `searchName`: Lowercase, ohne Leerzeichen – für Suche/Filter
 - `monthString`: Format `YYYYMM` (z.B. `"202501"`)
 - Feature-Module pro Seite unter `pages/`, gemeinsame Komponenten unter `components/`
+- **Variablennamen müssen immer lesbar und aussagekräftig sein** – keine Abkürzungen wie `cdr`, `ref`, `svc` o.ä. Stattdessen vollständige Namen wie `changeDetectorRef`, `modalRef`, `entryService`
+- **Private und public Injections trennen**: erst alle `private`-Injections, dann alle öffentlichen (template-zugänglich) mit Kommentar `// Private injections` / `// Public injections (used in template)`
+- **Dokumentation**: Alle öffentlichen Methoden, Getter und Properties mit JSDoc kommentieren
 
 ## Firebase-Struktur
 ```

@@ -1,7 +1,8 @@
-@if (!showInvoice) {
-  <app-invoice-settings
-    (onNext)="onNextSettings($event)">
-  </app-invoice-settings>
-} @else {
-  <app-invoice-list></app-invoice-list>
+<app-invoice-settings
+  (onNext)="onNextSettings($event)"
+  [hidden]="showInvoice">
+</app-invoice-settings>
+
+@if (showInvoice && invoiceSettings) {
+  <app-invoice-list [invoiceSettings]="invoiceSettings!" (onBack)="showInvoice = false"></app-invoice-list>
 }

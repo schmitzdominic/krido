@@ -143,4 +143,19 @@ export class EntryService {
   public getAllEntries(): Observable<(Entry & { id: string })[]> {
     return this.dbService.readList<Entry & { id: string }>(this.rootPath);
   }
+
+  /**
+   * Checks whether an invoice entry already exists for a given abrechnung value.
+   * @param abrechnungValue The abrechnung identifier in the format '{monthString}_{accountId}'.
+   * @returns An Observable emitting true if the invoice entry already exists, false otherwise.
+   */
+  public hasInvoiceEntryForAbrechnung(abrechnungValue: string): Observable<boolean> {
+    return this.dbService.readFilteredList<Entry & { id: string }>(
+      this.rootPath,
+      orderByChild('abrechnung'),
+      equalTo(abrechnungValue)
+    ).pipe(
+      map(entries => entries.length > 0)
+    );
+  }
 }

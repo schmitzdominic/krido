@@ -12,6 +12,7 @@ export class InvoiceComponent {
   private menuTitleService = inject(MenuTitleService);
 
   showInvoice = false;
+  invoiceSettings: InvoiceSettings | undefined;
 
   /** Inserted by Angular inject() migration for backwards compatibility */
   constructor(...args: unknown[]);
@@ -23,7 +24,8 @@ export class InvoiceComponent {
     this.setInitialValues();
   }
 
-  public onNextSettings(_invoiceSettings: InvoiceSettings): void {
+  public onNextSettings(invoiceSettings: InvoiceSettings): void {
+    this.invoiceSettings = invoiceSettings;
     this.showInvoice = true;
   }
 
