@@ -10,6 +10,10 @@
     @if (title()) {
       <h2 class="section-label">{{ title() }}</h2>
     }
+    <div class="total-amount" [class.total-amount--positive]="totalAmount() >= 0" [class.total-amount--negative]="totalAmount() < 0">
+      <span class="total-amount__label">Gesamt</span>
+      <span class="total-amount__value">{{ totalAmount() >= 0 ? '' : '- ' }}{{ priceService.convertNumberToEuro(Math.abs(totalAmount())) }}</span>
+    </div>
     <div class="entries-card-group">
       @for (entry of entries(); track entry.id) {
         <div class="entry-row" (click)="onEntryClick(entry)">

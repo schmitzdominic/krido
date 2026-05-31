@@ -67,11 +67,28 @@
 </ng-template>
 
 @if (totalActualMonthEntries === -1) {
-  <div class="d-flex justify-content-center py-5">
-    <div class="spinner-border" role="status">
-      <span class="visually-hidden">Lädt...</span>
+  <section class="entry-section">
+    <div class="entry-section__header">
+      <div class="skeleton skeleton--section-label"></div>
     </div>
-  </div>
+    <div class="entry-card-group">
+      @for (i of [1, 2, 3]; track i) {
+        <div class="skeleton-entry-row">
+          <div class="skeleton skeleton--indicator"></div>
+          <div class="skeleton-body">
+            <div class="skeleton-row">
+              <div class="skeleton skeleton--name"></div>
+              <div class="skeleton skeleton--value"></div>
+            </div>
+            <div class="skeleton-row skeleton-row--sub">
+              <div class="skeleton skeleton--sub-left"></div>
+              <div class="skeleton skeleton--sub-right"></div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </section>
 }
 
 <!-- Search results -->

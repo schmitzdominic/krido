@@ -129,6 +129,7 @@ export class DateService {
    */
   public getMonthStringFromMonth(offset: number): string {
     const date = this.actualDate;
+    date.setDate(1);
     date.setMonth(date.getMonth() + offset);
     return this.getMonthStringFromDate(date);
   }

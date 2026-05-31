@@ -1,5 +1,4 @@
 ---
-mode: agent
 description: Baut die Krido-App und deployed sie auf Firebase Hosting
 ---
 

@@ -22,11 +22,21 @@
 
   @if (allBudgets() === undefined) {
     <section class="home-section">
-      <h2 class="section-label">Budgets</h2>
-      <div class="d-flex justify-content-center py-4">
-        <div class="spinner-border" role="status">
-          <span class="visually-hidden">Lädt...</span>
-        </div>
+      <div class="skeleton skeleton--section-label mb-3"></div>
+      <div class="budget-cards">
+        @for (i of [1, 2]; track i) {
+          <div class="budget-card">
+            <div class="skeleton-budget-row">
+              <div class="skeleton skeleton--budget-name"></div>
+              <div class="skeleton skeleton--budget-limit"></div>
+            </div>
+            <div class="skeleton skeleton--progressbar"></div>
+            <div class="skeleton-budget-row mt-2">
+              <div class="skeleton skeleton--budget-sub"></div>
+              <div class="skeleton skeleton--budget-sub"></div>
+            </div>
+          </div>
+        }
       </div>
     </section>
   }

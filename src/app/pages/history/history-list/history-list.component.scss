@@ -1,3 +1,28 @@
+.total-amount {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  border-radius: var(--app-radius);
+  border: 1px solid var(--app-border);
+  background: var(--app-card-bg);
+  font-size: 14px;
+  color: var(--app-text-muted);
+
+  &__value {
+    font-weight: 600;
+    font-size: 15px;
+  }
+
+  &--positive &__value {
+    color: var(--bs-success);
+  }
+
+  &--negative &__value {
+    color: #c0595c;
+  }
+}
+
 .history-list {
   display: flex;
   flex-direction: column;

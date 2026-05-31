@@ -3,7 +3,9 @@ import { toSignal, toObservable } from '@angular/core/rxjs-interop';
 import {EntryService} from "../../../services/entry/entry.service";
 import {HelperService} from "../../../services/helper/helper.service";
 import {Entry} from "../../../../shared/interfaces/entry.model";
+import {EntryType} from "../../../../shared/enums/entry-type.enum";
 import {DateService} from "../../../services/date/date.service";
+import {PriceService} from "../../../services/price/price.service";
 import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {Account} from "../../../../shared/interfaces/account.model";
@@ -27,6 +29,7 @@ export class HistoryListComponent {
   private helperService = inject(HelperService);
   private dateService = inject(DateService);
   private ngbModal = inject(NgbModal);
+  public priceService = inject(PriceService);
 
   readonly historySearchObject = input<HistorySearchObject>();
 
@@ -34,6 +37,7 @@ export class HistoryListComponent {
 
   addOrEditEntryModalRef: NgbModalRef | undefined;
   selectedEntry: (Entry & { id: string }) | undefined;
+  readonly Math = Math;
 
   readonly entries = toSignal(
     toObservable(this.historySearchObject).pipe(
@@ -77,6 +81,13 @@ export class HistoryListComponent {
     ),
     { initialValue: [] as (Entry & { id: string })[] }
   );
+
+  /** The net total of all displayed entries (income - outcome). */
+  readonly totalAmount = computed(() => {
+    return this.entries().reduce((sum, entry) => {
+      return entry.type === EntryType.income ? sum + entry.value : sum - entry.value;
+    }, 0);
+  });
 
   readonly title = computed(() => {
     const search = this.historySearchObject();
